@@ -1,0 +1,107 @@
+<div class="cp-app-container" data-app="edit-user-perms">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+             	Moderator permissions
+            </h1>
+        </div>
+    </div>
+    <?php if (not_empty($cl["moder_data"])): ?>
+	    <div class="row">
+	        <div class="col-12">
+	            <div class="card">
+	                <div class="header">
+	                    <h2>
+	                        Edit (<?php echo $cl["moder_data"]["name"]; ?>) moderator accsess permissions
+	                    </h2>
+	                </div>
+	                <div class="body">
+	                	<div class="row">
+	                		<div class="col-md-4">
+	                			<a href="<?php echo $cl["moder_data"]["url"]; ?>" target="_blank" class="block-link">
+		                			<div class="user-card">
+				                		<div class="user-card__avatar">
+				                			<img src="<?php echo $cl["moder_data"]["avatar"]; ?>" alt="Image">
+				                		</div>
+				                		<div class="user-card__name">
+				                			<h3>
+				                				<?php echo $cl["moder_data"]["name"]; ?>
+				                			</h3>
+				                			<span>
+				                				@<?php echo $cl["moder_data"]["username"]; ?>
+				                			</span>
+				                		</div>
+				                		<div class="user-card__icon">
+				                			<?php echo cl_ficon("open"); ?>
+				                		</div>
+				                	</div>
+			                	</a>
+	                		</div>
+	                	</div>
+	                	
+	                	<div class="inline-alertbox-wrapper">
+	                        <div class="inline-alertbox info">
+	                            <div class="icon">
+	                                <?php echo cl_ficon("info"); ?>
+	                            </div>
+	                            <div class="alert-message">
+	                                <p>
+	                                    Please note that moderators will have full access to a specific admin section, including all section functionality, only if you, as the main admin, give them access rights.<br>
+
+	                                    To enable or disable rights to a specific section of the admin panel, find the corresponding item at the bottom and click on the switch, and then click on the save button at the bottom
+	                                </p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                   	<form class="form" data-an="form">	
+		            		<div class="row">
+		                		<?php foreach ($cl['morer_perms'] as $perms_key => $perms_data): ?>
+		            				<div class="col-6 mb-20">
+		            					<div class="form-switch-item">
+		            						<label class="form-check-label" for="label_<?php echo($perms_key); ?>">
+			                					<div class="form-check-label__text">
+			                						<h4>
+					                					<?php echo($perms_data["page_name"]); ?>
+					                				</h4>
+					                				<p>
+					                					<?php echo($perms_data["desc"]); ?>
+					                				</p>
+			                					</div>
+			                					<div class="form-check-label__ctrl">
+			                						<div class="form-check form-switch">
+													  <input class="form-check-input" <?php if(isset($cl["moder_perms"][$perms_key])) {echo "checked";} ?> name="<?php echo($perms_key); ?>" type="checkbox" id="label_<?php echo($perms_key); ?>">
+													</div>
+			                					</div>
+				                			</label>
+			                			</div>
+		            				</div>
+		                		<?php endforeach; ?>
+		            		</div>
+		            		<hr>
+		            		<div class="form-group no-mb">
+                                <button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                                    Save changes
+                                </button>
+                            </div>
+	            		</form>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+    <?php else: ?>
+    	<div class="card">
+            <div class="body">
+            	<h5>
+            		Ooops. Moderator not found
+            	</h5>
+            	<p>
+            		It seems that such a moderator does not exist on the site. Please make sure you go to the correct link and or start over
+            	</p>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+
+<?php if (not_empty($cl["moder_data"])): ?>
+	<?php echo cl_template('cpanel/assets/edit_user_perms/scripts/app_master_script'); ?>
+<?php endif; ?>

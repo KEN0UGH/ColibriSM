@@ -1,0 +1,112 @@
+<div class="cp-app-container" data-app="idrive-storage">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                iDrive S3
+            </h1>
+        </div>
+    </div>
+    <div class="card">
+        <div class="header">
+            <h2>
+                iDrive S3 Storage API settings
+            </h2>
+        </div>
+        <div class="body">
+            <form class="form" id="idrive-storage-settings">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="idrive3_storage-input">
+                            <label>
+                                iDrive S3 storage
+                            </label>
+                            <div class="form-line form-select">
+                                <select name="idrive3_storage" class="form-control">
+                                    <option value="on" <?php if($cl['config']['idrive3_storage'] == 'on') { echo('selected'); } ?>>Enabled</option>
+                                    <option value="off" <?php if($cl['config']['idrive3_storage'] == 'off') { echo('selected'); } ?>>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="idrive3_bucket_name-input">
+                            <label>
+                                iDrive bucket name
+                            </label>
+                            <div class="form-line">
+                                <input value="{%config idrive3_bucket_name%}" name="idrive3_bucket_name" type="text" class="form-control" placeholder="Enter iDS3 bucket name">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="idrive3_api_key-input">
+                            <label>
+                                iDrive S3 API key
+                            </label>
+                            <div class="form-line">
+                                <input value="{%config idrive3_api_key%}" name="idrive3_api_key" type="text" class="form-control" placeholder="Enter iDrive S3 API key">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="idrive3_api_secret_key-input">
+                            <label>
+                                iDrive S3 API secret key
+                            </label>
+                            <div class="form-line">
+                                <input value="{%config idrive3_api_secret_key%}" name="idrive3_api_secret_key" type="text" class="form-control" placeholder="Enter iDrive S3 API secret key">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="idrive3_bucket_region-input">
+                            <label>
+                                iDrive S3 bucket region
+                            </label>
+                            <div class="form-line form-select">
+                                <select name="idrive3_bucket_region" data-size="5" class="form-control">
+                                    <option value="us-west-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'us-west-1')   ? ' selected' : '';?> >us-west-1</option>
+                                    <option value="us-east-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'us-east-1')   ? ' selected' : '';?> >us-east-1</option>
+                                    <option value="us-east-2" <?php echo ($cl['config']['idrive3_bucket_region'] == 'us-east-2')   ? ' selected' : '';?> >us-east-2</option>
+                                    <option value="us-central-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'us-central-1')   ? ' selected' : '';?> >us-central-1</option>
+                                    <option value="ca-central-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'ca-central-1')   ? ' selected' : '';?> >ca-central-1</option>
+
+                                    <option value="eu-west-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'eu-west-1')   ? ' selected' : '';?> >eu-west-1</option>
+                                    <option value="eu-west-2" <?php echo ($cl['config']['idrive3_bucket_region'] == 'eu-west-2')   ? ' selected' : '';?> >eu-west-2</option>
+                                    <option value="eu-central-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'eu-central-1')   ? ' selected' : '';?> >eu-central-1</option>
+                                    <option value="eu-central-2" <?php echo ($cl['config']['idrive3_bucket_region'] == 'eu-central-2')   ? ' selected' : '';?> >eu-central-2</option>
+
+                                    <option value="ap-northeast-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'ap-northeast-1')   ? ' selected' : '';?> >ap-northeast-1</option>
+                                    <option value="ap-northeast-2" <?php echo ($cl['config']['idrive3_bucket_region'] == 'ap-northeast-2')   ? ' selected' : '';?> >ap-northeast-2</option>
+                                    <option value="ap-southeast-2" <?php echo ($cl['config']['idrive3_bucket_region'] == 'ap-southeast-2')   ? ' selected' : '';?> >ap-southeast-2</option>
+                                    <option value="ap-southeast-1" <?php echo ($cl['config']['idrive3_bucket_region'] == 'ap-southeast-1')   ? ' selected' : '';?> >ap-southeast-1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="idrive3_endpoint_url-input">
+                            <label>
+                                iDrive S3 endpoint URL
+                            </label>
+                            <div class="form-line">
+                                <input value="{%config idrive3_endpoint_url%}" name="idrive3_endpoint_url" type="text" class="form-control" placeholder="Enter iDrive S3 endpoint">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group no-mb">
+                    <button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                        Save changes
+                    </button>
+                </div>
+                <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+            </form>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/idrive_s3/scripts/app_master_script'); ?>

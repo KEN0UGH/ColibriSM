@@ -1,0 +1,71 @@
+<div class="cp-app-container" data-app="infobip_settings">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Infobip API settings
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Manage Infobip API settings
+                    </h2>
+                </div>
+                <div class="body">
+                    <form class="form" data-an="form">
+                    	<div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" data-an="infobip_api_key-input">
+                                    <label>
+                                        Infobip API Key
+                                    </label>
+                                    <div class="form-line">
+                                        <input value="{%config infobip_api_key%}" name="infobip_api_key" type="text" class="form-control" placeholder="Enter infobip API key">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" data-an="infobip_base_url-input">
+                                    <label>
+                                        Infobip Base URL
+                                    </label>
+                                    <div class="form-line">
+                                        <input value="{%config infobip_base_url%}" name="infobip_base_url" type="text" class="form-control" placeholder="Enter infobip base url">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" data-an="infobip_phone_number-input">
+                                    <label>
+                                        Phone number
+                                    </label>
+                                    <div class="form-line">
+                                        <input value="{%config infobip_phone_number%}" name="infobip_phone_number" type="text" class="form-control" placeholder="Enter infobip phone number">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <small class="info-feedback">
+                                        Infobip site address: <a href="https://www.infobip.com">https://www.infobip.com</a>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group no-mb">
+                       		<button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                                Save changes
+                            </button>
+                        </div>
+                        <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/infobip_settings/scripts/app_master_script'); ?>

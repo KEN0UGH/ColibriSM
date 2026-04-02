@@ -1,0 +1,12 @@
+body[dir="rtl"]{
+	&.cl-app-guest{
+		div.welcome-page{
+			div.welcome-page__body{
+				div.welcome-page__rp{
+					display: flex;
+					justify-content: flex-end;
+				}
+			}
+		}
+	}
+}

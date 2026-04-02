@@ -1,0 +1,72 @@
+<div class="timeline-container" data-app="confirm_phone">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp">
+				<div class="nav-link-holder">
+					<a href="<?php echo cl_link("confirm_phone"); ?>" data-spa="true">
+						<?php echo cl_translate("Confirm phone number"); ?>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link("/"); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<span class="go-back" onclick="SMColibri.go_back();">
+						<?php echo cl_ficon('arrow_back'); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="confirm-email">
+		<div class="timeline-placeholder">
+			<div class="icon">
+				<div class="icon__bg">
+					<?php echo cl_ficon('phone'); ?>
+				</div>
+			</div>
+			<div class="pl-message">
+				<h4>
+					<?php echo cl_translate("Phone confirmation"); ?>
+				</h4>
+				<p>
+					<?php echo cl_translate("Please check your phone, we have just sent you an SMS message with a new confirmation code to your new number, enter this code in the (Activation Code) field and click (Confirm)!"); ?>
+				</p>
+			</div>
+		</div>
+		<form class="form" id="vue-confirm-phone-app" v-on:submit="submit_form($event)">
+			<div class="form-body">
+				<div class="form-group">
+					<label>
+						<?php echo cl_translate("Activation code"); ?>
+					</label>
+					<input v-model.trim="$v.code.$model" type="number" name="code" class="form-control" placeholder="<?php echo cl_translate("Enter phone confirmation code"); ?> ...">
+					<div class="invalid-main-feedback" v-if="is_invalid_code">
+						{{invalid_feedback_code}}
+					</div>
+					<div class="invalid-main-feedback" v-else-if="unsuccessful_attempt">
+						<?php echo cl_translate("An error occurred while processing your request. Please try again later."); ?>
+					</div>
+				</div>
+				<div class="form-group no-mb">
+					<button v-if="done" disabled="true" class="btn btn-custom main-inline lg btn-block">
+						<?php echo cl_translate("Done! Please wait.."); ?>
+					</button>
+					<button v-else-if="submitting" disabled="true" class="btn btn-custom main-inline lg btn-block">
+						<?php echo cl_translate("Please wait"); ?>
+					</button>
+					<button v-else v-bind:disabled="is_invalid_form" class="btn btn-custom main-inline lg btn-block">
+						<?php echo cl_translate("Confirm phone number"); ?>
+					</button>
+				</div>
+			</div>
+			<input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+		</form>
+	</div>
+	
+	<?php echo cl_template("confirm_phone/scripts/app_master_script"); ?>
+</div>

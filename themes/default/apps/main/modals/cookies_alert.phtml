@@ -1,0 +1,42 @@
+<div class="cookie-alert" tabindex="-1" role="dialog" data-app="cookie-alert-app">
+    <div class="cookie-alert__inner">
+        <div class="cookie-message">
+            <div class="lp">
+                <h4>
+                    <?php echo cl_translate("This website uses cookies"); ?>
+                </h4>
+                <p>
+                    <?php echo cl_translate("_cookies_alert_", array(
+                        "link" => cl_html_el("a", cl_translate("Learn more"), array(
+                            "href" => cl_link("cookies_policy"),
+                            "target" => "_blank"
+                        ))
+                    )); ?>
+                </p>
+            </div>
+            <div class="rp">
+                <button class="btn btn-custom main-white lg" data-uiel="accept-cookies">
+                    <?php echo cl_translate("Accept cookies"); ?>
+                </button>
+                <button class="btn btn-custom main-white main-white-outline lg" data-href="<?php echo cl_link("cookies_policy"); ?>">
+                    <?php echo cl_translate("Learn more"); ?>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function($) {
+            $('[data-app="cookie-alert-app"]').find('[data-uiel="accept-cookies"]').on('click', function(e) {
+                $.ajax({
+                    url: '<?php echo cl_link("native_api/main/cua"); ?>',
+                    type: 'GET',
+                    dataType: 'json'
+                }).done(function() {
+                    $('[data-app="cookie-alert-app"]').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                });
+            });
+        });
+    </script>
+</div>

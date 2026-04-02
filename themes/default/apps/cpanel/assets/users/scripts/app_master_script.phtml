@@ -1,0 +1,260 @@
+<script>
+	"use strict";
+
+	$(document).ready(function($) {
+		var _app      = $('[data-app="users"]');
+        SMC_CPanel.PS = new Vue({
+            el: "#vue-cpanel-users-app",
+            data: {
+                total_users: <?php echo fetch_or_get($cl['total_users'], 0); ?>,
+                loading: false,
+                prev_ctrl: true,
+                next_ctrl: true,
+                init_data: "",
+                search_404: false,
+                sorting: {
+                    status: "all",
+                    type: "all",
+                    username: "",
+                    email: "",
+                    ip: "",
+                    country: "any"
+                }
+            },
+            computed: {
+                allow2reset: function() {
+                    if (this.sorting.status != "all" || this.sorting.country != "any") {
+                        return true;
+                    }
+
+                    else if (this.sorting.type != "all") {
+                        return true;
+                    }
+
+                    else if(this.sorting.username.length > 0 || this.sorting.email.length > 0) {
+                        return true;
+                    }
+
+                    else if(this.sorting.ip.length > 0) {
+                        return true;
+                    }
+
+                    else {
+                        return false;
+                    }
+                },
+                dis_prev_ctrl: function() {
+                    if (this.loading || this.prev_ctrl != true) {
+                        return true;
+                    }
+
+                    else {
+                        return false;
+                    }
+                },
+                dis_next_ctrl: function() {
+                    if (this.loading || this.next_ctrl != true) {
+                        return true;
+                    }
+
+                    else {
+                        return false;
+                    }
+                },
+                show_ctrls: function() {
+                    if (this.total_users > 0 && this.search_404 != true) {
+                        return true;
+                    }
+
+                    else {
+                        return false;
+                    }
+                }
+            },
+            methods: {
+                paginate: function(dir = false) {
+                    var _app_       = this;
+                    var users_list  = _app.find('[data-an="users-list"]');
+                    var offset_lt   = users_list.find('[data-list-item]').first().data('list-item');
+                    var offset_gt   = users_list.find('[data-list-item]').last().data('list-item');
+                    var filter_data = _app_.get_filter_data();
+
+                    $.ajax({
+                        url: '<?php echo cl_link("native_api/cpanel/get_users"); ?>',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            dir: dir,
+                            offset_lt: offset_lt, 
+                            offset_gt: offset_gt,
+                            filter: filter_data
+                        },
+                        beforeSend: function() {
+                            _app_.loading   = true;
+                            _app_.prev_ctrl = true;
+                            _app_.next_ctrl = true;
+
+                            SMC_CPanel.waitme("show");
+                        }
+                    }).done(function(data) {
+                        if (data.status == 200) {
+                            users_list.html(data.html);
+                        }
+                        else{
+                            if (dir == 'up') {
+                                _app_.prev_ctrl = false;
+                            }
+                            else{
+                                _app_.next_ctrl = false;
+                            }
+                        }
+                    }).always(function() {
+                        delay(function() {
+                            _app_.loading = false;
+
+                            SMC_CPanel.waitme();
+                        },500);
+                    });
+                },
+                filter_table: function(event) {
+
+                    if (event) {
+                        event.preventDefault();
+                    }
+
+                    var _app_       = this;
+                    var users_list  = _app.find('[data-an="users-list"]');
+                    var filter_data = _app_.get_filter_data();
+
+                    $.ajax({
+                        url: '<?php echo cl_link("native_api/cpanel/search_users"); ?>',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            filter: filter_data
+                        },
+                        beforeSend: function() {
+                            _app_.loading   = true;
+                            _app_.prev_ctrl = true;
+                            _app_.next_ctrl = true;
+
+                            SMC_CPanel.waitme("show");
+                        }
+                    }).done(function(data) {
+                        if (data.status != 200) {
+                            _app_.search_404 = true;
+                        }
+
+                        else{
+                           _app_.search_404 = false; 
+                        }
+
+                        if (data.html) {
+                            users_list.html(data.html);
+                        }
+                    }).always(function() {
+                        delay(function() {
+                            _app_.loading = false;
+
+                            SMC_CPanel.waitme();
+                        },500);
+                    });
+                },
+                get_filter_data: function() {
+                    var _app_       = this;
+                    var filter_data = Object({
+                        status: _app_.sorting.status,
+                        type: _app_.sorting.type,
+                        username: _app_.sorting.username,
+                        email: _app_.sorting.email,
+                        ip: _app_.sorting.ip,
+                        country: _app_.sorting.country 
+                    });
+
+                    return filter_data;
+                },
+                reset_form: function() {
+                    var _app_        = this;
+                    var users_list   = _app.find('[data-an="users-list"]');
+                    _app_.search_404 = false;
+                    _app_.loading    = false;
+                    _app_.prev_ctrl  = true;
+                    _app_.next_ctrl  = true;
+
+                    if (_app_.init_data) {
+                        users_list.html(_app_.init_data);
+                    }
+
+                    _app_.sorting = Object({
+                        type: "all",
+                        status: "all",
+                        username: "",
+                        email: "",
+                        ip: "",
+                        country: "any"
+                    });
+                },
+                toggle_status: function(id = false) {
+                    if ($.isNumeric(id) && id) {
+                        $.ajax({
+                            url: '<?php echo cl_link("native_api/cpanel/toggle_user_status"); ?>',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: id},
+                        }).done(function(data) {
+                            if (data.message) {
+                                cl_bs_notify(data.message);
+                            }
+                        });
+                    }
+                },
+                toggle_type: function(id = false) {
+                    if ($.isNumeric(id) && id) {
+                        $.ajax({
+                            url: '<?php echo cl_link("native_api/cpanel/toggle_user_type"); ?>',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: id},
+                        }).done(function(data) {
+                            if (data.message) {
+                                cl_bs_notify(data.message);
+                            }
+
+                            var users_list_item = _app.find('[data-an="users-list"]').find(`[data-list-item="${id}"]`);
+                            const link_el = `
+                            <a href="<?php echo cl_link("admin_panel/edit_user_perms?moder="); ?>${id}" class="dropdown-item" data-el="edit-moder-permissions">
+                                Edit permissions
+                            </a>`;
+
+                            if (data.redirect) {
+                                users_list_item.find("div.dropdown-menu").prepend(link_el);
+                            }
+                            else{
+                                users_list_item.find('[data-el="edit-moder-permissions"]').remove();
+                            }
+                        });
+                    }
+                },
+                verify_user: function(id = false) {
+                    if ($.isNumeric(id) && id) {
+                        $.ajax({
+                            url: '<?php echo cl_link("native_api/cpanel/verify_user"); ?>',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: id},
+                        }).done(function(data) {
+                            if (data.message) {
+                                cl_bs_notify(data.message);
+                            }
+                        });
+                    }
+                }
+            },
+            mounted: function() {
+                var _app_       = this;
+                var users_list  = _app.find('[data-an="users-list"]');
+                _app_.init_data = users_list.html();
+            }
+        });
+	});
+</script>

@@ -1,0 +1,260 @@
+<div class="timeline-container">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp">
+				<div class="nav-link-holder">
+					<a href="<?php echo cl_link("settings/gender"); ?>" data-spa="true">
+						<?php echo cl_translate("Monetization"); ?>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link("home"); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<span class="go-back" onclick="SMColibri.go_back();">
+						<?php echo cl_ficon('arrow_back'); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="profile-settings">
+		<div class="profile-settings__content">
+			<div class="settings-form">
+				<form class="form" id="cl-monetization-settings-vue-app" v-on:submit="submit_form($event)">
+					<div class="form-group">
+                        <div class="form-toggle">
+                            <div class="form-toggle__lp">
+                                <?php echo cl_ficon("receipt_money"); ?>
+                            </div>
+                            <div class="form-toggle__mp">
+                                <span class="form-toggle__title">
+                                    <?php echo cl_translate("Content monetization"); ?>
+                                </span>
+                                <span class="form-toggle__desc">
+                                    <?php echo cl_translate("Toggle account content monetization system"); ?>
+                                </span>
+                            </div>
+                            <div class="form-toggle__rp">
+                                <div class="form-switch">
+                                    <input name="monitiz_status" v-on:change="monitiz_status = $event.target.value" v-bind:checked="monitiz_status == 'Y'" type="checkbox" class="form-check-input" <?php if(not_empty($me["settings"]["notifs"]["like"])) {echo("checked");} ?>>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+					<div class="form-group no-mb">
+                        <label>
+                            <?php echo cl_translate("Subscription price"); ?> / <?php echo cl_translate("Monthly"); ?>
+                        </label>
+	                    <input v-model.trim="$v.price.$model" type="text" class="form-control" name="price" placeholder="<?php echo cl_translate("Enter subscription price"); ?>">
+                    	<div class="invalid-main-feedback" v-if="is_invalid_price">
+                    		<?php echo cl_translate("Please correct subscription price"); ?>
+                    	</div>
+                    </div>
+                    <div class="form-group" v-if="unsuccessful_attempt">
+                        <div class="invalid-main-feedback">
+                            <?php echo cl_translate("Something went wrong while trying to save your changes, please try again later"); ?>
+                        </div>
+                    </div>
+                    <div class="form-group" v-else>
+                        <div class="form-info-label">
+                            <?php echo cl_translate("Please indicate the monthly amount you'd like subscribers to pay in order to see your content on your account"); ?>
+                        </div>
+                    </div>
+                    <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+                    <div class="form-group no-mb d-flex">
+                    	<button v-if="submitting != true" v-bind:disabled="is_invalid_form" type="submit" class="btn ml-auto btn-custom main-inline lg">
+	                        <?php echo cl_translate("Save changes"); ?>
+	                    </button>
+	                    <button v-else disabled="true" type="button" class="btn btn-custom main-inline lg ml-auto">
+	                        <?php echo cl_translate("Please wait"); ?>
+	                    </button>
+                    </div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="timeline-navbar timeline-navbar_border-top">
+		<div class="timeline-navbar__item">
+			<a href="<?php echo cl_link("settings/cont_monetization/active_sub"); ?>" data-spa="true">
+				<button class="timeline-navbar__item-btn <?php if($cl['page_tab'] == 'active_sub') {echo('active');} ?>">
+					<span class="btn-flex-inner">
+						<?php echo($cl["profile_total_active_subs"]); ?> <?php echo cl_translate("Active subscribers"); ?>
+					</span>
+				</button>
+			</a>
+		</div>
+		<div class="timeline-navbar__item">
+			<a href="<?php echo cl_link("settings/cont_monetization/inactive_sub"); ?>" data-spa="true">
+				<button class="timeline-navbar__item-btn <?php if($cl['page_tab'] == 'inactive_sub') {echo('active');} ?>">
+					<span class="btn-flex-inner">
+						<?php echo($cl["profile_total_inactive_subs"]); ?> <?php echo cl_translate("Inactive subscribers"); ?>
+					</span>
+				</button>
+			</a>
+		</div>
+	</div>
+
+	<?php if (not_empty($cl["profile_subscribers"])): ?>
+		<div data-app="profile-subscribers">
+			<div class="timeline-users-container">
+				<div class="timeline-user-ls" data-an="subscriptions-list">
+					<?php foreach ($cl["profile_subscribers"] as $cl['li']): ?>
+						<?php echo cl_template('settings/includes/monetization/user_li'); ?>
+					<?php endforeach; ?>
+				</div>
+			</div>
+
+			<?php if (count($cl["profile_subscribers"]) > 20): ?>
+				<div class="timeline-data-loader">
+					<button class="timeline-data-loader__btn" data-an="load-more">
+						<?php echo cl_translate("Show more"); ?>
+					</button>
+				</div>
+			<?php endif; ?>
+		</div>
+	<?php else: ?>
+		<?php if ($cl["page_tab"] == "active_sub"): ?>
+			<div class="timeline-placeholder">
+				<div class="pl-message">
+					<h4>
+						<?php echo cl_translate("No active subscribers yet!"); ?>
+					</h4>
+					<p>
+						<?php echo cl_translate("It looks like you don't have any active subscribers yet. All active subscribers of your profile will be shown here"); ?>
+					</p>
+				</div>
+			</div>
+		<?php else: ?>
+			<div class="timeline-placeholder">
+				<div class="pl-message">
+					<h4>
+						<?php echo cl_translate("No inactive subscribers yet!"); ?>
+					</h4>
+					<p>
+						<?php echo cl_translate("It looks like you don't have any inactive subscribers yet. All inactive subscribers of your profile will be shown here"); ?>
+					</p>
+				</div>
+			</div>
+		<?php endif; ?>
+	<?php endif; ?>
+
+	<script>
+		"use strict";
+
+		$(document).ready(function($) {
+			Vue.use(window.vuelidate.default);
+			var VueValids = window.validators;
+
+			new Vue({
+				el: "#cl-monetization-settings-vue-app",
+				data: {
+					submitting: false,
+					unsuccessful_attempt: false,
+					price: <?php echo $me["subscription_price"]; ?>,
+					monitiz_status: "<?php echo $me["cont_monetization"]; ?>"
+				},
+				computed: {
+					is_invalid_price: function() {
+						if (this.$v.price.required && this.$v.price.$invalid) {
+							return true;
+						}
+
+						else{
+							return false;
+						}
+					},
+					is_invalid_form: function() {
+						if (this.$v.$invalid) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+				},
+				validations: {
+					price: {
+						required: VueValids.required,
+						is_num: VueValids.decimal,
+						min_val: VueValids.minValue(0.1)
+					}
+				},
+				methods: {
+					submit_form: function(_self = null) {
+						_self.preventDefault();
+
+						var _app_ = this;
+
+						$(_self.target).ajaxSubmit({
+							url: "<?php echo cl_link("native_api/settings/save_monitiz_settings"); ?>",
+							type: 'POST',
+							dataType: 'json',
+							beforeSend: function() {
+								_app_.submitting = true;
+								_app_.unsuccessful_attempt = false;
+							},
+							success: function(data) {
+								if (data.status == 200) {
+									cl_bs_notify("<?php echo cl_translate("Your changes has been successfully saved!"); ?>", 5000, "success");
+								}
+
+								else {
+									_app_.unsuccessful_attempt = true;
+								}
+							},
+							complete: function() {
+								_app_.submitting = false;
+							}
+						});
+					}
+				},
+				mounted: function() {
+					var _app_ = this;
+
+					if (cl_empty(_app_.price)) {
+						_app_.price = "";
+					}
+				}
+			});
+
+			var _app = $('div[data-app="profile-subscribers"]');
+
+			_app.find('button[data-an="load-more"]').on('click', function(event) {
+				event.preventDefault();
+				var users_ls = _app.find('[data-an="subscriptions-list"]');
+				var last_li = users_ls.find('div[data-list-item]').last();
+				var _self = $(this);
+
+				if (last_li.length) {
+					$.ajax({
+						url: "<?php echo cl_link("native_api/monetization/load_more"); ?>",
+						type: 'GET',
+						dataType: 'json',
+						data: {
+							offset: last_li.data('list-item'),
+							subs_type: "<?php echo $cl["page_tab"]; ?>"
+						},
+						beforeSend: function(){
+							_self.attr('disabled', 'true').text("<?php echo cl_translate("Please wait"); ?>");
+						}
+					}).done(function(data) {
+						if (data.status == 200) {
+							users_ls.append(data.html);
+
+							_self.removeAttr('disabled').text("<?php echo cl_translate("Show more"); ?>");
+						}
+
+						else {
+							_self.text("<?php echo cl_translate("That is all for now!"); ?>");
+						}
+					});
+				}
+			});
+		});
+	</script>
+</div>

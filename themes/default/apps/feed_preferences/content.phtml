@@ -1,0 +1,121 @@
+<div class="timeline-container">
+	<div class="timeline-header" data-el="tl-header">
+        <div class="timeline-header__botline">
+    		<div class="lp">
+    			<div class="nav-link-holder">
+    				<a href="<?php echo cl_link("settings/feed_preferences"); ?>" data-spa="true">
+    					<?php echo cl_translate("Feed preferences"); ?>
+    				</a>
+    			</div>
+    		</div>
+    		<div class="cp">
+    			<a href="<?php echo cl_link("home"); ?>">
+    				<img src="{%config site_logo%}" alt="Logo">
+    			</a>
+    		</div>
+    		<div class="rp">
+    			<div class="nav-link-holder">
+    				<span class="go-back" onclick="SMColibri.go_back();">
+    					<?php echo cl_ficon('arrow_back'); ?>
+    				</span>
+    			</div>
+    		</div>
+        </div>
+	</div>
+	<div class="profile-settings">
+		<div class="profile-settings__content">
+			<div class="settings-form">
+				<form class="form" id="cl-feed-preferences-vue-app" v-on:submit="submit_form($event)">
+					<div class="form-group no-mb">
+                        <div class="form-toggle">
+                            <div class="form-toggle__lp">
+                                <?php echo cl_ficon("news"); ?>
+                            </div>
+                            <div class="form-toggle__mp">
+                                <span class="form-toggle__title">
+                                    <?php echo cl_translate("Recommended posts"); ?>
+                                </span>
+                                <span class="form-toggle__desc">
+                                    <?php echo cl_translate("Toggle to show/hide recommended posts in your feed"); ?>
+                                </span>
+                            </div>
+                            <div class="form-toggle__rp">
+                                <div class="form-switch">
+                                    <input name="feed_rec_status" value="on" <?php if($me["rec_feed"] == "on") {echo "checked";} ?> type="checkbox" class="form-check-input">
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" v-if="unsuccessful_attempt">
+                        <div class="invalid-main-feedback">
+                            <?php echo cl_translate("Something went wrong while trying to save your changes, please try again later"); ?>
+                        </div>
+                    </div>
+                    <div class="form-group" v-else>
+                        <div class="form-info-label">
+                            <?php echo cl_translate("Enabling this option will personalize your feed with featured posts"); ?>
+                        </div>
+                    </div>
+                    <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+                    <div class="form-group d-flex">
+                    	<button v-if="submitting != true" type="submit" class="btn btn-custom main-inline lg ml-auto">
+	                        <?php echo cl_translate("Save changes"); ?>
+	                    </button>
+	                    <button v-else disabled="true" type="button" class="btn btn-custom main-inline lg ml-auto">
+	                        <?php echo cl_translate("Please wait"); ?>
+	                    </button>
+                    </div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		"use strict";
+
+		$(document).ready(function($) {
+			Vue.use(window.vuelidate.default);
+			var VueValids = window.validators;
+
+			new Vue({
+				el: "#cl-feed-preferences-vue-app",
+				data: {
+					submitting: false,
+					unsuccessful_attempt: false
+				},
+				methods: {
+					submit_form: function(_self = null) {
+						_self.preventDefault();
+
+						var _app_ = this;
+
+						$(_self.target).ajaxSubmit({
+							url: "<?php echo cl_link("native_api/settings/save_feed_preferences_settings"); ?>",
+							type: 'POST',
+							dataType: 'json',
+                            data: {
+                            },
+							beforeSend: function() {
+								_app_.submitting = true;
+								_app_.unsuccessful_attempt = false;
+							},
+							success: function(data) {
+								if (data.status == 200) {
+									cl_bs_notify("<?php echo cl_translate("Your changes has been successfully saved!"); ?>", 5000, "success");
+								}
+								else{
+									_app_.unsuccessful_attempt = true;
+								}
+							},
+							complete: function() {
+								_app_.submitting = false;
+							}
+						});
+					}
+				}
+			});
+		});
+	</script>
+</div>
+
+

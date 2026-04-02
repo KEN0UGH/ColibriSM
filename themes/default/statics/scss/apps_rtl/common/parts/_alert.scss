@@ -1,0 +1,12 @@
+div.timeline-alert-container{
+	div.timeline-alert{
+		div.timeline-alert__icon{
+			order: -1;
+		}
+
+		div.timeline-alert__text{
+			margin-right: var(--cl-primary-offset-size);
+			text-align: right;
+		}
+	}
+}

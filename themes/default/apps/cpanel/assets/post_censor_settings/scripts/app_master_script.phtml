@@ -1,0 +1,29 @@
+<script>
+	"use strict";
+
+	$(document).ready(function($) {
+		var _app  = $('[data-app="posts-censor-settings"]');
+		var _data = _app.find('form[data-an="form"]');
+
+		_data.ajaxForm({
+			url: '<?php echo cl_link("native_api/cpanel/post_censor_settings"); ?>',
+			type: 'POST',
+			dataType: 'json',
+			beforeSend: function() {
+				_data.find('small.invalid-feedback').remove();
+				_data.find('[data-an="submit-ctrl"]').attr('disabled', 'true').text("Please wait");
+			},
+			success: function(data) {
+				if (data.status == 200) {
+					cl_bs_notify("Your changes have been saved successfully!", 3000);
+				}
+				else {
+					cl_bs_notify("Something went wrong while trying to store a list of censored words in a local database. Make sure file: (core/loc_db/censor_words.csv) is writable.", 7000, "danger");
+				}
+			},
+			complete: function() {
+				_data.find('[data-an="submit-ctrl"]').removeAttr('disabled').text("Save changes");
+			}
+		});
+	});
+</script>

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sass -w master.styles.scss:../css/master.styles.css

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sass -w install.master.style.scss:../install.master.style.css
+

@@ -1,0 +1,57 @@
+<div class="collage-grid mb-2">
+	<div class="collage-grid__item">
+		<a href="<?php echo cl_get_media($cl['li']['media'][0]['src']); ?>" class="fbox-media" data-fancybox="fbox-media-<?php echo($cl['li']['id']); ?>">
+			<div class="image-collage-item">
+				<div class="lozad-media">
+					<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($cl['li']['media'][0]['is_safe'], "Y")); ?>">
+						<img class="d-block w-100 lozad" data-src="<?php echo cl_get_media($cl['li']['media'][0]['x']['image_thumb']); ?>" alt="Image">
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+	<div class="collage-grid__item">
+		<a href="<?php echo cl_get_media($cl['li']['media'][1]['src']); ?>" class="fbox-media" data-fancybox="fbox-media-<?php echo($cl['li']['id']); ?>">
+			<div class="image-collage-item">
+				<div class="lozad-media">
+					<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($cl['li']['media'][1]['is_safe'], "Y")); ?>">
+						<img class="d-block w-100 lozad" data-src="<?php echo cl_get_media($cl['li']['media'][1]['x']['image_thumb']); ?>" alt="Image">
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+<a href="<?php echo cl_get_media($cl['li']['media'][2]['src']); ?>" class="fbox-media" data-fancybox="fbox-media-<?php echo($cl['li']['id']); ?>">
+	<div class="image-collage-item">
+		<div class="lozad-media">
+			<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($cl['li']['media'][2]['is_safe'], "Y")); ?>">
+				<img class="d-block w-100 lozad" data-src="<?php echo cl_get_media($cl['li']['media'][2]['src']); ?>" alt="Image">
+			</div>
+		</div>
+	</div>
+</a>
+<div class="collage-grid mt-2">
+	<div class="collage-grid__item">
+		<a href="<?php echo cl_get_media($cl['li']['media'][3]['src']); ?>" class="fbox-media" data-fancybox="fbox-media-<?php echo($cl['li']['id']); ?>">
+			<div class="image-collage-item">
+				<div class="lozad-media">
+					<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($cl['li']['media'][3]['is_safe'], "Y")); ?>">
+						<img class="d-block w-100 lozad" data-src="<?php echo cl_get_media($cl['li']['media'][3]['x']['image_thumb']); ?>" alt="Image">
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+	<div class="collage-grid__item">
+		<a href="<?php echo cl_get_media($cl['li']['media'][4]['src']); ?>" class="fbox-media" data-fancybox="fbox-media-<?php echo($cl['li']['id']); ?>">
+			<div class="image-collage-item">
+				<div class="lozad-media">
+					<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($cl['li']['media'][4]['is_safe'], "Y")); ?>">
+						<img class="d-block w-100 lozad" data-src="<?php echo cl_get_media($cl['li']['media'][4]['x']['image_thumb']); ?>" alt="Image">
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>

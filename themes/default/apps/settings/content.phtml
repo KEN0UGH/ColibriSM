@@ -1,0 +1,447 @@
+<div class="timeline-container">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp">
+				<div class="nav-link-holder">
+					<a href="<?php echo cl_link("settings"); ?>" data-spa="true">
+						<?php echo cl_translate("Account settings"); ?>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link("home"); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<span class="go-back" onclick="SMColibri.go_back();">
+						<?php echo cl_ficon('arrow_back'); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="profile-settings">
+		<?php if ($me["is_premium"] == "1" && $cl["config"]["prem_account_system_status"] == "on"): ?>
+			<div class="profile-settings__title">
+				<h4><?php echo cl_translate("Premium account settings"); ?></h4>
+			</div>
+			<a href="<?php echo cl_link("premium_features"); ?>" class="profile-settings__link" data-spa="true">
+				<div class="nav-list-item">
+					<div class="lp">
+						<?php echo cl_ficon("premium"); ?>
+					</div>
+					<div class="mp">
+						<span class="preview-label">
+							<?php echo cl_translate("Premium features"); ?>
+						</span>
+						<span class="preview-value">
+							<?php echo cl_translate("Premium features"); ?>
+						</span>
+					</div>
+					<div class="rp">
+						<?php echo cl_ficon("open"); ?>
+					</div>
+				</div>
+			</a>
+		<?php endif; ?>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("Monetization"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/cont_monetization"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("receipt_money"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("Content monetization settings"); ?>
+					</span>
+
+					<?php if ($me["cont_monetization"] == "Y"): ?>
+						<span class="preview-value">
+							<?php echo cl_translate("Monetization is enabled"); ?>
+						</span>
+					<?php else: ?>
+						<span class="preview-value">
+							<?php echo cl_translate("Monetization is disabled"); ?>
+						</span>
+					<?php endif; ?>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("General profile settings"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/name"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("person"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("Username"); ?>
+					</span>
+					<span class="preview-value">
+						<?php echo $me['name']; ?> - @<?php echo $me['username']; ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<a href="<?php echo cl_link("settings/email"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("mail"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("Email address"); ?></span>
+					<span class="preview-value">
+						<?php if (empty($me['email'])): ?>
+							<?php echo cl_translate("You haven't set your email address yet"); ?>
+						<?php else: ?>
+							<?php echo $me['email']; ?>
+						<?php endif; ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<?php if ($cl["config"]["signup_conf_system"] == "phone"): ?>
+			<a href="<?php echo cl_link("settings/phone"); ?>" class="profile-settings__link" data-spa="true">
+				<div class="nav-list-item">
+					<div class="lp">
+						<?php echo cl_ficon("phone"); ?>
+					</div>
+					<div class="mp">
+						<span class="preview-label"><?php echo cl_translate("Phone number"); ?></span>
+						<span class="preview-value">
+							<?php if (empty($me['phone'])): ?>
+								<?php echo cl_translate("You haven't set your phone number yet"); ?>
+							<?php else: ?>
+								<?php echo $me['phone']; ?>
+							<?php endif; ?>
+						</span>
+					</div>
+					<div class="rp">
+						<?php echo cl_ficon("open"); ?>
+					</div>
+				</div>
+			</a>
+		<?php endif; ?>
+		<a href="<?php echo cl_link("settings/social_links"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 32 32" width="32px" height="32px"><path d="M 16 4 C 9.3844276 4 4 9.3844276 4 16 C 4 22.615572 9.3844276 28 16 28 C 22.615572 28 28 22.615572 28 16 C 28 9.3844276 22.615572 4 16 4 z M 16 6 C 21.534692 6 26 10.465308 26 16 C 26 21.027386 22.311682 25.161277 17.488281 25.878906 L 17.488281 18.916016 L 20.335938 18.916016 L 20.783203 16.023438 L 17.488281 16.023438 L 17.488281 14.443359 C 17.488281 13.242359 17.882859 12.175781 19.005859 12.175781 L 20.810547 12.175781 L 20.810547 9.6523438 C 20.493547 9.6093438 19.822688 9.515625 18.554688 9.515625 C 15.906688 9.515625 14.355469 10.913609 14.355469 14.099609 L 14.355469 16.023438 L 11.632812 16.023438 L 11.632812 18.916016 L 14.355469 18.916016 L 14.355469 25.853516 C 9.6088556 25.070647 6 20.973047 6 16 C 6 10.465308 10.465308 6 16 6 z"/></svg>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("Social links"); ?>
+					</span>
+					<span class="preview-value">
+						<?php echo cl_translate("Your social network links"); ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<a href="<?php echo cl_link("settings/siteurl"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("link"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("Website URL address"); ?></span>
+					<span class="preview-value">
+						<?php if (empty($me['website'])): ?>
+							<?php echo cl_translate("You have not yet determined the URL of your site"); ?>
+						<?php else: ?>
+							<?php echo $me['website']; ?>
+						<?php endif; ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<a href="<?php echo cl_link("settings/bio"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("text"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("About you"); ?></span>
+					<span class="preview-value">
+						<?php if (empty($me['about'])): ?>
+							<?php echo cl_translate("The field with information about you is still empty"); ?>
+						<?php else: ?>
+							<?php echo $me['about']; ?>
+						<?php endif; ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<a href="<?php echo cl_link("settings/gender"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("person_question"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("Your gender"); ?></span>
+					<span class="preview-value">
+						<?php if ($me['gender'] == 'M'): ?>
+							<?php echo cl_translate("Male"); ?>
+						<?php elseif($me['gender'] == 'F'): ?>
+							<?php echo cl_translate("Female"); ?>
+						<?php elseif($me['gender'] == 'T'): ?>
+							<?php echo cl_translate("They"); ?>
+						<?php elseif($me['gender'] == 'O'): ?>
+							<?php echo cl_translate("Other"); ?>
+						<?php endif; ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("User password"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/password"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("password"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("My password"); ?>
+					</span>
+					<span class="preview-value">
+						<?php echo cl_translate("Click to set your account password"); ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("Language and Country"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/language"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("translate"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("Display language"); ?>
+					</span>
+					<span class="preview-value">
+						<?php if (isset($cl["languages"][$me['language']])): ?>
+							<?php echo cl_translate($cl["languages"][$me['language']]["name"]); ?>
+						<?php else: ?>
+							<?php echo cl_translate($cl["curr_lang"]["lang_data"]["name"]); ?>
+						<?php endif; ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<a href="<?php echo cl_link("settings/country"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("flag"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("The country in which you live"); ?></span>
+					<span class="preview-value">
+						<?php echo($me['country_name']); ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<a href="<?php echo cl_link("settings/city"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("city"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("Your State / City / Location"); ?></span>
+					<span class="preview-value">
+						<?php if (empty($me['city'])): ?>
+							<?php echo cl_translate("Click to set your city name"); ?>
+						<?php else: ?>
+							<?php echo $me['city']; ?>
+						<?php endif; ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("Account verification"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/verification"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("checkmark_circle"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("Verify my account"); ?></span>
+					<span class="preview-value">
+						<?php echo cl_translate("Click to submit a verification request"); ?> 
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("Account privacy settings"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/privacy"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("shield"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("Account privacy"); ?>
+					</span>
+					<span class="preview-value">
+						<?php echo cl_translate("Click to set your account privacy"); ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("Notifications settings"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/notifications"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("notifications"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("Notifications"); ?>
+					</span>
+					<span class="preview-value">
+						<?php echo cl_translate("Click to set up account notifications"); ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<?php if ($cl["config"]["email_notifications"] == "on"): ?>
+			<a href="<?php echo cl_link("settings/email_notifs"); ?>" class="profile-settings__link" data-spa="true">
+				<div class="nav-list-item">
+					<div class="lp">
+						<?php echo cl_ficon("mail_alert"); ?>
+					</div>
+					<div class="mp">
+						<span class="preview-label">
+							<?php echo cl_translate("Email notifications"); ?>
+						</span>
+						<span class="preview-value">
+							<?php echo cl_translate("Click to set up account email notification settings"); ?>
+						</span>
+					</div>
+					<div class="rp">
+						<?php echo cl_ficon("open"); ?>
+					</div>
+				</div>
+			</a>
+		<?php endif; ?>
+		<?php if (not_empty($cl["blocked_users"])): ?>
+			<a href="<?php echo cl_link("settings/blocked"); ?>" class="profile-settings__link" data-spa="true">
+				<div class="nav-list-item">
+					<div class="lp">
+						<?php echo cl_ficon("block"); ?>
+					</div>
+					<div class="mp">
+						<span class="preview-label">
+							<?php echo cl_translate("Blocked users"); ?>
+						</span>
+						<span class="preview-value">
+							<?php echo cl_translate("Click to manage blocked users"); ?>
+						</span>
+					</div>
+					<div class="rp">
+						<?php echo cl_ficon("open"); ?>
+					</div>
+				</div>
+			</a>
+		<?php endif; ?>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("My account information"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/information"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("arrow_download"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("Download my information"); ?></span>
+					<span class="preview-value">
+						<?php echo cl_translate("Please choose what information you want to download"); ?> 
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate("Delete profile"); ?></h4>
+		</div>
+		<a href="<?php echo cl_link("settings/delete"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("delete"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label"><?php echo cl_translate("Delete profile"); ?></span>
+					<span class="preview-value">
+						<?php echo cl_translate("Click to confirm deletion of your profile"); ?> 
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+
+
+

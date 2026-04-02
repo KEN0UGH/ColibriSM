@@ -1,0 +1,141 @@
+<div class="modal fadeIn" data-app="donate-post" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false" data-backdrop="static" data-onclose="remove">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+			<div class="modal-header">
+                <div class="modal-header__inner">
+                    <h5 class="modal-title">
+                        <?php echo cl_translate("Donate to {@name@}", array("name" => $cl['post_data']["owner"]["name"])); ?>
+                    </h5>
+                    <span class="dismiss-modal" data-dismiss="modal">
+                        <?php echo cl_ficon('dismiss'); ?>
+                    </span>
+                </div>
+            </div>
+            <div class="modal-body">
+                 <form class="form" id="vue-pubbox-app-donation" v-on:submit="submit_form($event)">
+                    <div class="timeline-donate">
+                        <div class="timeline-donate__header">
+                            <div class="modal-balance-widget">
+                                <span>
+                                    <?php echo cl_translate("Your account avaliable funds"); ?>
+                                </span>
+                                <h3><?php echo cl_money($me["wallet"]); ?></h3>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <?php echo cl_translate("Enter amount"); ?>
+                                </label>
+                                <input type="number" v-model.trim="donate_amount" min="0" max="20000" class="form-control" name="donate_amount" placeholder="<?php echo cl_money("0.00"); ?>">
+                            </div>
+                            <div class="form-group">
+                                <div v-if="donate_exceed_balance" class="invalid-main-feedback">
+                                    <?php echo cl_translate("The amount of donation you entered exceeds the available balance of your wallet"); ?>
+                                </div>
+                                <div v-else class="form-info-label">
+                                    <?php echo cl_translate("Enter the amount of money you want to donate and click (Send donation), the money will be deducted from your wallet"); ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-donate__footer">
+                            <button v-if="submitting" disabled="true" type="button" class="btn btn-block btn-custom main-green lg d-none">
+                                <?php echo cl_translate("Please wait"); ?>
+                            </button>
+                            <button v-else type="submit" v-bind:disabled="is_valid_form != true" class="btn btn-block btn-custom main-green lg">
+                                <?php echo cl_translate("Send donation"); ?>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+                </form>
+                <script>
+                    "use strict";
+
+                    $(document).ready(function() {
+                        new Vue({
+                            el: "#vue-pubbox-app-donation",
+                            data: {
+                                donate_amount: "",
+                                submitting: false,
+                                donate_exceed_balance: false,
+                                curr_balance: <?php echo $me["wallet"]; ?>
+                            },
+                            computed: {
+                                is_valid_form: function() {
+                                    if (this.donate_amount && this.donate_exceed_balance == false) {
+                                        return true;
+                                    }
+                                    else{
+                                        return false;
+                                    }
+                                }
+                            },
+                            methods: {
+                                submit_form: function(_self = null) {
+                                    _self.preventDefault();
+
+                                    var form  = $(_self.$el);
+                                    var _app_ = this;
+
+                                    $(_self.target).ajaxSubmit({
+                                        url: "<?php echo cl_link("native_api/donate/send_donation"); ?>",
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        data: {
+                                            id: <?php echo $cl['post_data']['id']; ?>
+                                        },
+                                        beforeSend: function() {
+                                            _app_.submitting = true;
+                                        },
+                                        success: function(data) {
+                                            if (data.status == 200) {
+                                                cl_bs_notify("<?php echo cl_translate("Your donation to {@name@} has been successfully sent", array("name" => $cl['post_data']["owner"]["name"])); ?>", 5000, "success");
+
+                                                if(SMColibri.curr_pn == "thread") {
+                                                    var _post_ = $('[data-an="thread-data"]');
+                                                }
+                                                else{
+                                                    var _post_ = $('div[data-list-item="{0}"]'.format(<?php echo $cl['post_data']['id']; ?>));
+                                                }
+                                                
+                                                _post_.find('[data-an="donation-raised"]').text(data.stats.donation_raised);
+                                                _post_.find('[data-an="donation-raised-percent"]').css("width", data.stats.donation_raised_percent + "%");
+                                                _post_.find('[data-an="donations-total"]').text(data.stats.donations_total);
+                                                _post_.find('[data-an="donations-left-amount"]').text(data.stats.donations_left_amount);
+                                            }
+
+                                            else if(data.status == 415) {
+                                                cl_bs_notify("<?php echo cl_translate("Sorry, but the user's wallet is temporarily disabled, and therefore you cannot complete this payment for the time being. Contact support if you have questions"); ?>", 5000, "warning");
+                                            }
+
+                                            else {
+                                                _app_.submitting = false;
+                                                SMColibri.errorMSG();
+                                            }
+                                        },
+                                        complete: function() {
+                                            _app_.submitting = false;
+
+                                            $('div[data-app="donate-post"]').modal('hide');
+                                        }
+                                    });
+                                }
+                            },
+                            updated: function() {
+                                var _app_ = this;
+
+                                if (Number(_app_.donate_amount) > Number(_app_.curr_balance)) {
+                                    _app_.donate_exceed_balance = true;
+                                }
+
+                                else{
+                                    _app_.donate_exceed_balance = false;
+                                }
+                            }
+                        });
+                    });
+                </script>      
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="conversation-messages__item <?php echo($cl['li']['side']); ?>" data-list-item="<?php echo($cl['li']['id']); ?>" <?php if(not_empty($cl['li']['html_attrs'])) { echo($cl['li']['html_attrs']); }; ?>>
+	<div class="message-data">
+		<div class="message-data__body">
+			<?php if ($cl['li']['media_type'] == "none"): ?>
+				<div class="message-text">
+					<?php echo($cl['li']['message']); ?>
+				</div>
+			<?php else: ?>
+				<?php if ($cl['li']['media_type'] == "image"): ?>
+					<div class="message-media">
+						<a class="image-wrapper fbox-media" data-fancybox="images" href="<?php echo($cl['li']['media_file']); ?>">
+							<img src="<?php echo($cl['li']['media_file']); ?>" alt="Image">
+						</a>
+					</div>
+				<?php elseif ($cl['li']['media_type'] == "video"): ?>
+					<div class="message-media">
+						<div class="cl-plyr-video">
+							<video data-video-ratio="16:9" class="plyr" preload="metadata" playsinline data-nocontrols="true">
+								<source src="<?php echo($cl['li']['media_file']); ?>" type="video/mp4">
+								<source src="<?php echo($cl['li']['media_file']); ?>" type="video/webm">
+								<source src="<?php echo($cl['li']['media_file']); ?>" type="video/mov">
+								<source src="<?php echo($cl['li']['media_file']); ?>" type="video/3gp">
+								<source src="<?php echo($cl['li']['media_file']); ?>" type="video/ogg">
+							</video>
+						</div>
+					</div>
+				<?php else: ?>
+					<div class="message-audio">
+						<div class="cl-plyr-audio">
+							<audio controls preload="metadata" class="plyr">
+						        <source src="<?php echo($cl['li']['audio_record']); ?>" type="audio/mp3">
+						        <source src="<?php echo($cl['li']['audio_record']); ?>" type="audio/mpeg">
+						        <source src="<?php echo($cl['li']['audio_record']); ?>" type="audio/wav">
+						    </audio>
+					    </div>
+					</div>
+				<?php endif; ?>
+			<?php endif; ?>
+		</div>
+		<div class="message-data__ctrls">
+			<button class="dropdown" type="button">
+				<div class="dropdown-toggle icon" data-toggle="dropdown">
+					<?php echo cl_ficon('more_horiz'); ?>
+				</div>
+				<div class="dropdown-menu dropdown-icons">
+					<a href="javascript:void(0);" class="dropdown-item" onclick="SMColibri.PS.chat.delete_message(this);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon("delete"); ?>
+						</span>
+						<span class="flex-item">
+							<?php echo cl_translate("Delete message"); ?>
+						</span>
+					</a>
+					<?php if (empty($cl['li']['media_file']) && empty($cl['li']['audio_record'])): ?>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item clip-board-copy" data-clipboard-text="<?php echo($cl['li']['msg_raw']); ?>" href="javascript:void(0);">
+							<span class="flex-item dropdown-item-icon">
+								<?php echo cl_ficon("copy"); ?>
+							</span>
+							<span class="flex-item">
+								<?php echo cl_translate("Copy message"); ?>
+							</span>
+						</a>
+					<?php endif; ?>
+					<?php if (not_empty($cl['li']['media_file']) || not_empty($cl['li']['audio_record'])): ?>
+						<div class="dropdown-divider"></div>
+						<?php if (not_empty($cl['li']['media_file'])): ?>
+							<a class="dropdown-item" download="<?php echo($cl['li']['media_name']); ?>" href="<?php echo($cl['li']['media_file']); ?>">
+						<?php elseif(not_empty($cl['li']['audio_record'])): ?>
+							<a class="dropdown-item" download="<?php echo($cl['li']['media_name']); ?>" href="<?php echo($cl['li']['audio_record']); ?>">
+						<?php endif; ?>
+							<span class="flex-item dropdown-item-icon">
+								<?php echo cl_ficon("arrow_download"); ?>
+							</span>
+							<span class="flex-item">
+								<?php echo cl_translate("Download"); ?>
+							</span>
+						</a>
+					<?php endif; ?>
+				</div>
+			</button>
+		</div>
+	</div>
+	<div class="message-time">
+		<?php echo($cl['li']['time']); ?>
+	</div>	
+</div>

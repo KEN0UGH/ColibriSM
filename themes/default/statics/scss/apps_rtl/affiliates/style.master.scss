@@ -1,0 +1,29 @@
+body[dir="rtl"]{
+	&.cl-app-affiliates{
+		div.affiliates{
+			div.affiliates__payouts{
+				div.affiliates-transactions{
+					div.affiliates-transactions__item{
+						div.rp{
+							padding-left: 0px;
+							padding-right: var(--cl-primary-offset-size);
+						}
+					}
+				}
+			}
+		}
+
+		div.modal.affiliates-workflow{
+			div.modal-body{
+				div.affiliates-workflow-list{
+					div.list-item{
+						div.list-item__mp{
+							margin-left: 0px;
+							margin-right: var(--cl-primary-offset-size);
+						}
+					}
+				}
+			}
+		}
+	}
+}

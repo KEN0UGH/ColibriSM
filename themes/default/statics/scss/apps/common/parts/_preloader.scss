@@ -1,0 +1,27 @@
+div.main-preloader-holder{
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--cl-primary-bg-color);
+    z-index: 6000;
+
+    div.main-preloader {
+	    width: 100%;
+	    height: 100%;
+	    display: flex;
+	    flex-direction: row;
+	    flex-wrap: wrap;
+	    align-items: center;
+	    justify-content: center;
+
+	    div.loading {
+		    width: 60px;
+
+		    img{
+		    	width: 100%;
+		    }
+		}
+	}
+}

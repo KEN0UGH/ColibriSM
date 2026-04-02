@@ -1,0 +1,64 @@
+<div class="modal popup-ticket-modal" tabindex="-1" role="dialog" data-backdrop="static" data-onclose="remove">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Withdrawal request, <?php echo cl_money($cl['req_data']['amount']); ?>
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="user-info">
+                    <div class="avatar">
+                        <img src="<?php echo($cl['req_data']['avatar']); ?>" alt="Avatar">
+                    </div>
+                    <div class="uname">
+                        <h5><?php echo($cl['req_data']['full_name']); ?></h5>
+                        <a><?php echo($cl['req_data']['email']); ?></a>
+                    </div>
+                </div>
+
+                <div class="text-message m-b-20">
+                    <h5>Requisites & Message</h5>
+                    <p>
+                        <?php 
+                            $cl['req_data']['requisites'] = cl_rn2br($cl['req_data']['requisites']);
+                            $cl['req_data']['requisites'] = cl_strip_brs($cl['req_data']['requisites']);
+
+                            echo $cl['req_data']['requisites'];
+                        ?>
+                    </p>
+                </div>
+                <div class="text-message">
+                    <h5>Request details</h5>
+                    <table class="table table-bordered margin-0">
+                        <tr>
+                            <td>Method</td>
+                            <td>
+                                <b><?php echo($cl['req_data']['method']); ?></b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Amount</td>
+                            <td><b><?php echo cl_money($cl['req_data']['amount']); ?></b></td>
+                        </tr>
+                        <tr>
+                            <td>Date</td>
+                            <td><b><?php echo($cl['req_data']['time']); ?></b></td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td>
+                                <span class="badge bg-orange">Pending</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-block" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

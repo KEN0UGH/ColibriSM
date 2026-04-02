@@ -1,0 +1,32 @@
+body[dir="rtl"]{
+	&.cl-app-chat{
+		div.chats{
+			div.chat-contacts{
+				div.contacts-list__item{
+					a{
+						div.contact-data{
+							div.contact-data__body{
+								padding-left: 0px;
+								padding-right: var(--cl-primary-offset-size);
+
+								div.contact-data__body-topline{
+									div.flex-item-left{
+			 							margin-right: 0px;
+			 							margin-left: var(--cl-primary-offset-size);
+									}
+								}
+
+								div.contact-data__body-midline{
+									div.last-message{
+										margin-right: 0px;
+										margin-left: var(--cl-primary-offset-size);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

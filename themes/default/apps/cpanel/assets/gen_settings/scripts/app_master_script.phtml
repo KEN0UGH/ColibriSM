@@ -1,0 +1,84 @@
+<script>
+	"use strict";
+
+	$(document).ready(function($) {
+		var _app  = $('[data-app="general-settings"]');
+		var _data1 = _app.find('form[data-an="form"]');
+		var _data2 = _app.find('form[data-an="logo-form"]');
+		var _data3 = _app.find('form[data-an="favicon-form"]');
+
+		_data1.on('submit', function(event) {
+			event.preventDefault();
+
+			var _form = $(this);
+			
+			_form.ajaxSubmit({
+				url: '<?php echo cl_link("native_api/cpanel/save_settings"); ?>',
+				type: 'POST',
+				dataType: 'json',
+				beforeSend: function() {
+					_form.find('small.invalid-feedback').remove();
+					_form.find('[data-an="submit-ctrl"]').attr('disabled', 'true').text("Please wait");
+				},
+				success: function(data) {
+					if (data.status == 200) {
+						cl_bs_notify("Your changes have been saved successfully!", 3000);
+					}
+					else {
+						_form.find('[data-an="{0}-input"]'.format(data.err_field)).append($('<small>', {
+							text: data.message,
+							class: 'invalid-feedback animated flash'
+						})).scroll2();
+					}
+				},
+				complete: function() {
+					_form.find('[data-an="submit-ctrl"]').removeAttr('disabled').text("Save changes");
+				}
+			});
+		});
+
+		_data2.ajaxForm({
+			url: '<?php echo cl_link("native_api/cpanel/save_site_logo"); ?>',
+			type: 'POST',
+			dataType: 'json',
+			beforeSend: function() {
+				_data2.find('[data-an="submit-ctrl"]').attr('disabled', 'true').text("Please wait");
+			},
+			success: function(data) {
+				if (data.status == 200) {
+					cl_bs_notify("Your changes have been saved successfully!", 3000);
+
+					_data2.get(0).reset();
+				}
+				else {
+					SMC_CPanel.errorMSG("An error occurred while saving your site's logo file. The problem could be that your logo file is not in the correct format (PNG), or you don't have permission to write to the [themes/default/statics/img] folder.", 10000);
+				}
+			},
+			complete: function() {
+				_data2.find('[data-an="submit-ctrl"]').removeAttr('disabled').text("Save changes");
+			}
+		});
+
+		_data3.ajaxForm({
+			url: '<?php echo cl_link("native_api/cpanel/save_favicon"); ?>',
+			type: 'POST',
+			dataType: 'json',
+			beforeSend: function() {
+				_data3.find('[data-an="submit-ctrl"]').attr('disabled', 'true').text("Please wait");
+
+				_data3.get(0).reset();
+			},
+			success: function(data) {
+				if (data.status == 200) {
+					cl_bs_notify("Your changes have been saved successfully!", 3000);
+				}
+				else {
+					SMC_CPanel.errorMSG("An error occurred while saving your site's favicon file. The problem could be that your favicon file is not in the correct format (PNG or ICO), or you don't have permission to write to the [themes/default/statics/img] folder.", 10000);
+				}
+			},
+			complete: function() {
+				_data3.find('[data-an="submit-ctrl"]').removeAttr('disabled').text("Save changes");
+			}
+		});
+	});
+</script>

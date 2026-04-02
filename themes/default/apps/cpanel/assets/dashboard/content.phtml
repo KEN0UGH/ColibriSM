@@ -1,0 +1,101 @@
+<div class="cp-app-container" data-app="dashboard">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-6">
+            <div class="info-box bg-red">
+                <div class="icon">
+                    <?php echo cl_ficon('live'); ?>
+                </div>
+                <div class="content">
+                    <div class="text">
+                        Online users
+                    </div>
+                    <div class="number count-to" data-from="0" data-to="<?php echo($cl['online_users']); ?>" data-speed="15" data-fresh-interval="20"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-6">
+            <div class="info-box bg-blue">
+                <div class="icon">
+                    <?php echo cl_ficon('note'); ?>
+                </div>
+                <div class="content">
+                    <div class="text">Total posts</div>
+                    <div class="number count-to" data-from="0" data-to="<?php echo($cl['total_posts']); ?>" data-speed="1000" data-fresh-interval="20"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-6">
+            <div class="info-box bg-light-green">
+                <div class="icon">
+                    <?php echo cl_ficon('image'); ?>
+                </div>
+                <div class="content">
+                    <div class="text">Total images</div>
+                    <div class="number count-to" data-from="0" data-to="<?php echo($cl['total_images']); ?>" data-speed="1000" data-fresh-interval="20"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-6">
+            <div class="info-box bg-orange">
+                <div class="icon">
+                    <?php echo cl_ficon('video'); ?>
+                </div>
+                <div class="content">
+                    <div class="text">Total videos</div>
+                    <div class="number count-to" data-from="0" data-to="<?php echo($cl['total_videos']); ?>" data-speed="1000" data-fresh-interval="20"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-6">
+            <div class="info-box bg-pink">
+                <div class="icon">
+                    <?php echo cl_ficon('people'); ?>
+                </div>
+                <div class="content">
+                    <div class="text">
+                        Total users
+                    </div>
+                    <div class="number count-to" data-from="0" data-to="<?php echo($cl['total_users']); ?>" data-speed="15" data-fresh-interval="20"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-6">
+            <div class="info-box bg-indigo">
+                <div class="icon">
+                    <?php echo cl_ficon('checkmark'); ?>
+                </div>
+                <div class="content">
+                    <div class="text">
+                        Total verified users
+                    </div>
+                    <div class="number count-to" data-from="0" data-to="<?php echo($cl['total_verified_users']); ?>" data-speed="15" data-fresh-interval="20"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Annual statistics of new users and published media content
+                    </h2>
+                </div>
+                <div class="body">
+                    <canvas id="annual_media_content_statistics" height="500"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php echo cl_template('cpanel/assets/dashboard/scripts/app_master_script'); ?>

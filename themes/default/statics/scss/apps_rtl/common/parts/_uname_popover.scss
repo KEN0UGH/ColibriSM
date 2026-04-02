@@ -1,0 +1,23 @@
+div.popover{
+	div.user-infobox{
+		div.user-infobox__header{
+			div.avatar{
+				margin-left: auto;
+				margin-right: var(--cl-primary-offset-size);
+			}
+		}
+
+		div.user-infobox__body{
+			padding: var(--cl-primary-offset-size);
+
+			div.user-data{
+				div.user-data__counter{
+					div.counter-item{
+						margin-right: 0px;
+						margin-left: var(--cl-primary-offset-size);
+					}
+				}
+			}
+		}
+	}
+}

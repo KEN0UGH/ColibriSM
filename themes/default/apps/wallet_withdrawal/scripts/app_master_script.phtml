@@ -1,0 +1,109 @@
+<script>
+	"use strict";
+
+	jQuery(document).ready(function($) {
+		Vue.use(window.vuelidate.default);
+
+		var _app     = $('[data-app="wallet_withdrawal"]');
+
+		SMColibri.PS = new Vue({
+			el: "#vue-wallet_withdrawal-app",
+			data: {
+				submitting: false,
+				unsuccessful_attempt: false,
+				invalid_feedback_text_message: "",
+				invalid_feedback_requisites_message: "",
+				withdrawal_amount: "",
+				withdrawal_methods: <?php echo cl_minify_js(json($cl["withdrawal_gws"], true)); ?>,
+				withdrawal_method: "",
+				withdrawal_requisites: "",
+				available_balance: "<?php echo $me['wallet']; ?>"
+			},
+			computed: {
+				is_valid_amount_message: function() {
+					if (this.$v.withdrawal_amount.required == true && this.$v.withdrawal_amount.$error) {
+						this.invalid_feedback_amount_message = "<?php echo cl_translate("Please enter the withdrawal amount from {@from@} to {@to@}", array("from" => 50, "to" => 15000)); ?>";
+						return true;
+					}
+
+					else if(Number(this.withdrawal_amount) > Number(this.available_balance)) {
+						this.invalid_feedback_amount_message = "<?php echo cl_translate("You have entered an amount that exceeds your available wallet balance"); ?>";
+						return true;
+					}
+
+					else {
+						return false;
+					}
+				},
+				is_valid_requisites_message: function() {
+					if (this.$v.withdrawal_requisites.required == true && this.$v.withdrawal_requisites.$error) {
+						this.invalid_feedback_requisites_message = "<?php echo cl_translate("You have entered too long a message. Maximum length 600 characters"); ?>";
+						return true;
+					}
+					else {
+						return false;
+					}
+				},
+				is_valid_form: function() {
+					if(this.$v.$invalid == true || (Number(this.withdrawal_amount) > Number(this.available_balance))) {
+						return false;
+					}
+
+					else {
+						return true;
+					}
+				}
+			},
+			validations: {
+				withdrawal_amount: {
+					required: window.validators.required,
+					is_num: window.validators.numeric,
+					min_val: window.validators.minValue(50),
+					max_val: window.validators.maxValue(15000)
+				},
+				withdrawal_method: {
+					required: window.validators.required
+				},
+				withdrawal_requisites: {
+					required: window.validators.required,
+					max_length: window.validators.maxLength(600)
+				}
+			},
+			methods: {
+				submit_form: function(_self = null) {
+					_self.preventDefault();
+
+					var _app_ = this;
+
+					$(_self.target).ajaxSubmit({
+						url: "<?php echo cl_link("native_api/wallet/withdrawal_req_submit"); ?>",
+						type: "POST",
+						dataType: "json",
+						data: {
+							withdrawal_method: _app_.withdrawal_method
+						},
+						beforeSend: function() {
+							_app_.submitting = true;
+
+							_app_.unsuccessful_attempt = false;
+						},
+						success: function(data) {
+							if (data.status == 200) {
+								cl_bs_notify("<?php echo cl_translate("Your withdrawal request has been sent successfully"); ?>", 3000, "info");
+
+								setTimeout(function() {
+									SMColibri.spa_load("<?php echo cl_link("wallet"); ?>", false);
+								}, 3500);
+							}
+
+							else {
+								_app_.unsuccessful_attempt = true;
+								_app_.submitting = false;
+							}
+						}
+					});
+				}
+			}
+		});
+	});
+</script>

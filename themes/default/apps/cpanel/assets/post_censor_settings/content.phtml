@@ -1,0 +1,39 @@
+<div class="cp-app-container" data-app="posts-censor-settings">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Posts censor settings
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Manage posts censored words settings
+                    </h2>
+                </div>
+                <div class="body">
+                    <form class="form" data-an="form">
+                    	<div class="form-group" data-an="firebase_api_key-input">
+                            <label>
+                                Censored words (List separated by commas. E.g word1, word2, word3, etc...)
+                            </label>
+                            <div class="form-line">
+                            	<textarea name="words_list" class="form-control" placeholder="Enter censored words list separated by commas"><?php echo($cl["post_censored_words_csv"]); ?></textarea>
+                            </div>
+                        </div>
+                       <div class="form-group no-mb">
+                       		<button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                                Save changes
+                            </button>
+                       </div>
+                        <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/post_censor_settings/scripts/app_master_script'); ?>

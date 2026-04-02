@@ -1,0 +1,23 @@
+.dropdown, .dropleft, .dropright, .dropup{
+	div.dropdown-menu{
+		a.dropdown-item{
+			text-align: right;
+		}
+
+		&.dropdown-icons{
+			a.dropdown-item{
+				span.flex-item{
+					&.dropdown-item-icon{
+						margin-left: 12px;
+						margin-right: 0px;
+
+						&.dropdown-item-icon_adinfo{
+							margin-right: 12px;
+							margin-left: 0px;
+						}
+					}
+				}
+			}
+		}
+	}
+}

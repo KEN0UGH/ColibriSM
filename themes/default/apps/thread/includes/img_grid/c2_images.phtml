@@ -1,0 +1,15 @@
+<div class="collage-grid">
+	<?php foreach ($cl['thread_data']['post']['media'] as $i => $row): ?>
+		<div class="collage-grid__item">
+			<a href="<?php echo cl_get_media($row['src']); ?>" class="fbox-media" data-fancybox="fbox-media-<?php echo($cl['thread_data']['post']['id']); ?>">
+				<div class="image-collage-item">
+					<div class="lozad-media">
+						<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($row['is_safe'], "Y")); ?>">
+							<img class="d-block w-100 lozad" data-src="<?php echo cl_get_media($row['x']['image_thumb']); ?>" alt="Image">
+						</div>
+					</div>
+				</div>
+			</a>
+		</div>
+	<?php endforeach; ?>
+</div>

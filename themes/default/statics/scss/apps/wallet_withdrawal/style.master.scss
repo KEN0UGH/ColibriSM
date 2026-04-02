@@ -1,0 +1,130 @@
+body.cl-app-wallet_withdrawal{
+	div.wallet-withdrawal{
+
+		div.wallet-withdrawal__balance{
+			padding: var(--cl-primary-offset-size);
+
+			div.account-wallet__card{
+				border-radius: var(--cl-secondary-border-radius);
+				border: 1px solid var(--cl-secondary-border-color);
+
+				@include media-breakpoint-down(xl) {
+					padding-top: 20px;
+				}
+
+				div.account-wallet__card-title{
+					padding: 15px 20px;
+					font-size: 16px;
+					color: var(--cl-primary-text-color);
+					font-weight: 500;
+					text-transform: uppercase;
+				}
+
+				div.wallet-balance{
+					width: 100%;
+					display: flex;
+					flex-direction: row;
+					flex-wrap: nowrap;
+					overflow: hidden;
+					align-items: center;
+					position: relative;
+					padding: 20px;
+
+					@include media-breakpoint-down(xl) {
+						padding: 20px;
+					}
+
+					&::before{
+						position: absolute;
+						width: 100%;
+						height: 100%;
+						background: var(--cl-primary-color);
+						opacity: 0.08;
+						content: "";
+						left: 0px;
+						top: 0px;
+					}
+					
+					div.wallet-balance__icon{
+						z-index: 5;
+
+						svg{
+							width: 42px;
+							height: 42px;
+							opacity: 0.8;
+
+							path{
+								fill: var(--cl-primary-color);
+							}
+
+							@include media-breakpoint-down(xl) {
+								width: 35px;
+								height: 35px;
+							}
+						}
+					}
+
+					div.wallet-balance__amount{
+						flex: 1;
+						overflow: hidden;
+						padding-right: var(--cl-primary-offset-size);
+						z-index: 5;
+
+						span{
+							display: block;
+							width: 100%;
+							line-height: 1;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							white-space: nowrap;
+							max-width: 100%;
+							letter-spacing: -0.04em;
+
+							&:first-child{
+								font-size: 42px;
+								margin-bottom: 5px;
+								font-weight: 500;
+								color: var(--cl-primary-text-color);
+								font-family: sans-serif;
+							}
+
+							&:last-child{
+								font-size: 12px;
+								color: var(--cl-secondary-text-color);
+								text-transform: uppercase;
+							}
+
+							@include media-breakpoint-down(xl) {
+								&:first-child{
+									font-size: 36px;
+								}
+							}
+						} 
+					}
+				}
+
+				div.wallet-footer{
+					padding: var(--cl-primary-offset-size) 20px;
+					padding-bottom: 20px;
+
+					div.wallet-footer__text{
+						font-size: 14px;
+						line-height: 1.4;
+						color: var(--cl-secondary-text-color);
+						margin-bottom: 0px;
+						max-width: 80%;
+					}
+
+					@include media-breakpoint-down(xl) {
+						padding-left: 20px;
+						padding-right: 20px;
+					}
+				}
+			}
+		}
+
+		div.wallet-withdrawal__form{
+			padding: var(--cl-primary-offset-size);
+		}
+	}
+}

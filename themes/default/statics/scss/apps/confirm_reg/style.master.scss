@@ -1,0 +1,15 @@
+body.cl-app-confirm_reg{
+	div.confirm-registration{
+		div.timeline-placeholder{
+			padding-bottom: 0px !important;
+
+			div.pl-message{
+				margin-bottom: 0px !important;
+			}
+		}
+
+		form.form{
+			padding: var(--cl-primary-offset-size);
+		}
+	}
+}

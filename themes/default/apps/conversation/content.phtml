@@ -1,0 +1,161 @@
+<div class="timeline-container" data-app="conversation">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp lp__avatar">
+				<div class="nav-link-avatar">
+					<?php if (cl_is_online($cl['interlocutor']['is_online'])): ?>
+						<a href="<?php echo($cl['interlocutor']['url']); ?>" data-an="last-seen" class="online" data-spa="true" title="<?php echo cl_translate("Online"); ?>">
+					<?php else: ?>
+						<a href="<?php echo($cl['interlocutor']['url']); ?>" data-an="last-seen" data-spa="true">
+					<?php endif; ?>
+						<img src="<?php echo($cl['interlocutor']['avatar']); ?>" alt="IMG">
+					</a>
+				</div>
+				<div class="nav-link-holder">
+					<a href="<?php echo($cl['interlocutor']['url']); ?>" data-spa="true">
+						<span class="user-name-holder">
+							<span class="user-name-holder__name">
+								<?php echo($cl['interlocutor']['name']); ?>
+							</span>
+
+							<?php if ($cl['interlocutor']['verified'] == '1'): ?>
+								<span class="user-name-holder__badge">
+									<?php echo cl_icon("verified_user_badge"); ?>
+								</span>
+							<?php endif; ?>
+						</span>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link('/'); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<button class="go-options dropleft">
+						<div class="dropdown-toggle icon go-options__icon" data-toggle="dropdown">
+							<?php echo cl_ficon('more_horiz'); ?>
+						</div>
+						<div class="dropdown-menu dropdown-icons">
+							<a class="dropdown-item" href="<?php echo($cl['interlocutor']['url']); ?>" data-spa="true">
+								<span class="flex-item dropdown-item-icon">
+									<?php echo cl_ficon("person"); ?>
+								</span>
+								<span class="flex-item">
+									<?php echo($cl['interlocutor']['name']); ?>
+								</span>
+								<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+									<?php echo cl_ficon('open'); ?>
+								</span>
+							</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" onclick="SMColibri.PS.chat.delete_chat();">
+								<span class="flex-item dropdown-item-icon">
+									<?php echo cl_ficon("delete"); ?>
+								</span>
+								<span class="flex-item">
+									<?php echo cl_translate("Delete chat"); ?>
+								</span>
+							</a>
+							<a class="dropdown-item" onclick="SMColibri.PS.chat.clear_chat();">
+								<span class="flex-item dropdown-item-icon">
+									<?php echo cl_ficon("paint_brush"); ?>
+								</span>
+								<span class="flex-item">
+									<?php echo cl_translate("Clear chat"); ?>
+								</span>
+							</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="<?php echo cl_link(cl_strf("settings/privacy")); ?>" data-spa="true">
+								<span class="flex-item dropdown-item-icon">
+									<?php echo cl_ficon('shield_video'); ?>
+								</span>
+								<span class="flex-item">
+									<?php echo cl_translate('Privacy settings'); ?>
+								</span>
+								<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+									<?php echo cl_ficon('open'); ?>
+								</span>
+							</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.go_back();">
+								<span class="flex-item dropdown-item-icon">
+									<?php echo cl_ficon('arrow_back'); ?>
+								</span>
+								<span class="flex-item">
+									<?php echo cl_translate("Go back"); ?>
+								</span>
+								<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+									<?php echo cl_ficon('open'); ?>
+								</span>
+							</a>
+						</div>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="d-block" id="vue-conversation-app">
+		<div class="conversation">
+			<div class="conversation__body">
+				<div v-on:scroll="get_old_messages($event)" data-an="messages-list" class="conversation-messages">
+					<?php if (not_empty($cl["messages"])): ?>
+						<?php foreach ($cl["messages"] as $cl['li']): ?>
+							<?php echo cl_template('conversation/includes/list_item'); ?>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</div>
+			</div>
+			<div class="conversation__footer">
+				<?php if (not_empty($cl["can_contact"])): ?>
+					<form class="form" v-on:submit="send_message($event)" data-an="message-form" ref="form">
+						<div class="message-input">
+							<button v-if="audio_rec.is_recording == false" v-on:click="record_audio_start" type="button" class="message-input__ctrl">
+								<?php echo cl_ficon('mic_on'); ?>
+							</button>
+							<button v-if="audio_rec.is_recording == true" v-on:click="record_audio_cancel" type="button" class="message-input__ctrl">
+								<?php echo cl_ficon('dismiss'); ?>
+							</button>
+							<div class="message-audio-recstat" v-if="audio_rec.is_recording == true">
+								<div class="lp">
+									<span></span>
+								</div>
+								<div class="mp">
+									<div class="wave-animation">
+										<?php foreach (range(0, 140) as $item): ?>
+											<div class="wave-animation__item" style="height: <?php echo rand(10, 100); ?>%;"></div>
+										<?php endforeach; ?>
+									</div>
+								</div>
+								<div class="rp">
+									<span class="record-timer">{{audio_rec.record_ftime}}</span>
+								</div>
+							</div>
+							<div v-if="audio_rec.is_recording == false" class="message-input-cont">
+								<div class="message-input__field">
+									<textarea ref="text_input" v-on:keydown="text_input_trigger($event)" data-an="msg-input" v-model="message" class="form-control autoresize" placeholder="<?php echo cl_translate("Write a message and hit Enter ..."); ?>"></textarea>
+								</div>
+								<button v-on:click="select_image" type="button" class="message-input__ctrl">
+									<?php echo cl_ficon('camera'); ?>
+								</button>
+							</div>
+							<button data-an="submit-btn" v-bind:disabled="is_invalid_form" type="submit" class="message-input__ctrl ml-auto">
+								<?php echo cl_ficon('send'); ?>
+							</button>
+						</div>
+						<input v-on:change="send_image($event)" type="file" class="d-none hidden" name="image" accept="image/*,video/*" data-an="media-input">
+					</form>
+				<?php else: ?>
+					<div class="ghost-form">
+						<?php echo cl_translate("You do not have permission direct messages to this chat"); ?>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+	</div>
+
+	<?php echo cl_template('conversation/scripts/app_master_script'); ?>
+</div>

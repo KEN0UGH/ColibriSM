@@ -1,0 +1,212 @@
+<button class="ctrls-item dropleft">
+	<div class="dropdown-toggle ctrls-item__icon" data-toggle="dropdown">
+		<?php echo cl_ficon('more_horiz'); ?>
+	</div>
+	<div class="dropdown-menu dropdown-icons">
+		<?php if (not_empty($cl['li']['is_owner'])): ?>
+			<?php if ($cl["li"]["owner"]["cont_monetization"] == "Y"): ?>
+				<?php if ($cl["li"]["is_free_post"] == "Y"): ?>
+					<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.freefy_post('<?php echo $cl['li']['id']; ?>', this);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon('lock_closed'); ?>
+						</span>
+						<span class="flex-item" data-itag="text">
+							<?php echo cl_translate('Close free access'); ?>
+						</span>
+					</a>
+					<div class="dropdown-divider"></div>
+				<?php else: ?>
+					<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.freefy_post('<?php echo $cl['li']['id']; ?>', this);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon('lock_open'); ?>
+						</span>
+						<span class="flex-item" data-itag="text">
+							<?php echo cl_translate('Open free access'); ?>
+						</span>
+					</a>
+					<div class="dropdown-divider"></div>
+				<?php endif; ?>
+			<?php endif ?>
+			<?php if ($cl["li"]["type"] == "poll"): ?>
+				<?php if ($cl['li']["poll_status"] == "active"): ?>
+					<a onclick="SMColibri.stop_poll(<?php echo($cl['li']['id']); ?>);" class="dropdown-item" href="javascript:void(0);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon('poll'); ?>
+						</span>
+						<span class="flex-item">
+							<?php echo cl_translate('Stop this poll'); ?>
+						</span>
+						<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+							<?php echo cl_ficon('timer_off'); ?>
+						</span>
+					</a>
+					<div class="dropdown-divider"></div>
+				<?php endif; ?>
+			<?php endif; ?>
+		<?php endif; ?>
+
+		<a class="dropdown-item" href="<?php echo $cl['li']['url']; ?>" data-spa="true">
+			<span class="flex-item dropdown-item-icon">
+				<?php echo cl_ficon('open'); ?>
+			</span>
+			<span class="flex-item">
+				<?php echo cl_translate('Show thread'); ?>
+			</span>
+		</a>
+		<?php if ($cl['li']['type'] == "document"): ?>
+			<div class="dropdown-divider"></div>
+			<a download="<?php echo $cl['li']['media'][0]['x']["filename"]; ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('arrow_download'); ?>
+				</span>
+				<span class="flex-item">
+					<?php echo cl_translate('Download document'); ?>
+				</span>
+				<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+					<?php echo cl_ficon('document'); ?>
+				</span>
+			</a>
+		<?php endif; ?>
+		<?php if ($cl["config"]["post_video_download_system"] == "on" && $cl['li']['type'] == "video"): ?>
+			<div class="dropdown-divider"></div>
+			<a download="<?php echo cl_strf("%s-Video-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('arrow_download'); ?>
+				</span>
+				<span class="flex-item">
+					<?php echo cl_translate('Download video'); ?>
+				</span>
+				<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+					<?php echo cl_ficon('video'); ?>
+				</span>
+			</a>
+		<?php endif; ?>
+		<?php if ($cl["config"]["post_audio_download_system"] == "on" && $cl['li']['type'] == "audio"): ?>
+			<div class="dropdown-divider"></div>
+			<a download="<?php echo cl_strf("%s-Audio-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('arrow_download'); ?>
+				</span>
+				<span class="flex-item">
+					<?php echo cl_translate('Download audio'); ?>
+				</span>
+				<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+					<?php echo cl_ficon('music'); ?>
+				</span>
+			</a>
+		<?php endif; ?>
+		<div class="dropdown-divider"></div>
+		<?php if (not_empty($cl['li']['can_edit'])): ?>
+			<a onclick="SMColibri.edit_post('<?php echo $cl['li']['id']; ?>');" class="dropdown-item" href="javascript:void(0);">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('note_edit'); ?>
+				</span>
+				<span class="flex-item">
+					<?php echo cl_translate('Edit post'); ?>
+				</span>
+				<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+					<?php echo cl_ficon('text'); ?>
+				</span>
+			</a>
+			<div class="dropdown-divider"></div>
+		<?php endif; ?>
+		<?php if (not_empty($cl['li']['can_delete'])): ?>
+			<a onclick="SMColibri.delete_post('<?php echo $cl['li']['id']; ?>');" class="dropdown-item" href="javascript:void(0);">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('delete'); ?>
+				</span>
+				<span class="flex-item">
+					<?php echo cl_translate('Delete'); ?>
+				</span>
+			</a>
+			<div class="dropdown-divider"></div>
+		<?php endif; ?>
+		<a onclick="SMColibri.show_likes('<?php echo $cl['li']['id']; ?>');" class="dropdown-item" href="javascript:void(0);">
+			<span class="flex-item dropdown-item-icon">
+				<?php echo cl_ficon('thumb_like'); ?>
+			</span>
+			<span class="flex-item">
+				<?php echo cl_translate('Show likes'); ?>
+			</span>
+			<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+				<?php echo cl_ficon('users_list'); ?>
+			</span>
+		</a>
+		<div class="dropdown-divider"></div>
+		<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.bookmark_post('<?php echo $cl['li']['id']; ?>', this);">
+			<span class="flex-item dropdown-item-icon">
+				<?php echo cl_ficon('bookmark'); ?>
+			</span>
+			<span class="flex-item" data-itag="text">
+				<?php echo ((empty($cl['li']['has_saved'])) ? cl_translate('Bookmark') : cl_translate('Unbookmark')); ?>
+			</span>
+		</a>
+		<a data-clipboard-text="<?php echo($cl['li']['url']); ?>" class="dropdown-item clip-board-copy" href="javascript:void(0);">
+			<span class="flex-item dropdown-item-icon">
+				<?php echo cl_ficon('clipboard_link'); ?>
+			</span>
+			<span class="flex-item">
+				<?php echo cl_translate('Copy link'); ?>
+			</span>
+		</a>
+		<?php if (empty($cl['li']['is_owner'])): ?>
+			<div class="dropdown-divider"></div>
+			<a onclick="SMColibri.report_post(<?php echo($cl['li']['id']); ?>);" class="dropdown-item" href="javascript:void(0);">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('flag'); ?>
+				</span>
+				<span class="flex-item">
+					<?php echo cl_translate('Report post'); ?>
+				</span>
+				<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+					<?php echo cl_ficon('shield_error'); ?>
+				</span>
+			</a>
+		<?php endif; ?>
+		<?php if (not_empty($cl['li']['is_owner'])): ?>
+			<div class="dropdown-divider"></div>
+			<a onclick="SMColibri.pin_profile_post(<?php echo($cl['li']['id']); ?>, this);" class="dropdown-item" href="javascript:void(0);">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('pin'); ?>
+				</span>
+				<span class="flex-item" data-itag="text">
+					<?php if ($cl['li']['profile_pinned'] == "Y"): ?>
+						<?php echo cl_translate('Unpin from my profile'); ?>
+					<?php else: ?>
+						<?php echo cl_translate('Pin to my profile'); ?>
+					<?php endif; ?>
+				</span>
+				<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+					<?php echo cl_ficon('note'); ?>
+				</span>
+			</a>
+		<?php endif; ?>
+		<div class="dropdown-divider"></div>
+		<a onclick="SMColibri.share_post('<?php echo $cl['li']['url']; ?>','<?php echo urlencode($cl['li']['url']); ?>');" class="dropdown-item" href="javascript:void(0);">
+			<span class="flex-item dropdown-item-icon">
+				<?php echo cl_ficon('share'); ?>
+			</span>
+			<span class="flex-item">
+				<?php echo cl_translate('Share'); ?>
+			</span>
+		</a>
+		<?php if (not_empty($cl['is_admin'])): ?>
+			<div class="dropdown-divider"></div>
+			<a onclick="SMColibri.pin_admin_post(<?php echo($cl['li']['id']); ?>, this);" class="dropdown-item" href="javascript:void(0);">
+				<span class="flex-item dropdown-item-icon">
+					<?php echo cl_ficon('pin'); ?>
+				</span>
+				<span class="flex-item" data-itag="text">
+					<?php if ($cl['li']['admin_pinned'] == "Y"): ?>
+						<?php echo cl_translate('Unpin post from feeds'); ?>
+					<?php else: ?>
+						<?php echo cl_translate('Pin post to feeds'); ?>
+					<?php endif; ?>
+				</span>
+				<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+					<?php echo cl_ficon('alert_urgent'); ?>
+				</span>
+			</a>
+		<?php endif; ?>
+	</div>
+</button>

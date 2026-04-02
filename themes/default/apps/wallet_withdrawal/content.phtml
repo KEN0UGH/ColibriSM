@@ -1,0 +1,147 @@
+<div class="timeline-container" data-app="wallet_withdrawal">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp">
+				<div class="nav-link-holder">
+					<a href="/" data-spa="true">
+						<?php echo cl_translate("Wallet withdrawal"); ?>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link('/'); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<span class="go-back" onclick="SMColibri.go_back();">
+						<?php echo cl_ficon('arrow_back'); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="wallet-withdrawal">
+		<div class="wallet-withdrawal__balance">
+			<div class="account-wallet__card">
+				<div class="account-wallet__card-title">
+					<?php echo cl_translate("Your credit"); ?>
+				</div>
+				<div class="wallet-balance">
+					<div class="wallet-balance__amount">
+						<span>
+							<?php echo cl_money($me['wallet']); ?>
+						</span>
+						<span>
+							<?php echo cl_translate("Your account's available funds"); ?>
+						</span>
+					</div>
+					<div class="wallet-balance__icon">
+						<?php echo cl_ficon("wallet"); ?>
+					</div> 
+				</div>
+
+                <div class="wallet-footer">
+					<div class="wallet-footer__text">
+						<?php echo cl_translate("You may withdraw funds or use them in your account for advertising, subscription or other purposes"); ?>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="wallet-banktrans__alert">
+			<div class="timeline-alert-container">
+				<div class="timeline-alert timeline-alert_info timeline-alert_align-center">
+					<div class="timeline-alert__icon">
+						<?php echo cl_ficon("payment"); ?>
+					</div>
+					<div class="timeline-alert__text">
+						<?php echo cl_translate("Processing and completing your withdrawal can take 3 to 14 business days, depending on the payment method chosen"); ?>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php if ($cl["withdrawal_awaiting"] != true): ?>
+			<div class="wallet-withdrawal__form">
+				<form class="form" id="vue-wallet_withdrawal-app" autocomplete="off" v-on:submit="submit_form($event)">
+					<div class="form-group">
+		                <label>
+		                    <?php echo cl_translate("Withdrawal amount"); ?>, ({{available_balance}} <?php echo strtoupper($cl["config"]["site_currency"]); ?>)
+		                </label>
+		                <input v-model.trim="$v.withdrawal_amount.$model" type="number" name="withdrawal_amount" class="form-control" placeholder="<?php echo cl_translate("Enter withdrawal amount. E.g. {@withdrawal_amount@}", array("withdrawal_amount" => cl_money("100"))); ?>">
+		                <div class="invalid-main-feedback" v-if="is_valid_amount_message">
+		                    {{invalid_feedback_amount_message}}
+		                </div>
+		            </div>
+					<div class="form-group">
+	                	<label>
+	                        <?php echo cl_translate("Payment method"); ?>
+	                    </label>
+	                	<div class="dropdown vue-dropdown-select">
+	                        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	                            <span v-if="withdrawal_method">{{withdrawal_method}}</span>
+	                            <span v-else>
+	                            	<?php echo cl_translate("Nothing selected"); ?>
+	                            </span>
+	                        </button>
+	                        <div class="dropdown-menu">
+	                            <a v-for="i in withdrawal_methods" v-on:click="withdrawal_method = i" class="dropdown-item" href="javascript:void(0);">
+	                                {{i}}
+	                            </a>
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="form-group">
+	                    <label>
+	                        <?php echo cl_translate("Requisites & Your message"); ?>
+	                    </label>
+
+	                    <textarea v-model.trim="$v.withdrawal_requisites.$model" name="withdrawal_requisites" rows="5" class="form-control" placeholder="<?php echo cl_translate("Enter the required details for withdrawing funds"); ?>"></textarea>
+	                    <div class="invalid-main-feedback" v-if="is_valid_requisites_message">
+	                        {{invalid_feedback_requisites_message}}
+	                    </div>
+	                </div>
+	                <div class="form-group" v-if="unsuccessful_attempt">
+	                    <div class="invalid-main-feedback">
+	                        <?php echo cl_translate("An error occurred while processing your request. Please try again later."); ?>
+	                    </div>
+	                </div>
+	                <div class="form-group" v-else>
+	                    <div class="form-info-label">
+	                        <?php echo cl_translate("Please note that if you have a message for the reviewer, you can write it in the field along with the requisites"); ?>
+	                    </div>
+	                </div>
+	                <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+	                <div class="form-group no-mb">
+	                	<button v-if="submitting != true" v-bind:disabled="is_valid_form != true" type="submit" class="btn btn-block btn-custom main-inline lg">
+	                        <?php echo cl_translate("Submit request"); ?>
+	                    </button>
+	                    <button v-else disabled="true" type="button" class="btn btn-block btn-custom main-inline lg">
+	                        <?php echo cl_translate("Please wait"); ?>
+	                    </button>
+	                </div>
+				</form>
+			</div>
+		<?php else: ?>
+			<div class="timeline-placeholder">
+				<div class="icon">
+					<div class="icon__bg">
+						<?php echo cl_ficon('timer'); ?>
+					</div>
+				</div>
+				<div class="pl-message">
+					<h4>
+						<?php echo cl_translate("Request is pending"); ?>
+					</h4>
+					<p>
+						<?php echo cl_translate("You have submitted a withdrawal request that is currently pending, as soon as the reviewer completes processing, you will receive an email notification"); ?>
+					</p>
+				</div>
+			</div>
+		<?php endif; ?>
+	</div>
+	
+	<?php if ($cl["withdrawal_awaiting"] != true): ?>
+		<?php echo cl_template("wallet_withdrawal/scripts/app_master_script"); ?>
+	<?php endif; ?>
+</div>

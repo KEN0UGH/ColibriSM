@@ -1,0 +1,141 @@
+﻿.form-group {
+    width: 100%;
+    margin-bottom: 25px;
+
+    & > label{
+        font-size: $fsz-cp1;
+        margin: 0px 0px 6px 0px;
+        padding: 0px;
+    }
+
+    small.invalid-feedback{
+        display: block;
+        font-size: 13px;
+        line-height: 140%;
+        color: $red;
+        margin-top: 10px;
+    }
+
+    div.form-file-input{
+        position: relative;
+
+        input{
+            line-height: normal;
+            appearance: none;
+            background-color: $gray-bg-1;
+            display: block;
+            width: 100%;
+            height: 52px;
+            cursor: pointer;
+            font-size: 14px;
+            color: $black;
+            transition: all 0.40s ease-in-out;
+
+            &::file-selector-button{
+                margin: 0px;
+                height: 100%;
+                cursor: inherit;
+                text-transform: uppercase;
+                font-size: 13px;
+                margin-right: 20px;
+                padding: 0px 30px;
+                border-radius: 1px;
+                border: none;
+                font-weight: 500;
+                background-color: transparent;
+                color: $black;
+                opacity: 1;
+                transition: inherit;
+                border-right: 1px solid darken($border, 5);
+            }
+
+            &:hover, &:active{
+                border-color: $blue;
+            }
+        }
+
+        span.form-file-input__icon{
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            bottom: 2px;
+            display: inline-flex;
+            width: 46px;
+            align-items: center;
+            justify-content: center;
+
+            svg{
+                width: 24px;
+                height: 24px;
+
+                path{
+                    fill: $pl_holder;
+                }
+            }
+        }
+    }
+
+    small.info-feedback{
+        display: block;
+        font-size: 13px;
+        line-height: 150%;
+        color: $grey;
+        margin-top: 10px;
+    }
+
+    .form-control{
+        width: 100%;
+        border: none;
+        border-bottom: 3px solid $border;
+        box-shadow: none;
+        padding: 12px 15px;
+        color: $black;
+        font-size: 14px;
+        background-color: lighten($gray-bg-1, 1);
+        border-radius: 0px;
+        height: 52px;
+
+        &::placeholder{
+            color: $pl_holder;
+            font-size: 12px !important;
+        }
+
+        &:hover, &:active, &:focus{
+            border-color: $black;
+        }
+    }
+
+    div.form-select{
+        position: relative;
+        padding: 0px;
+        border: none;
+        cursor: pointer;
+
+        select{
+            cursor: pointer;
+        }
+
+        &::after{
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-left: 1px solid $grey;
+            border-bottom: 1px solid $grey;
+            top: calc(50% - 4px);
+            right: 20px;
+            z-index: 10;
+            transform: rotate(-45deg);
+        }
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+    }
+
+    .form-control[disabled],
+    .form-control[readonly],
+    fieldset[disabled] .form-control {
+        background-color: transparent;
+    }
+}

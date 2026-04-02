@@ -1,0 +1,80 @@
+div.timeline-navbar{
+	overflow: hidden;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	background-color: var(--cl-primary-bg-color);
+	z-index: 10;
+
+	div.timeline-navbar__item{
+		flex: 1;
+		overflow: hidden;
+	
+		a{
+			display: block;
+			text-decoration: none;
+			outline: 0;
+
+			button.timeline-navbar__item-btn{
+				background: transparent;
+				color: var(--cl-secondary-text-color);
+				box-shadow: none;
+				border: none;
+				padding: 12px var(--cl-primary-offset-size) 20px var(--cl-primary-offset-size);
+				margin: 0px;
+				cursor: pointer;
+				display: block;
+				width: 100%;
+				outline: 0;
+				position: relative;
+
+				span.btn-flex-inner{
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					font-size: 13px;
+					font-weight: 600;
+					text-transform: uppercase;
+				}
+
+				@include media-breakpoint-down(xl) {
+					padding-top: 15px;
+					padding-bottom: 15px;
+
+					span.btn-flex-inner{
+						font-size: 12px;
+					}
+				}
+
+				&::after{
+					content: "";
+					position: absolute;
+					bottom: 0px;
+					left: 0px;
+					right: 0px;
+					height: 2px;
+					background: var(--cl-primary-border-color);
+				}
+
+				&.active{
+					&::after{
+						background: var(--cl-primary-text-color);
+					}
+
+					span.btn-flex-inner{
+						color: var(--cl-primary-text-color);
+					}
+				}
+
+				&:hover, &:active, &:focus{
+					background: var(--cl-event-hover-bg);
+				}
+			}
+		}
+	}
+
+	&_border-top{
+		border-top: 1px solid var(--cl-primary-border-color);
+	}
+}

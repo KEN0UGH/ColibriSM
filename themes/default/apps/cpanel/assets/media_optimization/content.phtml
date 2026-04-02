@@ -1,0 +1,58 @@
+<div class="cp-app-container" data-app="media-optimization">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Media files optimization (Intervention API)
+            </h1>
+        </div>
+    </div>
+    <div class="card">
+        <div class="header">
+            <h2>
+                Media files optimization system
+            </h2>
+        </div>
+        <div class="body">
+            <form class="form" data-an="form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="media_optimization_status-input">
+                            <label>
+                                Media optimizer status
+                            </label>
+                            <div class="form-line form-select">
+                                <select name="media_optimization_status" class="form-control">
+                                    <option value="on" <?php if($cl['config']['media_optimization_status'] == 'on') { echo('selected'); } ?>>Enabled</option>
+                                    <option value="off" <?php if($cl['config']['media_optimization_status'] == 'off') { echo('selected'); } ?>>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" data-an="post_images_compression-input">
+                            <label>
+                                Post images compression (from 1 to 100)
+                            </label>
+                            <div class="form-line">
+                            	<select name="post_images_compression" class="form-control">
+                            		<?php foreach (range(1, 100) as $num_val): ?>
+                            			<option value="<?php echo($num_val); ?>" <?php if($cl['config']['post_images_compression'] == $num_val) { echo('selected'); } ?>>
+                            				<?php echo $num_val;?>
+                            			</option>
+                            		<?php endforeach; ?>
+                            	</select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group no-mb">
+                    <button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                        Save changes
+                    </button>
+                </div>
+                <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+            </form>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/media_optimization/scripts/app_master_script'); ?>

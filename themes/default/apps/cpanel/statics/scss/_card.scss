@@ -1,0 +1,66 @@
+﻿div.card {
+    background: #ffffff;
+    min-height: 50px;
+    box-shadow: none;
+    position: relative;
+    margin-bottom: 1.2rem;
+    border: none;
+    border-radius: 0px;
+
+    div.header {
+        color: $black;
+        padding: 30px;
+        position: relative;
+        border-bottom: 1px solid $border;
+
+        h2 {
+            margin: 0;
+            font-size: $fsz-h3;
+            font-weight: 600;
+            color: inherit;
+
+            small {
+                display: block;
+                font-size: 12px;
+                margin-top: 5px;
+                color: #999;
+                line-height: 15px;
+
+                a {
+                    font-weight: bold;
+                    color: #777;
+                }
+            }
+        }
+    }
+
+    div.body {
+        padding: 30px;
+
+        &.responsive{
+            overflow-x: auto;
+        }
+
+        &.no-pb{
+            padding-bottom: 0px;
+        }
+    }
+
+    div.footer{
+        padding: 10px 30px 30px 30px;
+
+
+        &.footer__btns{
+            display: flex;
+
+            button:first-child{
+                margin-right: 16px;
+            }
+        }
+    }
+
+    hr{
+        border-bottom: 1px solid $border;
+        opacity: 1;
+    }
+}

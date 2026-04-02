@@ -1,0 +1,110 @@
+<div class="cp-app-container" data-app="media-filter">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Media files filters
+            </h1>
+        </div>
+    </div>
+    <div class="card">
+        <div class="header">
+            <h2>
+                Media content filter (Google AI vision)
+            </h2>
+        </div>
+        <div class="body">
+            <div class="inline-alertbox-wrapper">
+                <div class="inline-alertbox info">
+                    <div class="icon">
+                        <?php echo cl_ficon("info"); ?>
+                    </div>
+                    <div class="alert-message">
+                        <p>
+                            Please note that media file filtering is done through Google AI vision.
+                            <br>
+                            To use this feature, you need to create an API key and set up this API application.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <form class="form" id="media-filter-settings">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group" data-an="google_ai_vision_status-input">
+                            <label>
+                                Google AI vision
+                            </label>
+                            <div class="form-line form-select">
+                                <select name="google_ai_vision_status" class="form-control">
+                                    <option value="on" <?php if($cl['config']['google_ai_vision_status'] == 'on') { echo('selected'); } ?>>Enabled</option>
+                                    <option value="off" <?php if($cl['config']['google_ai_vision_status'] == 'off') { echo('selected'); } ?>>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group" data-an="google_ai_vision_key-input">
+                            <label>
+                                Google vision API key
+                            </label>
+                            <div class="form-line">
+                                <input value="{%config google_ai_vision_key%}" name="google_ai_vision_key" type="text" class="form-control" placeholder="Enter Google vision API key">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group no-mb">
+                    <button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                        Save changes
+                    </button>
+                </div>
+                <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+            </form>
+            <br>
+            <hr>
+            <br>
+            <div>
+                <h6>
+                    Follow the steps below to generate an API key.
+                </h6>
+                <br>
+                <ol>
+                    <li>
+                        Go to the Google Cloud Platform website (<a href="https://cloud.google.com/" target="_blank">https://cloud.google.com/</a>).
+                    </li>
+                    <li>
+                        Sign in to your Google account or create a new one if you don't have it.
+                    </li>
+                    <li>
+                        After signing in, click on the "Console" button to access the Google Cloud Platform console.
+                    </li>
+                    <li>
+                        In the top right corner, click on the project list and select or create the project where you'll be using the Vision API.
+                    </li>
+                    <li>
+                        Once you've selected the project, click on the "Navigation menu" (the icon with three horizontal lines) in the top left corner.
+                    </li>
+                    <li>
+                        In the opened menu, choose "APIs & Services" -> "Library."
+                    </li>
+                    <li>
+                        In the search field, enter "Google Cloud Vision API" and select it from the search results.
+                    </li>
+                    <li>
+                        Click the "Enable" button to activate the Vision API for the selected project.
+                    </li>
+                    <li>
+                        After enabling the API, go to the "Credentials" section (under "APIs & Services") and select "Create credentials."
+                    </li>
+                    <li>
+                        Choose the credential type as "API Key," then select "Create" and follow the instructions to create the API key.
+                    </li>
+                    <li>
+                        Copy the generated API key, which will be used for accessing the Google Cloud Vision API.
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/media_filter/scripts/app_master_script'); ?>

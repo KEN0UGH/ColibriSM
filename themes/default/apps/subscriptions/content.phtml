@@ -1,0 +1,50 @@
+<div class="timeline-container" data-app="subscriptions">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp">
+				<div class="nav-link-holder">
+					<a href="<?php echo cl_link("subscriptions"); ?>" data-spa="true">
+						<?php echo cl_translate("Subscriptions"); ?>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link('/'); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<span class="go-back" onclick="SMColibri.go_back();">
+						<?php echo cl_ficon('arrow_back'); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php if (not_empty($cl["subscriptions"])): ?>
+		<div class="timeline-users-container">
+			<div class="timeline-user-ls" data-an="subscriptions-list">
+				<?php foreach ($cl["subscriptions"] as $cl['li']): ?>
+					<?php echo cl_template('subscriptions/includes/list_item'); ?>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	<?php else: ?>
+		<div class="timeline-placeholder">
+			<div class="icon">
+				<div class="icon__bg">
+					<?php echo cl_ficon('person_tag'); ?>
+				</div>
+			</div>
+			<div class="pl-message">
+				<h4>
+					<?php echo cl_translate("No subscriptions yet!"); ?>
+				</h4>
+				<p>
+					<?php echo cl_translate("It looks like you haven't subscribed to paid accounts yet. All the people you have subscribed to will be here"); ?>
+				</p>
+			</div>
+		</div>
+	<?php endif; ?>
+</div>

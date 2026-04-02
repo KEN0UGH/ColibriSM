@@ -1,0 +1,78 @@
+<div class="cp-app-container" data-app="twilio_settings">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Twilio API settings
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Manage Twilio API settings
+                    </h2>
+                </div>
+                <div class="body">
+                    <form class="form" data-an="form">
+                    	<div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" data-an="twilio_account_sid-input">
+                                    <label>
+                                        Twilio account SID
+                                    </label>
+                                    <div class="form-line">
+                                        <input value="{%config twilio_account_sid%}" name="twilio_account_sid" type="text" class="form-control" placeholder="Enter twilio account SID">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" data-an="twilio_auth_token-input">
+                                    <label>
+                                        Twilio auth token
+                                    </label>
+                                    <div class="form-line">
+                                        <input value="{%config twilio_auth_token%}" name="twilio_auth_token" type="text" class="form-control" placeholder="Enter twilio auth token">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" data-an="twilio_phone_number-input">
+                                    <label>
+                                        Twilio phone number
+                                    </label>
+                                    <div class="form-line">
+                                        <input value="{%config twilio_phone_number%}" name="twilio_phone_number" type="text" class="form-control" placeholder="Enter twilio phone number">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <small class="info-feedback">
+                                        This feature enables your website to send SMS messages to users for various purposes, <br> like sending a one-time code via SMS to confirm their registration, or for other messages you may need to send.
+                                        <br>
+                                        <br>
+
+                                        To make this feature work, you'll need special keys called 'API Keys' for Twilio's SMS service. If you don't have these keys, <br> you can create them on the Twilio website and then enter them in the form provided above. <br> This step is crucial for enabling the sending of SMS messages from your website to users.
+                                        <br>
+                                        <br>
+                                        Twilio site address: <a href="https://www.twilio.com/console">https://www.twilio.com/console</a>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group no-mb">
+                       		<button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                                Save changes
+                            </button>
+                        </div>
+                        <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/twilio_settings/scripts/app_master_script'); ?>

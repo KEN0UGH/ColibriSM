@@ -1,0 +1,44 @@
+<div class="cp-app-container" data-app="static-pages">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Privacy policy page
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Edit Privacy policy HTML Page
+                    </h2>
+                </div>
+                <div class="body">
+                    <form class="form" data-an="form">
+                        <div class="form-group" data-an="pagehtml-input">
+                            <label>
+                                Put page HTML code here
+                            </label>
+                            <div class="form-line">
+                                <textarea class="form-control" rows="15" name="pagehtml" placeholder="Add here HTML code"><?php echo($cl["static_page_code"]); ?></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group no-mb">
+                            <button data-an="submit-ctrl" type="submit" class="btn btn-primary">
+                                Save changes
+                            </button>
+                        </div>
+                        <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+                    </form>
+
+                    <br>
+                    <div>
+                        You can use this service to create HTML page content. <a href="https://onlinehtmleditor.dev/" target="_blank">https://onlinehtmleditor.dev/</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/static_pages/scripts/app_master_script'); ?>

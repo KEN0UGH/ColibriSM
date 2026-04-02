@@ -1,0 +1,16 @@
+&-online{
+	position: relative;
+
+	&:before{
+		width: 10px;
+		height: 10px;
+		border-radius: 100%;
+		background-color: #2fbf63;
+		position: absolute;
+		top: 0px;
+		right: 0px;
+		content: "";
+		border: 2px solid var(--cl-primary-bg-color);
+		z-index: 100;
+	}
+}

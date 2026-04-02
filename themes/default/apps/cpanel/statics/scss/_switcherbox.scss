@@ -1,0 +1,32 @@
+div.form-switch-item{
+	border: 1px solid $border;
+	cursor: pointer;
+	margin-bottom: 20pxs;
+	transition: all 0.26s ease-in-out;
+
+	label.form-check-label{
+		display: flex;
+		padding: 20px;
+		justify-content: space-between;
+		cursor: pointer;
+
+		div.form-check-label__text{
+			h4{
+				font-size: 16px;
+				padding: 0px;
+				margin: 0px 0px 6px 0px;
+			}
+
+			p{
+				font-size: 13px;
+				padding: 0px;
+				margin: 0px;
+				color: $grey;
+			}
+		}
+	}
+
+	&:hover, &:active{
+		border-color: $black;
+	}
+}

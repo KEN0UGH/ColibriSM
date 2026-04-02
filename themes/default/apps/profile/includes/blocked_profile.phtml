@@ -1,0 +1,31 @@
+<div class="timeline-placeholder">
+	<?php if (not_empty($cl['prof_user']['is_blocked'])): ?>
+		<div class="icon">
+			<div class="icon__bg">
+				<?php echo cl_ficon('block'); ?>
+			</div>
+		</div>
+		<div class="pl-message">
+			<h4>
+				<?php echo cl_translate("You have blocked this user."); ?>
+			</h4>
+			<p>
+				<?php echo cl_translate("You will not see posts from this user, receive notifications, comments, messages, etc."); ?>
+			</p>
+		</div>
+	<?php else: ?>
+		<div class="icon">
+			<div class="icon__bg">
+				<?php echo cl_ficon('block'); ?>
+			</div>
+		</div>
+		<div class="pl-message">
+			<h4>
+				<?php echo cl_translate("You are blocked!"); ?>
+			</h4>
+			<p>
+				<?php echo cl_translate("Sorry, access to this profile is denied! You have been blocked by this user"); ?>
+			</p>
+		</div>
+	<?php endif; ?>
+</div>

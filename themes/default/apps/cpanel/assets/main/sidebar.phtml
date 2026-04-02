@@ -1,0 +1,508 @@
+<div class="acp-main-left-sidebar" data-app="left-sidebar">
+    <div class="admin-info">
+        <div class="user-info">
+            <div class="avatar">
+                <img src="<?php echo($me['avatar']); ?>" alt="Avatar">
+            </div>
+            <div class="uname">
+                <h5>
+                    <?php echo($me['name']); ?>
+                </h5>
+            </div>
+            <div class="menu-ctrl">
+                <button class="btn" onclick="SMC_CPanel.menu_toggle();">
+                    <?php echo cl_ficon("dismiss"); ?>
+                </button>
+            </div>
+        </div>
+    </div>
+    <ul class="menu-list">
+        <li class="menu-list-item">
+            <a href="<?php echo cl_link('home'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("home"); ?>
+                </span>
+                <span class="text">
+                    Homepage
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'dashboard') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/dashboard'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("board"); ?>
+                </span>
+                <span class="text">
+                    Dashboard
+                </span>
+            </a>
+        </li>
+        <?php echo cl_template("cpanel/assets/main/custom_sections"); ?>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'gen_settings') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/gen_settings'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("settings"); ?>
+                </span>
+                <span class="text">
+                    Settings
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'toggle_features') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/toggle_features'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("toggle_left"); ?>
+                </span>
+                <span class="text">
+                    Toggle functions
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'email_settings') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/email_settings'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("mail"); ?>
+                </span>
+                <span class="text">
+                    SMTP settings
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('twilio_settings', 'infobip_settings'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" class="menu-list-item-link" href="javascript:void(0);">
+                <span class="icon">
+                    <?php echo cl_ficon("server"); ?>
+                </span>
+                <span class="text">
+                    APIs settings
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'twilio_settings'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/twilio_settings'); ?>">
+                    Twilio API Settings
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'infobip_settings'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/infobip_settings'); ?>">
+                    Infobip API Settings
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'auto_follow') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/auto_follow'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("people_swap"); ?>
+                </span>
+                <span class="text">
+                    Auto follow settings
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'oauth_settings') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/oauth_settings'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("share_screen_person"); ?>
+                </span>
+                <span class="text">
+                    Social login
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('users', 'wallet_balance'))) {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/users'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("apps_list_detail"); ?>
+                </span>
+                <span class="text">
+                    Manage users
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('restrictions'))) {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/restrictions'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("window_shield"); ?>
+                </span>
+                <span class="text">
+                    Restrictions
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'invite_users') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/invite_users'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("person_arrow_left"); ?>
+                </span>
+                <span class="text">
+                    Invite users
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('publications', 'post_censor_settings'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" href="javascript:void(0);" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("note"); ?>
+                </span>
+                <span class="text">
+                    Publications
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'publications'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/publications'); ?>">
+                    Posts management
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'post_censor_settings'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/post_censor_settings'); ?>">
+                    Posts censor settings
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'media_optimization') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/media_optimization'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("mobile_optimized"); ?>
+                </span>
+                <span class="text">
+                    Media optimization 
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'themes') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/themes'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("design_ideas"); ?>
+                </span>
+                <span class="text">
+                    UI Themes
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'display_settings') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/display_settings'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon('content_settings'); ?>
+                </span>
+                <span class="text">
+                    Display settings
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'premium_account') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/premium_account'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon('premium'); ?>
+                </span>
+                <span class="text">
+                    Premium account system
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('account_verification', 'withdrawal_requests'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" href="javascript:void(0);" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("person_support"); ?>
+                </span>
+                <span class="text">
+                    User requests
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'account_verification'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/account_verification'); ?>">
+                    Account verification
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'withdrawal_requests'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/withdrawal_requests'); ?>">
+                    Withdrawal requests
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('payment_gateways', "banktrans_receipts"))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" href="javascript:void(0);" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("money"); ?>
+                </span>
+                <span class="text">
+                    Payment gateways
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'payment_gateways'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/payment_gateways'); ?>">
+                    Settings
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'banktrans_receipts'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/banktrans_receipts'); ?>">
+                    Bank transfers
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('ads_settings', 'manage_ads'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" class="menu-list-item-link" href="javascript:void(0);">
+                <span class="icon">
+                    <?php echo cl_ficon('ads'); ?>
+                </span>
+                <span class="text">
+                    Advertising
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'ads_settings'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/ads_settings'); ?>">
+                    Settings
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'manage_ads'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/manage_ads'); ?>">
+                    Manage ads
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('affiliate_settings', 'affiliate_payouts'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" class="menu-list-item-link" href="javascript:void(0);">
+                <span class="icon">
+                    <?php echo cl_ficon('group_work'); ?>
+                </span>
+                <span class="text">
+                    Affiliates
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'affiliate_settings'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/affiliate_settings'); ?>">
+                    Settings
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'affiliate_payouts'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/affiliate_payouts'); ?>">
+                    Payouts
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('account_reports', 'post_reports'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" class="menu-list-item-link" href="javascript:void(0);">
+                <span class="icon">
+                    <?php echo cl_ficon('flag'); ?>
+                </span>
+                <span class="text">
+                    Reports
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'account_reports'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/account_reports'); ?>">
+                    Account reports
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'post_reports'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/post_reports'); ?>">
+                    Publication reports
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('delete_swifts', 'delete_spam_accounts'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" class="menu-list-item-link" href="javascript:void(0);">
+                <span class="icon">
+                    <?php echo cl_ficon("paint_brush"); ?>
+                </span>
+                <span class="text">
+                    DB Cleaning
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'delete_swifts'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/delete_swifts'); ?>">
+                    Remove expired swifts
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'delete_spam_accounts'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/delete_spam_accounts'); ?>">
+                    Remove spam accounts
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'google_ads') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/google_ads'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("ads"); ?>
+                </span>
+                <span class="text">
+                    Google Ads
+                </span>
+            </a>
+        </li>
+
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('aws3', 'wasabi_s3', 'idrive_s3'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" class="menu-list-item-link" href="javascript:void(0);">
+                <span class="icon">
+                    <?php echo cl_ficon("cloud"); ?>
+                </span>
+                <span class="text">
+                    S3 Cloud storage
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'aws3'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/aws3'); ?>">
+                    Amazon S3 storage
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'wasabi_s3'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/wasabi_s3'); ?>">
+                    Wasabi S3 storage
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'idrive_s3'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/idrive_s3'); ?>">
+                    iDrive S3 storage
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'origin') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/media_filter'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("shield_checkmark"); ?>
+                </span>
+                <span class="text">
+                    Media filter
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'custom_jscss') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/custom_jscss'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("code"); ?>
+                </span>
+                <span class="text">
+                    Custom JS/CSS
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('aboutus', 'privacy_policy', 'terms_of_use', 'faqs', 'cookies'))) {echo('active open');} ?>">
+            <a data-toggle-menu="1" class="menu-list-item-link" href="javascript:void(0);">
+                <span class="icon">
+                    <?php echo cl_ficon("document"); ?>
+                </span>
+                <span class="text">
+                    Static HTML pages
+                </span>
+                <span class="chevron-down">
+                    <?php echo cl_ficon("chevron_down"); ?>
+                </span>
+            </a>
+            <div class="submenu-list">
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'aboutus'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/aboutus'); ?>">
+                    About us
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'privacy_policy'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/privacy_policy'); ?>">
+                    Privacy policy
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'terms_of_use'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/terms_of_use'); ?>">
+                    Terms of Use
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'faqs'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/faqs'); ?>">
+                    Help center (FAQs)
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'cookies'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/cookies'); ?>">
+                    Cookie files
+                </a>
+            </div>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'push_notifications') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/push_notifications'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("notifications"); ?>
+                </span>
+                <span class="text">
+                    Push notifications
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'changelogs') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/changelogs'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("history"); ?>
+                </span>
+                <span class="text">
+                    Changelogs
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'backups') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/backups'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("database"); ?>
+                </span>
+                <span class="text">
+                    Backups
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'languages') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/languages'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("local_language"); ?>
+                </span>
+                <span class="text">
+                    UI Languages
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'recaptcha') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/recaptcha'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("brain_circuit"); ?>
+                </span>
+                <span class="text">
+                    Google reCAPTCHA
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'sitemap') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/sitemap'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("map"); ?>
+                </span>
+                <span class="text">
+                    Sitemap
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'app_links') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/app_links'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("phone"); ?>
+                </span>
+                <span class="text">
+                    Mobile App links
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'timezone') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/timezone'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("access_time"); ?>
+                </span>
+                <span class="text">
+                    Timezone settings
+                </span>
+            </a>
+        </li>
+        <li class="menu-list-item">
+            <a href="https://docs.colibrism.ru" class="menu-list-item-link" target="_blank">
+                <span class="icon">
+                    <?php echo cl_ficon("chat_help"); ?>
+                </span>
+                <span class="text">
+                    Documentation
+                </span>
+            </a>
+        </li>
+    </ul>
+    <div class="sb-footer">
+        &copy; {%config name%} - <?php echo date('Y'); ?>.  <b>(v<?php echo $cl["config"]["version"]; ?>)</b>
+    </div>
+</div>

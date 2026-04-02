@@ -1,0 +1,92 @@
+<div class="modal subscription-modal" tabindex="-1" role="dialog" data-app="subscription-app" data-backdrop="static" data-onclose="remove">
+    <div class="modal-dialog" role="document" id="cl-subscription-vue-app">
+        <div class="modal-content">
+            <div class="subscription-form">
+                <div class="subscription-form__header">
+                    <div class="lp">
+                        <div class="lp__avatar">
+                            <img class="lozad" data-src="<?php echo $cl['creator_data']["avatar"]; ?>">
+                        </div>
+                        <div class="lp__avatar">
+                            <img class="lozad" data-src="<?php echo cl_link("themes/default/statics/img/premium-avatar.png"); ?>">
+                        </div>
+                    </div>
+                </div>
+                <div class="subscription-form__body">
+                    <h3>
+                        <?php echo cl_translate("Subscribe to {@name@}", array("name" => $cl["creator_data"]["name"])); ?>
+                    </h3>
+                    <p>
+                        <?php echo cl_translate("Unlock access to {@name@} exclusive content with a 30-day subscription", array("name" => $cl["creator_data"]["name"])); ?>
+                    </p>
+
+                    <div class="subscription-price">
+                        <div class="subscription-price__header">
+                            <?php echo cl_translate("Subscription regular price"); ?>
+                        </div>
+                        <div class="subscription-price__body">
+                            <span><?php echo cl_money($cl["creator_data"]["subscription_price"]); ?></span> / <?php echo cl_translate("monthly"); ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="subscription-form__footer">
+                    <div class="btn-group">
+                        <button class="btn btn-custom main-inline lg" data-uiel="pay-subscription-btn">
+                            <?php echo cl_translate("Pay subscription now"); ?>
+                        </button>
+                        <button class="btn btn-custom main-gray lg" data-dismiss="modal">
+                            <?php echo cl_translate("Cancel"); ?>
+                        </button>
+                    </div>
+                    <span>
+                        <?php echo cl_translate("One-time payment from your wallet, no subscription auto-renewal"); ?>
+                    </span>
+                </div>
+            </div>  
+        </div>
+    </div>
+
+    <script>
+        "use strict";
+
+        $('[data-uiel="pay-subscription-btn"]').on("click", function(event) {
+            event.preventDefault();
+
+            var self = $(this);
+            
+            $.ajax({
+                url: '<?php echo cl_link("native_api/subscription/subscription_pay"); ?>',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    creator_id: <?php echo $cl['creator_data']["id"]; ?>
+                },
+                beforeSend: function() {
+                    self.attr("disabled", "true").text("<?php echo cl_translate("Please wait"); ?>");
+                }
+            }).done(function(data) {
+                if (data.status == 200) {
+                    cl_bs_notify("<?php echo cl_translate("Subscription was successfully completed"); ?>", 3000, "success");
+
+                    setTimeout(function() {
+                        cl_redirect("<?php echo $cl['creator_data']["url"]; ?>");
+                    }, 2500);
+                }
+                else {
+
+                    self.removeAttr("disabled").text("<?php echo cl_translate("Pay subscription now"); ?>");
+
+                    if(data.status == 410) {
+                        cl_bs_notify("<?php echo cl_translate("Your wallet does not have enough funds to pay for the subscription"); ?>", 3000, "warning");
+                    }
+                    else if(data.status == 415) {
+                        cl_bs_notify("<?php echo cl_translate("Sorry, but the user's wallet is temporarily disabled, and therefore you cannot complete this payment for the time being. Contact support if you have questions"); ?>", 5000, "warning");
+                    }
+                    else{
+                        SMColibri.errorMSG();
+                    }
+                }
+            });
+        });
+    </script>
+</div>
