@@ -1,5 +1,5 @@
 <div class="timeline-pubbox-container">
-	<form class="form" id="vue-pubbox-app-<?php echo($cl['pb_id']); ?>" v-on:submit="publish($event)">
+	<form class="form" id="vue-pubbox-app-<?php echo($cl['pb_id']); ?>" v-on:submit="publish($event)" @dragenter="handle_drag_enter($event)" @dragover="handle_drag_over($event)" @dragleave="handle_drag_leave($event)" @drop="handle_drop($event)">
 		<div class="timeline-pubbox">
 			<div class="timeline-pubbox__header">
 				<div class="timeline-pubbox__textinput">
@@ -7,7 +7,7 @@
 						<img src="<?php echo($me['avatar']); ?>" alt="Avatar">
 					</div>
 					<div class="pubbox-input">
-						<textarea ref="text_input" v-on:input.trim="text_input_trigger" v-on:blur="text_blur_trigger" class="autoresize" v-model="text" name="post_text" v-bind:placeholder="text_ph"></textarea>
+						<textarea ref="text_input" v-on:input.trim="text_input_trigger" v-on:blur="text_blur_trigger" v-on:paste="handle_paste_images($event)" class="autoresize" v-model="text" name="post_text" v-bind:placeholder="text_ph"></textarea>
 					</div>
 				</div>
 			</div>

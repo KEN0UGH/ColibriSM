@@ -21,6 +21,7 @@ var pubbox_form_app_mixin = Object({
 			audio_ctrl: true,
 			music_ctrl: true,
 			poll_ctrl: true,
+			drag_over: false,
 			donate_ctrl: true,
 			doc_ctrl: true,
 			gif_ctrl: true,
@@ -268,6 +269,84 @@ var pubbox_form_app_mixin = Object({
 			setTimeout(function() {
 				_app_.destroy_mentag_autocomplete();
 			}, 1500);
+		},
+		handle_paste_images: function(e = false) {
+			var _app_ = this;
+			
+			if (!e || !e.clipboardData || !e.clipboardData.items) {
+				return;
+			}
+
+			var items = e.clipboardData.items;
+			for (var i = 0; i < items.length; i++) {
+				if (items[i].type.indexOf('image') !== -1) {
+					var file = items[i].getAsFile();
+					if (file) {
+						var event_obj = {
+							target: {
+								files: [file]
+							}
+						};
+						_app_.upload_images(event_obj);
+					}
+				}
+			}
+		},
+		handle_drag_enter: function(e = false) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			var _app_ = this;
+			_app_.drag_over = true;
+		},
+		handle_drag_over: function(e = false) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				e.dataTransfer.dropEffect = 'copy';
+			}
+			var _app_ = this;
+			_app_.drag_over = true;
+		},
+		handle_drag_leave: function(e = false) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			var _app_ = this;
+			_app_.drag_over = false;
+		},
+		handle_drop: function(e = false) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+
+			var _app_ = this;
+			_app_.drag_over = false;
+
+			if (!e || !e.dataTransfer || !e.dataTransfer.files) {
+				return;
+			}
+
+			var files = e.dataTransfer.files;
+			var image_files = [];
+
+			for (var i = 0; i < files.length; i++) {
+				if (files[i].type.indexOf('image') !== -1) {
+					image_files.push(files[i]);
+				}
+			}
+
+			if (image_files.length > 0) {
+				var event_obj = {
+					target: {
+						files: image_files
+					}
+				};
+				_app_.upload_images(event_obj);
+			}
 		},
 		trigger_mentag_input: function(char = "@") {
 			var _app_     = this;
