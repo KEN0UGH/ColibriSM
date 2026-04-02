@@ -18,14 +18,20 @@
 # @*************************************************************************@
 
 if (not_empty($cl["is_logged"])) {
-	cl_redirect("home");
+    cl_redirect("home");
 }
 
 require_once(cl_full_path("core/apps/guest/app_ctrl.php"));
 
 $cl["invite_code"] = fetch_or_get($_GET["invite_code"], false);
-$cl["auth_type"]   = fetch_or_get($_GET["auth"], "login");
-$cl["auth_type"]   = (in_array($cl["auth_type"], array("login", "signup", "forgot_pass", "reset_pass"))) ? $cl["auth_type"] : "login";
+$cl["auth_type"]   = fetch_or_get($_GET["auth"], false);
+$cl["auth_type"]   = (in_array($cl["auth_type"], array("login", "signup", "forgot_pass", "reset_pass"))) ? $cl["auth_type"] : false;
+
+// If no auth type specified, redirect to explore page
+if (empty($cl["auth_type"])) {
+    cl_redirect("explore");
+}
+
 $cl["page_title"]  = $cl["config"]["title"];
 $cl["page_desc"]   = $cl["config"]["description"];
 $cl["page_kw"]     = $cl["config"]["keywords"];
