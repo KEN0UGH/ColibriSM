@@ -2,7 +2,7 @@
 	<?php if ($cl['li']['advertising']): ?>
 		<?php echo cl_template('timeline/ad'); ?>
 	<?php else: ?>
-		<div class="post-list-item" data-list-item="<?php echo($cl['li']['id']); ?>" data-post-offset="<?php echo($cl['li']['offset_id']); ?>" <?php echo fetch_or_get($cl['li']['attrs'],''); ?>>
+		<div class="post-list-item" data-list-item="<?php echo($cl['li']['id']); ?>" data-post-offset="<?php echo($cl['li']['offset_id']); ?>"<?php if (!isset($me['profile_maturity']) || $me['profile_maturity'] == 'general'): ?>  data-mature="<?php echo(fetch_or_get($cl['li']['mature_wcr'], 'general')); ?>"<?php endif; ?><?php echo fetch_or_get($cl['li']['attrs'],''); ?>>
 			<?php if (not_empty($cl['li']['me_blocked'])): ?>
 				<div class="post-placeholder">
 					<div class="d-flex flex-wn align-items-center">

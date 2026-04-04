@@ -13,9 +13,13 @@
 					submitting: false,
 					done: false,
 					unsuccessful_attempt: false,
+					grecaptcha_error: false,
 					invalid_feedback_email: "",
 					invalid_feedback_pass: "",
-					password_display: "password"
+					password_display: "password",
+					grecaptcha: "{%config google_recaptcha%}",
+					captcha: "",
+					captcha_error: false
 				},
 				computed: {
 					is_valid_email: function() {
@@ -58,6 +62,22 @@
 						_self.preventDefault();
 
 						var _app_ = this;
+						
+						if (_app_.grecaptcha == "on") {
+							var grecap_res = grecaptcha.getResponse();
+
+							if (grecap_res.length < 1) {
+
+								_app_.grecaptcha_error = true;
+
+								return false;
+							}
+						}
+
+						if (_app_.captcha.toLowerCase() !== _app_.captcha.toLowerCase()) { // Placeholder; actual check in backend
+							_app_.captcha_error = true;
+							return false;
+						}
 
 						$(_self.target).ajaxSubmit({
 							url: "<?php echo cl_link("native_api/auth/login"); ?>",
@@ -130,7 +150,9 @@
 					password1_display: "password",
 					password2_display: "password",
 					invite_code: "<?php echo fetch_or_get($cl["invite_code"], ''); ?>",
-					grecaptcha: "{%config google_recaptcha%}"
+					grecaptcha: "{%config google_recaptcha%}",
+					captcha: "",
+					captcha_error: false
 				},
 				computed: {
 					is_valid_uname: function() {
@@ -257,6 +279,11 @@
 
 								return false;
 							}
+						}
+						
+						if (_app_.captcha.toLowerCase() !== _app_.captcha.toLowerCase()) { // Placeholder; actual check in backend
+							_app_.captcha_error = true;
+							return false;
 						}
 
 						$(_self.target).ajaxSubmit({

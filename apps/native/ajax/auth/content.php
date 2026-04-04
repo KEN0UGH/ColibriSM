@@ -53,6 +53,26 @@ if ($action == "login") {
         	$data['err_code'] = "invalid_creds";
         } 
 
+        if ($cl["config"]["google_recaptcha"] == "on") {
+            $data['err_code'] = "grecaptcha_error";
+            $recaptcha_code   = fetch_or_get($_POST['g-recaptcha-response'], false);
+            $recaptcha_verif  = file_get_contents(cl_strf("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s", $cl["config"]["google_recap_key2"], $recaptcha_code));
+            
+            if (not_empty($recaptcha_verif)) {
+                $recaptcha_verif = json($recaptcha_verif);
+
+                if (is_array($recaptcha_verif) && not_empty($recaptcha_verif["success"]) && $recaptcha_verif["success"] == 1) {
+                    $data['err_code'] = false;
+                }
+            }
+        }
+        if ($cl["config"]["captcha"] == "on") {        
+            $captcha_input = fetch_or_get($_POST['captcha'], '');
+            if (strtolower($captcha_input) !== strtolower($_SESSION['captcha'])) {
+                $data['err_code'] = "captcha_error";
+            }
+        }
+
         if (empty($data["err_code"])) {   
         	$user_ip        = cl_get_ip();
         	$user_ip        = ((filter_var($user_ip, FILTER_VALIDATE_IP) == true) ? $user_ip : '0.0.0.0');
@@ -157,6 +177,12 @@ else if ($action == 'signup') {
                 if (is_array($recaptcha_verif) && not_empty($recaptcha_verif["success"]) && $recaptcha_verif["success"] == 1) {
                     $data['err_code'] = false;
                 }
+            }
+        }
+        if ($cl["config"]["captcha"] == "on") {
+            $captcha_input = fetch_or_get($_POST['captcha'], '');
+            if (strtolower($captcha_input) !== strtolower($_SESSION['captcha'])) {
+                $data['err_code'] = "captcha_error";
             }
         }
 

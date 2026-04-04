@@ -78,6 +78,26 @@
                                     </div>
                                 </div>
                             </div>
+							<div class="col-lg-6">
+                                <div class="form-group" data-an="captcha-input">
+                                    <label>
+                                        Custom Captcha
+                                    </label>
+                                    <div class="form-line form-select">
+                                        <select name="captcha" class="form-control">
+                                            <option value="on" <?php if($cl['config']['captcha'] == "on") { echo('selected'); } ?>>
+                                                Enabled
+                                            </option>
+                                            <option value="off" <?php if($cl['config']['captcha'] == "off") { echo('selected'); } ?>>
+                                                Disabled
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <small class="info-feedback">
+                                        Enable custom CAPTCHA on your website to prevent spam.
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="form-group no-mb">

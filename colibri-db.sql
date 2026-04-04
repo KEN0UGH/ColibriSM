@@ -359,7 +359,11 @@
 {%end%}
 
 {%begin%}
-  ALTER TABLE `cl_users` ADD `contact_privacy` ENUM('everyone','followed') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'everyone' AFTER `profile_privacy`;
+  ALTER TABLE `cl_users` ADD `profile_maturity` ENUM('general','adult','offensive') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'general' AFTER `profile_privacy`;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_users` ADD `contact_privacy` ENUM('everyone','followed') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'everyone' AFTER `profile_maturity`;
 {%end%}
 
 {%begin%}
@@ -518,6 +522,14 @@
 
 {%begin%}
   ALTER TABLE `cl_publications` ADD `priv_wcr` ENUM('everyone','followers','mentioned') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'everyone' AFTER `priv_wcs`;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_publications` ADD `mature_wcs` ENUM('general','adult','offensive') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'general' AFTER `priv_wcr`;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_publications` ADD `mature_wcr` ENUM('general','adult','offensive') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'general' AFTER `mature_wcs`;
 {%end%}
 
 {%begin%}
@@ -733,6 +745,10 @@
 
 {%begin%}
   INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Google reCAPTCHA', 'google_recaptcha', 'off', '/^(on|off)$/');
+{%end%}
+
+{%begin%}
+  INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Captcha', 'captcha', 'off', '/^(on|off)$/');
 {%end%}
 
 {%begin%}

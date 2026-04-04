@@ -463,6 +463,7 @@ else if ($action == "save_privacy_settings") {
     $data['err_code'] = 0;
     $data['status']   = 400;
     $profile_privacy  = fetch_or_get($_POST['profile_privacy'], null);
+    $profile_maturity = fetch_or_get($_POST['profile_maturity'], null);
     $follow_privacy   = fetch_or_get($_POST['follow_privacy'], null);
     $contact_privacy  = fetch_or_get($_POST['contact_privacy'], null);
     $index_privacy    = fetch_or_get($_POST['index_privacy'], null);
@@ -470,6 +471,10 @@ else if ($action == "save_privacy_settings") {
 
     if (in_array($profile_privacy, array('everyone','followers')) != true) {
         $data['err_code'] = "invalid_profile_privacy";
+    }
+
+    else if (in_array($profile_maturity, array('general', 'adult', 'offensive')) != true) {
+        $data['err_code'] = "invalid_profile_maturity";
     }
 
     else if (in_array($follow_privacy, array('everyone', 'approved')) != true) {
@@ -491,6 +496,7 @@ else if ($action == "save_privacy_settings") {
     else {
         cl_update_user_data($me["id"], array(
             'profile_privacy' => $profile_privacy,
+            "profile_maturity" => $profile_maturity,
             'follow_privacy'  => $follow_privacy,
             'contact_privacy' => $contact_privacy,
             'online_ind' => $online_ind,

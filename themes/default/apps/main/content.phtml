@@ -42,6 +42,7 @@
 	<link rel="stylesheet" href="{%config theme_url%}/statics/css/css-libs.css">
 	<link rel="stylesheet" href="{%config theme_url%}/statics/css/libs/jquery.toast.min.css">
 	<link rel="stylesheet" href="{%config theme_url%}/statics/css/master.styles.css?v=<?php echo($cl["update_date"]); ?>">
+	<link rel="stylesheet" href="{%config theme_url%}/statics/css/slave.styles.css?v=<?php echo($cl["update_date"]); ?>">
 
 	<?php if ($cl["curr_lang"]["lang_data"]["is_rtl"] == "Y"): ?>
 		<link rel="stylesheet" href="{%config theme_url%}/statics/css/master.styles.rtl.css?v=<?php echo($cl["update_date"]); ?>">
@@ -193,7 +194,7 @@
 		}
 	</script>
 
-	<?php if ($cl["pn"] == "guest" && $cl["auth_type"] == "signup"): ?>
+	<?php if ($cl["pn"] == "guest" && $cl["auth_type"] == "signup"): ?> <!--check this-->
 		<?php if ($cl["config"]["google_recaptcha"] == "on"): ?>
 			<script src='https://www.google.com/recaptcha/api.js' async defer></script>
 		<?php endif; ?>

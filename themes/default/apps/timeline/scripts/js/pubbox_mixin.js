@@ -29,6 +29,7 @@ var pubbox_form_app_mixin = Object({
 			active_media: null,
 			gif_source: null,
 			post_privacy: "everyone",
+			post_maturity: "general",
 			og_imported: false,
 			progress_bar_status: false,
 			progress_bar_value: 1,
@@ -53,6 +54,11 @@ var pubbox_form_app_mixin = Object({
 					everyone: "<?php echo cl_translate('Everyone can reply'); ?>",
 					mentioned: "<?php echo cl_translate('Only mentioned people'); ?>",
 					followers: "<?php echo cl_translate('Only my followers'); ?>",
+				},
+				maturity: {
+					general: "<?php echo cl_translate('General'); ?>",
+					adult: "<?php echo cl_translate('Adult Content'); ?>",
+					offensive: "<?php echo cl_translate('Offensive Content'); ?>"
 				}
 			},
 			data_temp: {
@@ -444,7 +450,8 @@ var pubbox_form_app_mixin = Object({
 					og_data: _app_.og_data,
 					privacy: _app_.post_privacy,
 					poll_data: _app_.poll,
-					donation_amount: _app_.donation.donate_amount
+					donation_amount: _app_.donation.donate_amount,
+					maturity: _app_.post_maturity
 				},
 				beforeSend: function() {
 					_app_.submitting = true;

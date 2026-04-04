@@ -245,6 +245,35 @@
 					return false;
 				}
 			}
+			
+			_smc.post_maturity = function(priv = "general", id = false) {
+				if ($.isNumeric(id)) {
+					$.ajax({
+						url: '<?php echo cl_link("native_api/main/post_maturity"); ?>',
+						type: 'POST',
+						dataType: 'json',
+						data: {id: id, priv: priv},
+						beforeSend: function() {
+							_smc.progress_bar("show");
+						}
+					}).done(function(data) {
+						if (data.status == 200) {
+							_smc.spa_reload();
+						}
+						else {
+							_smc.errorMSG();
+						}
+					}).always(function() {
+						setTimeout(function() {
+							_smc.progress_bar("end");
+						}, 1500);
+					});
+				}
+
+				else {
+					return false;
+				}
+			}
 
 			_smc.subscribe = function(profile_id = false) {
 				if (_smc.is_logged()) {

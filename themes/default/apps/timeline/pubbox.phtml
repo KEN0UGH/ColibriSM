@@ -414,6 +414,63 @@
 							</div>
 						</button>
 					</div>
+					<div class="post-privacy" v-if="post_maturity">
+						<button class="privacy-settings dropdown" type="button">
+							<div class="dropdown-toggle" data-toggle="dropdown">
+								<span class="d-inline-flex align-items-center flex-wn">
+									<span class="flex-item icon" v-if="post_maturity == 'general'">
+										<?php echo cl_ficon('shield'); ?>
+									</span>
+									<span class="flex-item icon" v-else-if="post_maturity == 'adult'">
+										<?php echo cl_ficon('warning'); ?>
+									</span>
+									<span class="flex-item icon" v-else>
+										<?php echo cl_ficon('alert'); ?>
+									</span>
+									<span class="flex-item flex-grow-1 label">
+										{{sdds.maturity[post_maturity]}}
+									</span>
+								</span>
+							</div>
+							<div class="dropdown-menu dropdown-icons">
+								<a class="dropdown-item" href="javascript:void(0);" v-on:click="post_maturity = 'general'">
+									<span class="flex-item dropdown-item-icon">
+										<?php echo cl_ficon('shield'); ?>
+									</span>
+									<span class="flex-item">
+										<?php echo cl_translate('General'); ?>
+									</span>
+									<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_maturity == 'general'">
+										<?php echo cl_ficon('checkmark'); ?>
+									</span>
+								</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="javascript:void(0);" v-on:click="post_maturity = 'adult'">
+									<span class="flex-item dropdown-item-icon">
+										<?php echo cl_ficon('warning'); ?>
+									</span>
+									<span class="flex-item">
+										<?php echo cl_translate('Adult Content'); ?>
+									</span>
+									<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_maturity == 'adult'">
+										<?php echo cl_ficon('checkmark'); ?>
+									</span>
+								</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="javascript:void(0);" v-on:click="post_maturity = 'offensive'">
+									<span class="flex-item dropdown-item-icon">
+										<?php echo cl_ficon('alert'); ?>
+									</span>
+									<span class="flex-item">
+										<?php echo cl_translate('Offensive Content'); ?>
+									</span>
+									<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_maturity == 'offensive'">
+										<?php echo cl_ficon('checkmark'); ?>
+									</span>
+								</a>
+							</div>
+						</button>
+					</div>
 					<div class="post-publication">
 						<button v-if="submitting" disabled="true" type="submit" class="btn-custom main-inline md">
 							<?php echo cl_translate("Publishing"); ?>...

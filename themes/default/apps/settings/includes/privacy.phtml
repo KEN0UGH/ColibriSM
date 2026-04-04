@@ -41,6 +41,21 @@
 	                        </div>
 	                    </div>
 	                </div>
+					<div class="form-group">
+						<label>
+							<?php echo cl_translate("What content maturity level can you see?"); ?>   
+						</label>
+						<div class="dropdown vue-dropdown-select">
+							<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+								{{sdds.profile_maturity[profile_maturity]}}
+							</button>
+							<div class="dropdown-menu">
+								<a v-for="(v,k) in sdds.profile_maturity" v-on:click="profile_maturity = k" class="dropdown-item" href="javascript:void(0);">
+									{{v}}
+								</a>
+							</div>
+						</div>
+					</div>
 	                <div class="form-group">
 	                    <label>
 	                        <?php echo cl_translate("Who can follow me?"); ?>   
@@ -133,6 +148,7 @@
 					submitting: false,
 					unsuccessful_attempt: false,
 					profile_privacy: "<?php echo($me['profile_privacy']); ?>",
+					profile_maturity: "<?php echo($me['profile_maturity']); ?>",
 					follow_privacy: "<?php echo($me['follow_privacy']); ?>",
 					contact_privacy: "<?php echo($me['contact_privacy']); ?>",
 					index_privacy: "<?php echo($me['index_privacy']); ?>",
@@ -141,6 +157,11 @@
 						profile_privacy: {
 							everyone: "<?php echo cl_translate("Everyone"); ?>",
 							followers: "<?php echo cl_translate("My followers"); ?>"
+						},
+						profile_maturity: {
+							general: "<?php echo cl_translate("General content only"); ?>",
+							adult: "<?php echo cl_translate("General + Adult content"); ?>",
+							offensive: "<?php echo cl_translate("All content"); ?>"
 						},
 						follow_privacy: {
 							everyone: "<?php echo cl_translate("Everyone"); ?>",
@@ -163,6 +184,9 @@
 				validations: {
 					profile_privacy: {
 						profile_privacy: VueValids.required
+					},
+					 profile_maturity: {
+						profile_maturity: VueValids.required
 					},
 					follow_privacy: {
 						profile_privacy: VueValids.required
@@ -211,6 +235,7 @@
 
 	                   	return Object({
 	                   		profile_privacy: _app_.profile_privacy,
+							profile_maturity: _app_.profile_maturity,
 	                   		follow_privacy: _app_.follow_privacy,
 	                   		contact_privacy: _app_.contact_privacy,
 	                   		online_ind: _app_.online_ind,

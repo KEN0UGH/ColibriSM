@@ -36,6 +36,30 @@
 			<?php echo cl_translate("A user with such credentials is not found. Check the data entered and try again."); ?>
 		</div>
 	</div>
+	<?php if ($cl["config"]["google_recaptcha"] == "on"): ?>
+		<div class="form-group">
+			<div class="d-flex justify-content-center">
+				<div class="g-recaptcha" data-sitekey="<?php echo($cl["config"]["google_recap_key1"]); ?>"></div>
+			</div>
+			<div v-if="grecaptcha_error" class="invalid-main-feedback text-center">
+				<?php echo cl_translate("Please check reCAPTCHA to proceed with login."); ?>
+			</div>
+		</div>
+	<?php endif; ?>
+	<?php if ($cl["config"]["captcha"] == "on"): ?>
+		<div class="form-group">
+			<label class="input-label">
+				<?php echo cl_translate("CAPTCHA"); ?>
+			</label>
+			<div class="align-items-center">
+				<img src="<?php echo cl_link('apps/native/ajax/auth/captcha.php'); ?>" alt="CAPTCHA" class="mr-3" style="border: 1px solid #ccc;">
+				<input name="captcha" v-model.trim="captcha" type="text" class="form-control" placeholder="<?php echo cl_translate("Enter CAPTCHA code"); ?>" maxlength="6">
+			</div>
+			<div class="invalid-main-feedback" v-if="captcha_error">
+				<?php echo cl_translate("CAPTCHA code is incorrect."); ?>
+			</div>
+		</div>
+	<?php endif; ?>
 	<div class="form-group">
 		<div class="form-cta-link">
 			<span>
