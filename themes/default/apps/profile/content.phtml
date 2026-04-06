@@ -598,6 +598,15 @@
 				</a>
 			</div>
 			<div class="timeline-navbar__item">
+				<a href="<?php echo cl_link(cl_strf("%s/replies",$cl['prof_user']['raw_uname'])); ?>" data-spa="true">
+					<button class="timeline-navbar__item-btn <?php if($cl['page_tab'] == 'replies') {echo('active');} ?>">
+						<span class="btn-flex-inner">
+							<?php echo cl_translate("Replies"); ?>
+						</span>
+					</button>
+				</a>
+			</div>
+			<div class="timeline-navbar__item">
 				<a href="<?php echo cl_link(cl_strf("%s/media",$cl['prof_user']['raw_uname'])); ?>" data-spa="true">
 					<button class="timeline-navbar__item-btn <?php if($cl['page_tab'] == 'media') {echo('active');} ?>">
 						<span class="btn-flex-inner">
@@ -631,45 +640,47 @@
 			</div>
 		</div>
 	<?php else: ?>
-		<?php if (not_empty($cl["can_view"])): ?>
-			<?php if (in_array($cl['page_tab'], array('posts', 'media'))): ?>
-				<div class="timeline-posts-container">
-					<div class="timeline-posts-ls" data-an="entry-list">
-						<?php if (empty($cl["profile_pinned_post"]) != true): ?>
-							<?php
+		<?php if (in_array($cl['page_tab'], array('posts', 'media'))): ?>
+			<div class="timeline-posts-container">
+				<div class="timeline-posts-ls" data-an="entry-list">
+					<?php if (empty($cl["profile_pinned_post"]) != true): ?>
+						<?php
+							$cl['li'] = $cl["profile_pinned_post"];
+							echo cl_template('timeline/post'); 
+						?>
+					<?php endif; ?>
 
-								$cl['li'] = $cl["profile_pinned_post"];
-
-								echo cl_template('timeline/post'); 
-							?>
-						<?php endif; ?>
-
-						<?php if (not_empty($cl["user_posts"])): ?>
-							<?php foreach ($cl["user_posts"] as $cl['li']): ?>
-								<?php echo cl_template('timeline/post'); ?>
-							<?php endforeach; ?>
-						<?php else: ?>
-							<?php echo cl_template('profile/includes/no_posts'); ?>
-						<?php endif; ?>
-					</div>
+					<?php if (not_empty($cl["user_posts"])): ?>
+						<?php foreach ($cl["user_posts"] as $cl['li']): ?>
+							<?php echo cl_template('timeline/post'); ?>
+						<?php endforeach; ?>
+					<?php else: ?>
+						<?php echo cl_template('profile/includes/no_posts'); ?>
+					<?php endif; ?>
 				</div>
-			<?php else: ?>
-				<div class="timeline-posts-container">
-					<div class="timeline-posts-ls" data-an="entry-list">
-						<?php if (not_empty($cl["user_likes"])): ?>
-							<?php foreach ($cl["user_likes"] as $cl['li']): ?>
-								<?php echo cl_template('timeline/post'); ?>
-							<?php endforeach; ?>
-						<?php else: ?>
-							<?php echo cl_template('profile/includes/no_posts'); ?>
-						<?php endif; ?>
-					</div>
+			</div>
+		<?php elseif ($cl['page_tab'] == 'replies'): ?>
+			<div class="timeline-posts-container">
+				<div class="timeline-posts-ls" data-an="entry-list">
+					<?php if (not_empty($cl["user_replies"])): ?>
+						<?php foreach ($cl["user_replies"] as $cl['li']): ?>
+							<?php echo cl_template('timeline/post'); ?>
+						<?php endforeach; ?>
+					<?php else: ?>
+						<?php echo cl_template('profile/includes/no_posts'); ?>
+					<?php endif; ?>
 				</div>
-			<?php endif; ?>
+			</div>
 		<?php else: ?>
 			<div class="timeline-posts-container">
-				<div class="timeline-posts-ls">
-					<?php echo cl_template('profile/includes/private_profile'); ?>
+				<div class="timeline-posts-ls" data-an="entry-list">
+					<?php if (not_empty($cl["user_likes"])): ?>
+						<?php foreach ($cl["user_likes"] as $cl['li']): ?>
+							<?php echo cl_template('timeline/post'); ?>
+						<?php endforeach; ?>
+					<?php else: ?>
+						<?php echo cl_template('profile/includes/no_posts'); ?>
+					<?php endif; ?>
 				</div>
 			</div>
 		<?php endif; ?>

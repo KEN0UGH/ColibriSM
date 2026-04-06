@@ -44,6 +44,7 @@ else{
 		$cl["sbl"]         = true;
 		$cl["user_posts"]  = array();
 		$cl["user_likes"]  = array();
+		$cl["user_replies"] = array();
 		$cl["can_view"]    = cl_can_view_profile($cl['prof_user']['id']);
 		$cl["app_statics"] = array(
 			"scripts" => array()
@@ -100,6 +101,12 @@ else{
 				if (not_empty($cl["can_view"])) {
 					$media_type       = (($cl['page_tab'] == 'media') ? true : false);
 					$cl["user_posts"] = cl_get_profile_posts($cl['prof_user']['id'], 30, $media_type);
+				}
+			}
+
+			elseif ($cl['page_tab'] == 'replies') {
+				if (not_empty($cl["can_view"])) {
+					$cl["user_replies"] = cl_get_profile_replies($cl['prof_user']['id'], 30);
 				}
 			}
 

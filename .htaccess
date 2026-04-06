@@ -95,7 +95,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 RewriteRule ^(\w{3,25})(\/|)$ index.php?app=profile&uname=$1 [QSA]
 RewriteRule ^(\w{3,25})/(following|followers|follow_requests)(\/|)$ index.php?app=connections&uname=$1&tab=$2 [QSA]
-RewriteRule ^(\w{3,25})/(posts|media|likes)(\/|)$ index.php?app=profile&uname=$1&tab=$2 [QSA]
+RewriteRule ^(\w{3,25})/(posts|replies|media|likes)(\/|)$ index.php?app=profile&uname=$1&tab=$2 [QSA]
 
 
 # If you have custom pages or sections that you 

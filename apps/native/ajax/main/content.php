@@ -665,11 +665,9 @@ else if ($action == 'publish_new_post') {
 
         if (not_empty($thread_id)) {
             $thread_data  = cl_raw_post_data($thread_id);
-            $post_privacy = "everyone";
-            $post_maturity = "general";
 
             if (empty($thread_data) || cl_can_reply($thread_data) != true) {
-                $thread_id   = 0; 
+                $thread_id   = 0;
                 $thread_data = array();
             }
         }

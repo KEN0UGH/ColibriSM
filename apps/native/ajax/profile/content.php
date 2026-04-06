@@ -20,7 +20,7 @@
 require_once(cl_full_path("core/apps/profile/app_ctrl.php"));
 
 if ($action == 'load_more') {
-	$data['err_code'] = 0;
+    $data['err_code'] = 0;
     $data['status']   = 400;
     $offset           = fetch_or_get($_GET['offset'], 0);
     $prof_id          = fetch_or_get($_GET['prof_id'], 0);
@@ -28,10 +28,15 @@ if ($action == 'load_more') {
     $html_arr         = array();
 
     if (is_posnum($prof_id) && is_posnum($offset) && cl_can_view_profile($prof_id)) { 	
-    	if (in_array($type, array('posts', 'media'))) {
+        if (in_array($type, array('posts', 'media', 'replies'))) {
 
-            $media_type = (($type == 'media') ? true : false);
-            $posts_ls   = cl_get_profile_posts($prof_id, 30, $media_type, $offset);
+            if ($type == 'media') {
+                $posts_ls = cl_get_profile_posts($prof_id, 30, true, $offset);
+            } elseif ($type == 'replies') {
+                $posts_ls = cl_get_profile_replies($prof_id, 30, $offset);
+            } else {
+                $posts_ls = cl_get_profile_posts($prof_id, 30, false, $offset);
+            }
 
             if (not_empty($posts_ls)) {
                 foreach ($posts_ls as $cl['li']) {
