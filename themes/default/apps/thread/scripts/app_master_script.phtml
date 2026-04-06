@@ -1,41 +1,59 @@
 <script>
-	"use strict";
-	
-	$(document).ready(function($) {
-		var _app = $('[data-app="thread"]');
+    "use strict";
+    
+    $(document).ready(function($) {
+        var _app = $('[data-app="thread"]');
 
-		_app.find('div[data-an="thread-data"]').scroll2();
+        _app.find('div[data-an="thread-data"]').scroll2();
 
-		_app.find('button[data-an="load-more"]').on('click', function(event) {
-			event.preventDefault();
+        // Initialize thread reply box
+        <?php echo cl_js_template('apps/timeline/scripts/js/pubbox_mixin'); ?>
+        
+        if ($("form#vue-pubbox-app-3").length) {
+            var pubbox_app_3 = new Vue({
+                el: "#vue-pubbox-app-3",
+                mixins: [pubbox_form_app_mixin]
+            });
+            
+            // Set the thread ID for replies
+            pubbox_app_3.thread_id = <?php echo($cl['thread_data']['post']['id']); ?>;
+            
+            // Mark as inline reply box to prevent thread_id reset
+            pubbox_app_3.is_inline_thread_reply = true;
+            
+            SMColibri.extend_vue('pubbox3', pubbox_app_3);
+        }
 
-			var _self     = $(this);
-			var replys_ls = _app.find('div[data-an="replys-list"]');
-			var last_item = replys_ls.find('div[data-post-offset]').last();
+        _app.find('button[data-an="load-more"]').on('click', function(event) {
+            event.preventDefault();
 
-			if (last_item.length) {
-				$.ajax({
-					url: '<?php echo cl_link("native_api/thread/load_thread_replys"); ?>',
-					type: 'GET',
-					dataType: 'json',
-					data: {
-						offset: last_item.data('post-offset'),
-						thread_id: '<?php echo($cl['thread_data']['post']['id']); ?>'
-					},
-					beforeSend: function(){
-						_self.attr('disabled', 'true').text("<?php echo cl_translate("Please wait"); ?>");
-					}
-				}).done(function(data) {
-					if (data.status == 200) {
-						replys_ls.append(data.html);
-						
-						_self.removeAttr('disabled').text("<?php echo cl_translate("Show more"); ?>");
-					}
-					else {
-						_self.text("<?php echo cl_translate("That is all for now!"); ?>");
-					}
-				});
-			}
-		});
-	});
+            var _self     = $(this);
+            var replys_ls = _app.find('div[data-an="replys-list"]');
+            var last_item = replys_ls.find('div[data-post-offset]').last();
+
+            if (last_item.length) {
+                $.ajax({
+                    url: '<?php echo cl_link("native_api/thread/load_thread_replys"); ?>',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        offset: last_item.data('post-offset'),
+                        thread_id: '<?php echo($cl['thread_data']['post']['id']); ?>'
+                    },
+                    beforeSend: function(){
+                        _self.attr('disabled', 'true').text("<?php echo cl_translate("Please wait"); ?>");
+                    }
+                }).done(function(data) {
+                    if (data.status == 200) {
+                        replys_ls.append(data.html);
+                        
+                        _self.removeAttr('disabled').text("<?php echo cl_translate("Show more"); ?>");
+                    }
+                    else {
+                        _self.text("<?php echo cl_translate("That is all for now!"); ?>");
+                    }
+                });
+            }
+        });
+    });
 </script>

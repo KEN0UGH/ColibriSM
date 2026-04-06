@@ -473,10 +473,15 @@ var pubbox_form_app_mixin = Object({
 								SMColibri.spa_reload();
 							}
 						}
-						else if(SMColibri.curr_pn == "thread" && _app_.thread_id) {
-							_app_.thread_id     = 0;
-							var thread_timeline = $('div[data-app="thread"]');
-							var new_post        = $(data.html).addClass('animated fadeIn');
+						else if (SMColibri.curr_pn == "thread" && _app_.thread_id) {
+    var is_inline_reply = (_app_.$el.id == 'vue-pubbox-app-3' || _app_.is_inline_thread_reply);
+
+    if (!is_inline_reply) {
+        _app_.thread_id = 0;
+    }
+
+    var thread_timeline = $('div[data-app="thread"]');
+    var new_post        = $(data.html).addClass('animated fadeIn');
 
 							if(thread_timeline.find('div[data-an="replys-list"]').length) {
 								thread_timeline.find('div[data-an="replys-list"]').prepend(new_post).promise().done(function() {

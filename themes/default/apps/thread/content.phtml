@@ -35,6 +35,12 @@
 			<?php echo cl_template('thread/thread'); ?>
 		</div>
 
+		<?php if (not_empty($cl['thread_data']['can_reply'])): ?>
+            <div class="timeline-reply-box-container">
+                <?php $cl['pb_id'] = 3; echo cl_template('timeline/pubbox'); ?>
+            </div>
+        <?php endif; ?>
+
 		<?php if (cl_is_feed_gad_allowed()): ?>
 			<?php if (not_empty($cl["gads_horiz"])): ?>
 				<div class="cl-google-ads centered">
