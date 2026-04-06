@@ -629,6 +629,18 @@ function cl_delete_user_data($user_id = false) {
                     }
                 }
             }
+
+            if (not_empty($user_data['avatar'])) {
+                cl_delete_media($user_data['avatar']);
+            }
+
+            if (not_empty($user_data['cover'])) {
+                cl_delete_media($user_data['cover']);
+            }
+
+            if (not_empty($user_data['cover_orig'])) {
+                cl_delete_media($user_data['cover_orig']);
+            }
             
 
             $db = $db->where('user_id', $user_id);
