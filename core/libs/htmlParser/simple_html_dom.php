@@ -73,10 +73,11 @@ function file_get_html(
 	$context = stream_context_create(array(
 		"http" => array(
 			"ignore_errors" => true,
-			"user_agent" => ""
+			"user_agent"   => "",
+			"timeout"      => 1
 		),
 		"ssl" => array(
-			"verify_peer" => false,
+			"verify_peer"      => false,
 			"verify_peer_name" => false
 		)
 	));

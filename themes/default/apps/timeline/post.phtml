@@ -2,7 +2,7 @@
 	<?php if ($cl['li']['advertising']): ?>
 		<?php echo cl_template('timeline/ad'); ?>
 	<?php else: ?>
-		<div class="post-list-item" data-list-item="<?php echo($cl['li']['id']); ?>" data-post-offset="<?php echo($cl['li']['offset_id']); ?>"<?php if (!isset($me['profile_maturity']) || $me['profile_maturity'] == 'general'): ?>  data-mature="<?php echo(fetch_or_get($cl['li']['mature_wcr'], 'general')); ?>"<?php endif; ?><?php echo fetch_or_get($cl['li']['attrs'],''); ?>>
+		<div class="post-list-item" data-list-item="<?php echo($cl['li']['id']); ?>" data-post-offset="<?php echo($cl['li']['offset_id']); ?>" <?php if (!isset($me['profile_maturity']) || $me['profile_maturity'] == 'general'): ?> <?php endif; ?> data-mature="<?php echo(fetch_or_get($cl['li']['mature_wcs'], fetch_or_get($cl['li']['mature_wcr'], 'general'))); ?>"<?php echo fetch_or_get($cl['li']['attrs'],''); ?>>
 			<?php if (not_empty($cl['li']['me_blocked'])): ?>
 				<div class="post-placeholder">
 					<div class="d-flex flex-wn align-items-center">
@@ -96,6 +96,15 @@
 
 				<div class="post-list-item__content">
 					<div class="post-data">
+						<?php if ($cl['li']['incognito_wcs'] == 'incognito' || $cl['li']['incognito_wcr'] == 'incognito'): ?>
+						<div class="post-data__avatar">
+							<a class="block-link" href="<?php echo($cl['li']['url']); ?>" data-spa="true">
+								<div class="avatar-holder <?php if(cl_is_online($cl['li']['owner']['is_online'])) {echo "avatar-holder-online";} ?>">
+									<img class="lozad" data-src="<?php echo cl_link("themes/default/statics/img/incognito.png"); ?>">
+								</div> 
+							</a>
+						</div>
+						<?php else: ?>
 						<div class="post-data__avatar">
 							<a class="block-link" href="<?php echo($cl['li']['url']); ?>" data-spa="true">
 								<div class="avatar-holder <?php if(cl_is_online($cl['li']['owner']['is_online'])) {echo "avatar-holder-online";} ?>">
@@ -103,6 +112,7 @@
 								</div> 
 							</a>
 						</div>
+						<?php endif; ?>
 						<div class="post-data__content">
 							<?php if (not_empty($cl['li']['is_blocked'])): ?>
 								<div class="post-data__content-hidden" data-softhidden-post="<?php echo($cl['li']['id']); ?>">
@@ -141,13 +151,26 @@
 							<div class="post-data__content-inner">
 								<div class="post-data-layout">
 									<div class="post-data-layout__publisher">
+										<?php if ($cl['li']['incognito_wcs'] == 'incognito' || $cl['li']['incognito_wcr'] == 'incognito'): ?>
+										<div class="post-username">
+											<a href="<?php echo($cl['li']['url']); ?>" data-spa="true">
+												<span class="user-name-holder">
+													<span class="user-name-holder__name">
+														Incognito
+													</span>
+													<span class="user-name-holder__badge">
+														<?php echo cl_icon("verified_user_badge"); ?>
+													</span>
+												</span>
+											</a>
+										</div>
+										<?php else: ?>
 										<div class="post-username">
 											<a href="<?php echo($cl['li']['owner']['url']); ?>" data-spa="true" data-uinfo-lbox="<?php echo($cl['li']['owner']['id']); ?>" data-toggle="popover" data-placement="bottom">
 												<span class="user-name-holder">
 													<span class="user-name-holder__name">
 														<?php echo($cl['li']['owner']['name']); ?>
 													</span>
-
 													<?php if ($cl['li']['owner']['verified'] == '1'): ?>
 														<span class="user-name-holder__badge">
 															<?php echo cl_icon("verified_user_badge"); ?>
@@ -156,6 +179,7 @@
 												</span>
 											</a>
 										</div>
+										<?php endif; ?>
 										<div class="post-time">
 											<?php echo($cl['li']['time']); ?>
 
@@ -265,19 +289,35 @@
 													</div>
 												<?php endif; ?>
 											<?php elseif($cl['li']['type'] == 'video' && not_empty($cl['li']['media'])): ?>
-												<div class="lozad-media">
-													<div class="publication-video">
-														<div class="cl-plyr-video">
-															<video data-video-ratio="<?php echo(fetch_or_get($cl['li']['media'][0]['x']["ratio"],'16:9')); ?>" class="plyr" preload="metadata" playsinline controls data-poster="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['x']['poster_thumb'],'')); ?>">
-																<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mp4">
-			 													<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/webm">
-			 													<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mov">
-			 													<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/3gp">
-			 													<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/ogg">
-															</video>
+												<?php if ($cl["config"]["html5player"] == "on"): ?>
+													<div class="lozad-media">
+														<div class="publication-video">
+															<div class="cl-html5-video">
+																<video data-video-ratio="<?php echo(fetch_or_get($cl['li']['media'][0]['x']["ratio"],'16:9')); ?>" preload="metadata" playsinline controls>
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mp4">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/webm">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mov">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/3gp">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/ogg">
+																</video>
+															</div>
 														</div>
-												    </div>
-												</div>
+													</div>
+												<?php else: ?>
+													<div class="lozad-media">
+														<div class="publication-video">
+															<div class="cl-plyr-video">
+																<video data-video-ratio="<?php echo(fetch_or_get($cl['li']['media'][0]['x']["ratio"],'16:9')); ?>" class="plyr" preload="metadata" playsinline controls data-poster="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['x']['poster_thumb'],'')); ?>">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mp4">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/webm">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mov">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/3gp">
+																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/ogg">
+																</video>
+															</div>
+														</div>
+													</div>
+												<?php endif; ?>
 											<?php elseif($cl['li']['type'] == 'audio' && not_empty($cl['li']['media'])): ?>
 												<div class="publication-audio">
 													<div class="cl-plyr-audio">
@@ -548,6 +588,12 @@
 												</span>
 											</button>
 										<?php endif; ?>
+
+										<button class="ctrls-item" onclick="SMColibri.quote_repost('<?php echo $cl['li']['id']; ?>', '<?php echo $cl['li']['url']; ?>', this);">
+											<span class="ctrls-item__icon">
+												<?php echo cl_ficon('rocket'); ?>
+											</span>
+										</button>
 
 										<button class="ctrls-item" onclick="SMColibri.share_post('<?php echo $cl['li']['url']; ?>','<?php echo urlencode($cl['li']['url']); ?>');">
 											<span class="ctrls-item__icon">

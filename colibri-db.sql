@@ -363,7 +363,11 @@
 {%end%}
 
 {%begin%}
-  ALTER TABLE `cl_users` ADD `contact_privacy` ENUM('everyone','followed') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'everyone' AFTER `profile_maturity`;
+  ALTER TABLE `cl_users` ADD `profile_incognito` ENUM('cognito','incognito') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'cognito' AFTER `profile_maturity`;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_users` ADD `contact_privacy` ENUM('everyone','followed') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'everyone' AFTER `profile_incognito`;
 {%end%}
 
 {%begin%}
@@ -530,6 +534,14 @@
 
 {%begin%}
   ALTER TABLE `cl_publications` ADD `mature_wcr` ENUM('general','adult','offensive') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'general' AFTER `mature_wcs`;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_publications` ADD `incognito_wcs` ENUM('cognito','incognito') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'cognito' AFTER `mature_wcr`;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_publications` ADD `incognito_wcr` ENUM('cognito','incognito') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'cognito' AFTER `incognito_wcs`;
 {%end%}
 
 {%begin%}
@@ -749,6 +761,10 @@
 
 {%begin%}
   INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Captcha', 'captcha', 'off', '/^(on|off)$/');
+{%end%}
+
+{%begin%}
+  INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'HTML5 Player', 'html5player', 'off', '/^(on|off)$/');
 {%end%}
 
 {%begin%}

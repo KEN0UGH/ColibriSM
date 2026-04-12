@@ -28,10 +28,21 @@ if (empty($cl['thread_data']['post'])) {
 }
 
 else{
-	$cl["page_title"] = cl_translate("post_seo_title", array("user_name" => $cl['thread_data']['post']['owner']['name'], "site_name" => $cl["config"]["name"], "post_url" => $cl['thread_data']['post']["url"]));
+	$owner_name = $cl['thread_data']['post']['owner']['name'];
+
+	if ($cl['thread_data']['post']['incognito_wcr'] == 'incognito') {
+		$owner_name = cl_translate("Incognito");
+	}
+
+	$cl["page_title"] = cl_translate("post_seo_title", array(
+		"user_name" => $owner_name,
+		"site_name" => $cl["config"]["name"],
+		"post_url"  => $cl['thread_data']['post']["url"]
+	));
 	$cl["page_desc"]  = $cl['thread_data']['post']['og_text'];
 	$cl["page_kw"]    = $cl["config"]["keywords"];
 	$cl["page_image"] = $cl['thread_data']['post']['og_image'];
+	$cl["page_img"] = $cl['thread_data']['post']['og_image'];
 	$cl["page_url"]   = cl_link(cl_strf("thread/%d", $thread_id));
 	$cl["pn"]         = "thread";
 	$cl["sbr"]        = true;

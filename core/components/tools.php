@@ -450,12 +450,6 @@ function cl_cropimg($max_width, $max_height, $source_file, $dst_dir, $quality = 
     }
 
     @imagejpeg($dst_img, $dst_dir, $quality);
-    if ($dst_img) {
-        @imagedestroy($dst_img);
-    }     
-    if ($src_img) {
-        @imagedestroy($src_img);
-    }      
 }
 
 function cl_imagerotate($img_source = false, $source_url = false) {

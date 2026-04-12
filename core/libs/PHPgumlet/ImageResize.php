@@ -357,7 +357,9 @@ class ImageResize {
             chmod($filename, $permissions);
         }
 
-        imagedestroy($dest_image);
+        if (PHP_VERSION_ID < 80000) {
+            imagedestroy($dest_image);
+        }
 
         return $this;
     }

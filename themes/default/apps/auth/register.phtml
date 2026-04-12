@@ -87,10 +87,16 @@
 		<?php if ($cl["config"]["captcha"] == "on"): ?>
 			<div class="form-group">
 				<label><?php echo cl_translate("CAPTCHA"); ?></label>
-				<div class="d-flex align-items-center">
-					<img src="<?php echo cl_link('apps/native/ajax/auth/captcha.php'); ?>" alt="CAPTCHA" class="mr-3" style="border: 1px solid #ccc;">
-					<input name="captcha" v-model.trim="captcha" type="text" class="form-control" placeholder="<?php echo cl_translate("Enter CAPTCHA code"); ?>" maxlength="6">
+
+				<div class="captcha-row">
+					<img id="captcha-image" src="<?php echo cl_link('apps/native/ajax/auth/captcha.php?r=' . time()); ?>" alt="CAPTCHA" class="captcha-img">
+					<button type="button" class="btn btn-custom main-outline sm captcha-refresh-btn">
+						<?php echo cl_translate("Refresh"); ?>
+					</button>
 				</div>
+
+				<input name="captcha" v-model.trim="captcha" type="text" class="form-control mt-2" placeholder="<?php echo cl_translate("Enter CAPTCHA code"); ?>" maxlength="6">
+
 				<div class="invalid-main-feedback" v-if="captcha_error">
 					<?php echo cl_translate("CAPTCHA code is incorrect."); ?>
 				</div>

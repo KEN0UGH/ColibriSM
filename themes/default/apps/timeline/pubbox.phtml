@@ -132,6 +132,26 @@
 						</div>
 					</div>
 				</div>
+				<?php if ($cl["config"]["html5player"] == "on"): ?>
+				<div class="timeline-pubbox__video" v-if="active_media == 'video'">	
+					<div class="pubbox-video">
+						<div class="pubbox-video__player">
+							<div class="cl-html5-video">
+								<video data-video-ratio="16:9" preload="metadata" playsinline controls>
+									<source v-bind:src="video.source" type="video/mp4">
+									<source v-bind:src="video.source" type="video/webm">
+									<source v-bind:src="video.source" type="video/mov">
+									<source v-bind:src="video.source" type="video/3gp">
+									<source v-bind:src="video.source" type="video/ogg">
+								</video>
+							</div>
+						</div>
+						<button type="button" class="delete-preview" v-on:click="delete_video">
+							<?php echo cl_icon('close'); ?>
+						</button>
+					</div>
+				</div>
+				<?php else: ?>
 				<div class="timeline-pubbox__video" v-if="active_media == 'video'">	
 					<div class="pubbox-video">
 						<div class="pubbox-video__player">
@@ -150,6 +170,7 @@
 						</button>
 					</div>
 				</div>
+				<?php endif; ?>
 				<div class="timeline-pubbox__audio" v-if="preview_audio">
 					<div class="pubbox-audio">
 						<div class="pubbox-audio__player">
@@ -425,7 +446,7 @@
 										<?php echo cl_ficon('warning'); ?>
 									</span>
 									<span class="flex-item icon" v-else>
-										<?php echo cl_ficon('alert'); ?>
+										<?php echo cl_ikon('skull'); ?>
 									</span>
 									<span class="flex-item flex-grow-1 label">
 										{{sdds.maturity[post_maturity]}}
@@ -459,12 +480,54 @@
 								<div class="dropdown-divider"></div>
 								<a class="dropdown-item" href="javascript:void(0);" v-on:click="post_maturity = 'offensive'">
 									<span class="flex-item dropdown-item-icon">
-										<?php echo cl_ficon('alert'); ?>
+										<?php echo cl_ikon('skull'); ?>
 									</span>
 									<span class="flex-item">
 										<?php echo cl_translate('Offensive Content'); ?>
 									</span>
 									<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_maturity == 'offensive'">
+										<?php echo cl_ficon('checkmark'); ?>
+									</span>
+								</a>
+							</div>
+						</button>
+					</div>
+					<div class="post-privacy" v-if="post_incognito">
+						<button class="privacy-settings dropdown" type="button">
+							<div class="dropdown-toggle" data-toggle="dropdown">
+								<span class="d-inline-flex align-items-center flex-wn">
+									<span class="flex-item icon" v-if="post_incognito == 'cognito'">
+										<?php echo cl_ficon('shield'); ?>
+									</span>
+									<span class="flex-item icon" v-else>
+										<?php echo cl_ikon('skull'); ?>
+									</span>
+									<span class="flex-item flex-grow-1 label">
+										{{sdds.incognito[post_incognito]}}
+									</span>
+								</span>
+							</div>
+							<div class="dropdown-menu dropdown-icons">
+								<a class="dropdown-item" href="javascript:void(0);" v-on:click="post_incognito = 'cognito'">
+									<span class="flex-item dropdown-item-icon">
+										<?php echo cl_ficon('shield'); ?>
+									</span>
+									<span class="flex-item">
+										<?php echo cl_translate('General'); ?>
+									</span>
+									<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_incognito == 'cognito'">
+										<?php echo cl_ficon('checkmark'); ?>
+									</span>
+								</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="javascript:void(0);" v-on:click="post_incognito = 'incognito'">
+									<span class="flex-item dropdown-item-icon">
+										<?php echo cl_ficon('warning'); ?>
+									</span>
+									<span class="flex-item">
+										<?php echo cl_translate('Incognito'); ?>
+									</span>
+									<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_incognito == 'incognito'">
 										<?php echo cl_ficon('checkmark'); ?>
 									</span>
 								</a>
@@ -481,9 +544,9 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="progress_bar_status" class="timeline-pubbox__progress">
+			<!--<div v-if="progress_bar_status" class="timeline-pubbox__progress">
 				<div class="progress-line" v-bind:style="{'width': progress_bar_value + '%'}">{{progress_bar_value}}%</div>
-			</div>
+			</div>-->
 		</div>
 
 		<input multiple="multiple" type="file" class="d-none" data-an="images-input" accept="image/*" v-on:change="upload_images($event)">

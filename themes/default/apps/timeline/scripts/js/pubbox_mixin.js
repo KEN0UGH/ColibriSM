@@ -30,6 +30,7 @@ var pubbox_form_app_mixin = Object({
 			gif_source: null,
 			post_privacy: "everyone",
 			post_maturity: "general",
+			post_incognito: "cognito",
 			og_imported: false,
 			progress_bar_status: false,
 			progress_bar_value: 1,
@@ -59,6 +60,10 @@ var pubbox_form_app_mixin = Object({
 					general: "<?php echo cl_translate('General'); ?>",
 					adult: "<?php echo cl_translate('Adult Content'); ?>",
 					offensive: "<?php echo cl_translate('Offensive Content'); ?>"
+				},
+				incognito: {
+					cognito: "<?php echo cl_translate('Cognito'); ?>",
+					incognito: "<?php echo cl_translate('Incognito'); ?>"
 				}
 			},
 			data_temp: {
@@ -440,7 +445,7 @@ var pubbox_form_app_mixin = Object({
 			var _app_ = this;
 
 			$(_self.target).ajaxSubmit({
-				url: "<?php echo cl_link("native_api/main/publish_new_post"); ?>",
+				url: "<?php echo cl_link('native_api/main/publish_new_post'); ?>",
 				type: 'POST',
 				dataType: 'json',
 				data: {
@@ -451,7 +456,8 @@ var pubbox_form_app_mixin = Object({
 					privacy: _app_.post_privacy,
 					poll_data: _app_.poll,
 					donation_amount: _app_.donation.donate_amount,
-					maturity: _app_.post_maturity
+					maturity: _app_.post_maturity,
+					incognito: _app_.post_incognito
 				},
 				beforeSend: function() {
 					_app_.submitting = true;
@@ -908,9 +914,9 @@ var pubbox_form_app_mixin = Object({
 			if (cl_empty(_app_.active_media) || _app_.active_media == 'image') {
 				var images = event.target.files;
 
-				if (SMColibri.curr_pn == 'thread') {
+				/*if (SMColibri.curr_pn == 'thread') {
 	        		$('div[data-app="modal-pubbox"]').addClass('vis-hidden');
-	        	}
+	        	}*/	
 
 				if (images.length) {
 					_app_.progress_bar_start();
@@ -967,11 +973,11 @@ var pubbox_form_app_mixin = Object({
 					_app_.progress_bar_end();
 				}
 
-				setTimeout(function() {
+				/*setTimeout(function() {
 					if (SMColibri.curr_pn == 'thread') {
 		        		$('div[data-app="modal-pubbox"]').removeClass('vis-hidden');
 		        	}
-				}, 1500);
+				}, 1500);*/
 
 				app_el.find('input[data-an="images-input"]').val('');
 			}
@@ -1001,11 +1007,11 @@ var pubbox_form_app_mixin = Object({
 				        contentType: false,
 				        processData: false,
 				        timeout: 600000,
-				        beforeSend: function() {
+				        /*beforeSend: function() {
 				        	if (SMColibri.curr_pn == 'thread') {
 				        		$('div[data-app="modal-pubbox"]').addClass('vis-hidden');
 				        	}
-				        },
+				        },*/
 						success: function(data) {
 							if (data.status == 200) {
 								_app_.video = data.video;
@@ -1032,11 +1038,11 @@ var pubbox_form_app_mixin = Object({
 							_app_.disable_ctrls();
 							app_el.find('input[data-an="video-input"]').val('');
 
-							setTimeout(function() {
+							/*setTimeout(function() {
 								if (SMColibri.curr_pn == 'thread') {
 					        		$('div[data-app="modal-pubbox"]').removeClass('vis-hidden');
 					        	}
-							}, 1500);
+							}, 1500);*/
 						}
 					});
 				}
@@ -1067,11 +1073,11 @@ var pubbox_form_app_mixin = Object({
 				        contentType: false,
 				        processData: false,
 				        timeout: 600000,
-				        beforeSend: function() {
+				        /*beforeSend: function() {
 				        	if (SMColibri.curr_pn == 'thread') {
 				        		$('div[data-app="modal-pubbox"]').addClass('vis-hidden');
 				        	}
-				        },
+				        },*/
 						success: function(data) {
 							if (data.status == 200) {
 								_app_.music = data.music;
@@ -1099,11 +1105,11 @@ var pubbox_form_app_mixin = Object({
 							_app_.disable_ctrls();
 							app_el.find('input[data-an="music-input"]').val('');
 
-							setTimeout(function() {
+							/*setTimeout(function() {
 								if (SMColibri.curr_pn == 'thread') {
 					        		$('div[data-app="modal-pubbox"]').removeClass('vis-hidden');
 					        	}
-							}, 1500);
+							}, 1500);*/
 						}
 					});
 				}
@@ -1134,11 +1140,11 @@ var pubbox_form_app_mixin = Object({
 				        contentType: false,
 				        processData: false,
 				        timeout: 600000,
-				        beforeSend: function() {
+				        /*beforeSend: function() {
 				        	if (SMColibri.curr_pn == 'thread') {
 				        		$('div[data-app="modal-pubbox"]').addClass('vis-hidden');
 				        	}
-				        },
+				        },*/
 						success: function(data) {
 							if (data.status == 200) {
 								_app_.document = data.document;
@@ -1166,11 +1172,11 @@ var pubbox_form_app_mixin = Object({
 							_app_.disable_ctrls();
 							app_el.find('input[data-an="doc-input"]').val('');
 
-							setTimeout(function() {
+							/*setTimeout(function() {
 								if (SMColibri.curr_pn == 'thread') {
 					        		$('div[data-app="modal-pubbox"]').removeClass('vis-hidden');
 					        	}
-							}, 1500);
+							}, 1500);*/
 						}
 					});
 				}

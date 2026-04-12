@@ -549,5 +549,11 @@
 				});
 			}
 		<?php endif; ?>
+
+		$(document).on("click", ".captcha-refresh-btn", function(e) {
+			e.preventDefault();
+			var img = $("#captcha-image");
+			img.attr("src", "<?php echo cl_link('apps/native/ajax/auth/captcha.php'); ?>?r=" + Date.now());
+		});
 	});
 </script>

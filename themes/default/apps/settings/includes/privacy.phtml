@@ -56,6 +56,36 @@
 							</div>
 						</div>
 					</div>
+					<div class="form-group">
+						<label>
+							<?php echo cl_translate("Mark content you post as having material that may be adult or offensive"); ?>   
+						</label>
+						<div class="dropdown vue-dropdown-select">
+							<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+								{{sdds.mark_maturity[mark_maturity]}}
+							</button>
+							<div class="dropdown-menu">
+								<a v-for="(v,k) in sdds.mark_maturity" v-on:click="mark_maturity = k" class="dropdown-item" href="javascript:void(0);">
+									{{v}}
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label>
+							<?php echo cl_translate("label all your posts as incognito"); ?>   
+						</label>
+						<div class="dropdown vue-dropdown-select">
+							<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+								{{sdds.profile_incognito[profile_incognito]}}
+							</button>
+							<div class="dropdown-menu">
+								<a v-for="(v,k) in sdds.profile_incognito" v-on:click="profile_incognito = k" class="dropdown-item" href="javascript:void(0);">
+									{{v}}
+								</a>
+							</div>
+						</div>
+					</div>
 	                <div class="form-group">
 	                    <label>
 	                        <?php echo cl_translate("Who can follow me?"); ?>   
@@ -149,6 +179,8 @@
 					unsuccessful_attempt: false,
 					profile_privacy: "<?php echo($me['profile_privacy']); ?>",
 					profile_maturity: "<?php echo($me['profile_maturity']); ?>",
+					mark_maturity: "<?php echo($me['mark_maturity']); ?>",
+					profile_incognito: "<?php echo($me['profile_incognito']); ?>",
 					follow_privacy: "<?php echo($me['follow_privacy']); ?>",
 					contact_privacy: "<?php echo($me['contact_privacy']); ?>",
 					index_privacy: "<?php echo($me['index_privacy']); ?>",
@@ -162,6 +194,15 @@
 							general: "<?php echo cl_translate("General content only"); ?>",
 							adult: "<?php echo cl_translate("General + Adult content"); ?>",
 							offensive: "<?php echo cl_translate("All content"); ?>"
+						},
+						mark_maturity: {
+							general: "<?php echo cl_translate("General content"); ?>",
+							adult: "<?php echo cl_translate("Adult content"); ?>",
+							offensive: "<?php echo cl_translate("Offensive content"); ?>"
+						},
+						profile_incognito: {
+							cognito: "<?php echo cl_translate("Cognito"); ?>",
+							incognito: "<?php echo cl_translate("Incognito"); ?>"
 						},
 						follow_privacy: {
 							everyone: "<?php echo cl_translate("Everyone"); ?>",
@@ -187,6 +228,12 @@
 					},
 					 profile_maturity: {
 						profile_maturity: VueValids.required
+					},
+					 mark_maturity: {
+						mark_maturity: VueValids.required
+					},
+					 profile_incognito: {
+						profile_incognito: VueValids.required
 					},
 					follow_privacy: {
 						profile_privacy: VueValids.required
@@ -236,6 +283,8 @@
 	                   	return Object({
 	                   		profile_privacy: _app_.profile_privacy,
 							profile_maturity: _app_.profile_maturity,
+							mark_maturity: _app_.mark_maturity,
+							profile_incognito: _app_.profile_incognito,
 	                   		follow_privacy: _app_.follow_privacy,
 	                   		contact_privacy: _app_.contact_privacy,
 	                   		online_ind: _app_.online_ind,

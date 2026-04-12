@@ -275,6 +275,35 @@
 				}
 			}
 
+			_smc.post_incognito = function(priv = "cognito", id = false) {
+				if ($.isNumeric(id)) {
+					$.ajax({
+						url: '<?php echo cl_link("native_api/main/post_incognito"); ?>',
+						type: 'POST',
+						dataType: 'json',
+						data: {id: id, priv: priv},
+						beforeSend: function() {
+							_smc.progress_bar("show");
+						}
+					}).done(function(data) {
+						if (data.status == 200) {
+							_smc.spa_reload();
+						}
+						else {
+							_smc.errorMSG();
+						}
+					}).always(function() {
+						setTimeout(function() {
+							_smc.progress_bar("end");
+						}, 1500);
+					});
+				}
+
+				else {
+					return false;
+				}
+			}
+
 			_smc.subscribe = function(profile_id = false) {
 				if (_smc.is_logged()) {
 					if ($.isNumeric(profile_id) && profile_id) {
@@ -475,7 +504,7 @@
 			_smc.pub_reply = function(id = false) {
 				if (_smc.is_logged()) {
 					if ($.isNumeric(id) && id) {
-						_smc.vue.pubbox2.post_privacy = false;
+						_smc.vue.pubbox2.post_privacy = "everyone";
 						_smc.vue.pubbox2.thread_id    = id;
 
 						$("div#add_new_post").modal('show');
@@ -824,6 +853,37 @@
 					}
 				}
 				else{
+					_smc.req_auth();
+				}
+			}
+
+			_smc.quote_repost = function(id = false, url = false, event = false) {
+				if (_smc.is_logged()) {
+					if ($.isNumeric(id) && id && url) {
+						var pubbox = _smc.vue.pubbox2;
+
+						if (pubbox) {
+							pubbox.thread_id   = 0;
+							pubbox.active_media = null;
+							pubbox.og_imported  = false;
+							pubbox.og_data      = {};
+							pubbox.text         = url + " ";
+							pubbox.post_privacy = "everyone";
+
+							$('div#add_new_post').modal('show');
+
+							setTimeout(function() {
+								if (pubbox.$refs && pubbox.$refs.text_input) {
+									pubbox.$refs.text_input.focus();
+								}
+							}, 100);
+						}
+					}
+					else {
+						_smc.req_auth();
+					}
+				}
+				else {
 					_smc.req_auth();
 				}
 			}

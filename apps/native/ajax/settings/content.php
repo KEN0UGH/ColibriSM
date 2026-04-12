@@ -464,6 +464,8 @@ else if ($action == "save_privacy_settings") {
     $data['status']   = 400;
     $profile_privacy  = fetch_or_get($_POST['profile_privacy'], null);
     $profile_maturity = fetch_or_get($_POST['profile_maturity'], null);
+	$mark_maturity = fetch_or_get($_POST['mark_maturity'], null);
+    $profile_incognito = fetch_or_get($_POST['profile_incognito'], null);
     $follow_privacy   = fetch_or_get($_POST['follow_privacy'], null);
     $contact_privacy  = fetch_or_get($_POST['contact_privacy'], null);
     $index_privacy    = fetch_or_get($_POST['index_privacy'], null);
@@ -475,6 +477,14 @@ else if ($action == "save_privacy_settings") {
 
     else if (in_array($profile_maturity, array('general', 'adult', 'offensive')) != true) {
         $data['err_code'] = "invalid_profile_maturity";
+    }
+	
+	else if (in_array($mark_maturity, array('general', 'adult', 'offensive')) != true) {
+        $data['err_code'] = "invalid_mark_maturity";
+    }
+
+    else if (in_array($profile_incognito, array('cognito', 'incognito')) != true) {
+        $data['err_code'] = "invalid_profile_incognito";
     }
 
     else if (in_array($follow_privacy, array('everyone', 'approved')) != true) {
@@ -497,17 +507,21 @@ else if ($action == "save_privacy_settings") {
         cl_update_user_data($me["id"], array(
             'profile_privacy' => $profile_privacy,
             "profile_maturity" => $profile_maturity,
+			"mark_maturity" => $mark_maturity,
+            'profile_incognito' => $profile_incognito,
             'follow_privacy'  => $follow_privacy,
             'contact_privacy' => $contact_privacy,
             'online_ind' => $online_ind,
-            'index_privacy'   => $index_privacy
+            'index_privacy'   => $index_privacy,
         ));
 
         cl_db_update(T_PUBS, array(
             "user_id" => $me["id"],
             "status"  => "active"
         ), array(
-            "priv_wcs" => $profile_privacy
+            "priv_wcs" => $profile_privacy,
+			"mature_wcs" => $mark_maturity,
+			"incognito_wcs" => $profile_incognito
         ));
 
         if ($online_ind == "off") {

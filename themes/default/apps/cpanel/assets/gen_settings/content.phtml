@@ -247,6 +247,21 @@
                             </div>
                         </div>
                         <div class="row">
+                        <div class="col-sm-12">
+                                <div class="form-group" data-an="html5player-input">
+                                    <label>
+                                        HTML5 Player
+                                    </label>
+                                    <div class="form-line form-select">
+                                        <select name="html5player" class="form-control">
+                                            <option <?php if($cl['config']['html5player'] == 'on') {echo('selected');} ?> value="on">On</option>
+                                            <option <?php if($cl['config']['html5player'] == 'off') {echo('selected');} ?> value="off">Off</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group" data-an="ffmpeg_binary-input">
                                     <label>

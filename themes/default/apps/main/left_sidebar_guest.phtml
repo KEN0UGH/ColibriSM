@@ -5,6 +5,31 @@
 				<?php echo cl_template('auth/login'); ?>
 			</div>
 		</div>
+		<div class="sidebar__nav">
+			<div class="sidebar__nav-group">
+				
+				<div data-navitem="home" class="sidebar__nav-item <?php if($cl['pn'] == 'home') {echo('active');} ?>">
+					<span class="icon">
+						<?php echo cl_ficon('home'); ?>
+					</span>
+					<span class="text">
+						<a href="<?php echo cl_link('/'); ?>" data-spa="true">
+							<?php echo cl_translate('Home'); ?>
+						</a>
+					</span>
+				</div>
+				<div data-navitem="search" class="sidebar__nav-item <?php if($cl['pn'] == 'search') {echo('active');} ?>">
+					<span class="icon">
+						<?php echo cl_ficon('compass_northwest'); ?>
+					</span>
+					<span class="text">
+						<a href="<?php echo cl_link("search"); ?>" data-spa="true">
+							<?php echo cl_translate('Explore'); ?>
+						</a>
+					</span>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 

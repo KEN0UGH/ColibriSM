@@ -659,6 +659,7 @@ else if ($action == 'publish_new_post') {
         $thread_id        = fetch_or_get($_POST['thread_id'], 0);
         $post_privacy     = fetch_or_get($_POST['privacy'], "everyone");
 		$post_maturity    = fetch_or_get($_POST['maturity'], "general");
+        $post_incognito    = fetch_or_get($_POST['incognito'], "cognito");
         $post_text        = cl_censore_post_text($post_text);
         $post_text        = cl_croptxt($post_text, $max_post_length);
         $thread_data      = array();
@@ -679,6 +680,10 @@ else if ($action == 'publish_new_post') {
             if (in_array($post_maturity, array("general", "adult", "offensive")) != true) {
                 $post_maturity = "general";
             }
+
+            if (in_array($post_incognito, array("cognito", "incognito")) != true) {
+                $post_incognito = "cognito";
+            }
         }
 
         if (not_empty($post_data) && not_empty($post_data["media"])) {
@@ -694,7 +699,10 @@ else if ($action == 'publish_new_post') {
                 "time"      => time(),
                 "priv_wcs"  => $me["profile_privacy"],
                 "priv_wcr"  => $post_privacy,
-				"mature_wcr"  => $post_maturity
+				"mature_wcs"  => $me["mark_maturity"],
+				"mature_wcr"  => $post_maturity,
+				"incognito_wcs"  => $me["profile_incognito"],
+                "incognito_wcr"  => $post_incognito
             );
 
             if(not_empty($post_text) && not_empty($donation_amount) && is_numeric($donation_amount) && $donation_amount > 0) {
@@ -775,7 +783,10 @@ else if ($action == 'publish_new_post') {
                     "time"      => time(),
                     "priv_wcs"  => $me["profile_privacy"],
                     "priv_wcr"  => $post_privacy,
-					"mature_wcr"  => $post_maturity
+					"mature_wcs"  => $me["mark_maturity"],
+					"mature_wcr"  => $post_maturity,
+					"incognito_wcs"  => $me["profile_incognito"],
+					"incognito_wcr"  => $post_incognito
                 );
 
                 if(not_empty($post_text) && not_empty($donation_amount) && is_numeric($donation_amount) && $donation_amount > 0) {
@@ -1559,6 +1570,31 @@ else if($action == 'post_maturity') {
             if (not_empty($post_data) && $post_data["user_id"] == $me["id"] && in_array($mature_wcr, array("general", "adult", "offensive"))) {
                 cl_update_post_data($post_id, array(
                     "mature_wcr" => $mature_wcr
+                ));
+
+                $data['status'] = 200;
+            }
+        }
+    }
+}
+
+else if($action == 'post_incognito') {
+    if (empty($cl["is_logged"])) {
+        $data['status'] = 400;
+        $data['error']  = 'Invalid access token';
+    }
+    else {
+        $data['err_code'] = 0;
+        $data['status']   = 400;
+        $post_id          = fetch_or_get($_POST['id'], 0);
+        $incognito_wcr         = fetch_or_get($_POST['priv'], 'cognito');
+
+        if (is_posnum($post_id)) {
+            $post_data = cl_raw_post_data($post_id);
+
+            if (not_empty($post_data) && $post_data["user_id"] == $me["id"] && in_array($incognito_wcr, array("cognito", "incognito"))) {
+                cl_update_post_data($post_id, array(
+                    "incognito_wcr" => $incognito_wcr
                 ));
 
                 $data['status'] = 200;
