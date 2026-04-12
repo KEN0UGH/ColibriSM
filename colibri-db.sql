@@ -367,7 +367,11 @@
 {%end%}
 
 {%begin%}
-  ALTER TABLE `cl_users` ADD `contact_privacy` ENUM('everyone','followed') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'everyone' AFTER `profile_incognito`;
+  ALTER TABLE `cl_users` ADD `mark_maturity` ENUM('general','adult','offensive') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'general' AFTER `profile_incognito`;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_users` ADD `contact_privacy` ENUM('everyone','followed') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'everyone' AFTER `mark_maturity`;
 {%end%}
 
 {%begin%}
