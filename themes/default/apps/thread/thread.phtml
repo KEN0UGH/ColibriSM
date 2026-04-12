@@ -579,6 +579,83 @@
 												</div>
 											</button>
 										</div>
+										<div class="publication-privacy">
+											<button class="privacy-settings dropleft" type="button">
+												<div class="dropdown-toggle" data-toggle="dropdown">
+													<?php if ($cl['thread_data']['post']['mature_wcr'] == "general"): ?>
+														<span class="d-inline-flex align-items-center flex-wn">
+															<span class="flex-item icon">
+																<?php echo cl_ficon('earth'); ?>
+															</span>
+															<span class="flex-item flex-grow-1 label">
+																<?php echo cl_translate('General Content'); ?>
+															</span>
+														</span>
+													<?php elseif($cl['thread_data']['post']['mature_wcr'] == "adult"): ?>
+														<span class="d-inline-flex align-items-center flex-wn">
+															<span class="flex-item icon">
+																<?php echo cl_ficon('comment_mention'); ?>
+															</span>
+															<span class="flex-item flex-grow-1 label">
+																<?php echo cl_translate('Adult Content'); ?>
+															</span>
+														</span>
+													<?php else: ?>
+														<span class="d-inline-flex align-items-center flex-wn">
+															<span class="flex-item icon">
+																<?php echo cl_ficon('followers'); ?>
+															</span>
+															<span class="flex-item flex-grow-1 label">
+																<?php echo cl_translate('Offensive Content'); ?>
+															</span>
+														</span>
+													<?php endif; ?>
+												</div>
+												<div class="dropdown-menu dropdown-icons">
+													<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.post_maturity('general', <?php echo $cl['thread_data']['post']['id']; ?>);">
+														<span class="flex-item dropdown-item-icon">
+															<?php echo cl_ficon('earth'); ?>
+														</span>
+														<span class="flex-item">
+															<?php echo cl_translate('General Content'); ?>
+														</span>
+														<?php if ($cl['thread_data']['post']['mature_wcr'] == "general"): ?>
+															<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+																<?php echo cl_ficon('checkmark'); ?>
+															</span>
+														<?php endif; ?>
+													</a>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.post_maturity('adult', <?php echo $cl['thread_data']['post']['id']; ?>);">
+														<span class="flex-item dropdown-item-icon">
+															<?php echo cl_ficon('comment_mention'); ?>
+														</span>
+														<span class="flex-item">
+															<?php echo cl_translate('Adult Content'); ?>
+														</span>
+														<?php if ($cl['thread_data']['post']['mature_wcr'] == "adult"): ?>
+															<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+																<?php echo cl_ficon('checkmark'); ?>
+															</span>
+														<?php endif; ?>
+													</a>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.post_maturity('offensive', <?php echo $cl['thread_data']['post']['id']; ?>);">
+														<span class="flex-item dropdown-item-icon">
+															<?php echo cl_ficon('followers'); ?>
+														</span>
+														<span class="flex-item">
+															<?php echo cl_translate('Offensive Content'); ?>
+														</span>
+														<?php if ($cl['thread_data']['post']['mature_wcr'] == "offensive"): ?>
+															<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+																<?php echo cl_ficon('checkmark'); ?>
+															</span>
+														<?php endif; ?>
+													</a>
+												</div>
+											</button>
+										</div>
 									<?php endif; ?>
 								<?php endif; ?>
 							</div>

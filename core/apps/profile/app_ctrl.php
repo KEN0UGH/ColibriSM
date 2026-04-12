@@ -43,6 +43,7 @@ function cl_get_profile_posts($user_id = false, $limit = 30, $media = false, $of
 		foreach ($query_res as $row) {
 			$post_data = cl_raw_post_data($row['publication_id']);
 			if (not_empty($post_data) && in_array($post_data['status'], array('active'))) {
+				
 				if ($post_data['incognito_wcr'] == 'incognito' || $post_data['incognito_wcs'] == 'incognito' && empty($cl['is_admin']) && $post_data['user_id'] != $viewer_id) {
 					continue;
 				}
@@ -109,7 +110,7 @@ function cl_get_profile_posts($user_id = false, $limit = 30, $media = false, $of
 function cl_get_profile_replies($user_id = false, $limit = 30, $offset = false) {
     global $db, $cl, $me;
 
-	
+	$viewer_id = fetch_or_get($me['id'], 0);
 
     if (not_num($user_id)) {
         return false;
@@ -131,6 +132,7 @@ function cl_get_profile_replies($user_id = false, $limit = 30, $offset = false) 
         foreach ($query_res as $row) {
             $post_data = cl_raw_post_data($row['publication_id']);
             if (not_empty($post_data) && in_array($post_data['status'], array('active'))) {
+
 				if ($post_data['incognito_wcr'] == 'incognito' || $post_data['incognito_wcs'] == 'incognito' && empty($cl['is_admin']) && $post_data['user_id'] != $viewer_id) {
 					continue;
 				}

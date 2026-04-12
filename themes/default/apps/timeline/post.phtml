@@ -2,7 +2,7 @@
 	<?php if ($cl['li']['advertising']): ?>
 		<?php echo cl_template('timeline/ad'); ?>
 	<?php else: ?>
-		<div class="post-list-item" data-list-item="<?php echo($cl['li']['id']); ?>" data-post-offset="<?php echo($cl['li']['offset_id']); ?>" <?php if (!isset($me['profile_maturity']) || $me['profile_maturity'] == 'general'): ?> <?php endif; ?> data-mature="<?php echo(fetch_or_get($cl['li']['mature_wcs'], fetch_or_get($cl['li']['mature_wcr'], 'general'))); ?>"<?php echo fetch_or_get($cl['li']['attrs'],''); ?>>
+		<div class="post-list-item" data-list-item="<?php echo($cl['li']['id']); ?>" data-post-offset="<?php echo($cl['li']['offset_id']); ?>" <?php if (!isset($me['profile_maturity']) || $me['profile_maturity'] == 'general'): ?> data-mature="<?php echo((fetch_or_get($cl['li']['mature_wcs'], 'general') == 'offensive' || fetch_or_get($cl['li']['mature_wcr'], 'general') == 'offensive') ? 'offensive' : ((fetch_or_get($cl['li']['mature_wcs'], 'general') == 'adult' || fetch_or_get($cl['li']['mature_wcr'], 'general') == 'adult') ? 'adult' : 'general')); ?>"<?php endif; ?><?php echo fetch_or_get($cl['li']['attrs'],''); ?>>
 			<?php if (not_empty($cl['li']['me_blocked'])): ?>
 				<div class="post-placeholder">
 					<div class="d-flex flex-wn align-items-center">
@@ -156,7 +156,7 @@
 											<a href="<?php echo($cl['li']['url']); ?>" data-spa="true">
 												<span class="user-name-holder">
 													<span class="user-name-holder__name">
-														Incognito
+														<?php echo cl_translate("Incognito"); ?>
 													</span>
 													<span class="user-name-holder__badge">
 														<?php echo cl_icon("verified_user_badge"); ?>

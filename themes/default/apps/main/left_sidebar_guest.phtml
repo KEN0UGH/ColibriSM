@@ -2,12 +2,16 @@
 	<div class="sidebar__inner">
 		<div class="guest-welcome">
 			<div class="login-form">
-				<?php echo cl_template('auth/login'); ?>
+				<h4>
+					<?php echo cl_translate('Welcome to Hikichan'); ?>
+				</h4>
+				<p>
+					<?php echo cl_translate('We are a community of NEETS whit nothing better to do than to shitpost'); ?>
+				</p>
 			</div>
 		</div>
 		<div class="sidebar__nav">
 			<div class="sidebar__nav-group">
-				
 				<div data-navitem="home" class="sidebar__nav-item <?php if($cl['pn'] == 'home') {echo('active');} ?>">
 					<span class="icon">
 						<?php echo cl_ficon('home'); ?>
@@ -28,6 +32,11 @@
 						</a>
 					</span>
 				</div>
+			</div>
+		</div>
+		<div class="guest-welcome">
+			<div class="login-form">
+				<?php echo cl_template('auth/login'); ?>
 			</div>
 		</div>
 	</div>

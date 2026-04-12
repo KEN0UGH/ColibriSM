@@ -18,11 +18,36 @@
 # @*************************************************************************@
 
 if (empty($cl["is_logged"])) {
-	if ($cl["config"]["guest_page_status"] == "on") {
-		cl_redirect("guest");
+	if ($cl["config"]["guest_page_status"] == "off") {
+		require_once(cl_full_path("core/apps/guest/app_ctrl.php"));
+
+		$cl["invite_code"] = fetch_or_get($_GET["invite_code"], false);
+		$cl["auth_type"]   = fetch_or_get($_GET["auth"], false);
+		$cl["auth_type"]   = (in_array($cl["auth_type"], array("login", "signup", "forgot_pass", "reset_pass"))) ? $cl["auth_type"] : false;
+
+		$cl["page_title"]  = $cl["config"]["name"];
+		$cl["page_desc"]   = $cl["config"]["description"];
+		$cl["page_kw"]     = $cl["config"]["keywords"];
+		$cl["pn"]          = "guest";
+		$cl['em_code']     = ((not_empty($_GET['em_code']) && cl_verify_emcode($_GET['em_code'])) ? cl_text_secure($_GET['em_code']) : null);
+		$cl["sbr"]         = false;
+		$cl["sbl"]         = false;
+		$cl["slider_imgs"] = cl_get_slider_images();
+		$cl["invite_code_status"] = (not_empty($cl["invite_code"])) ? cl_verify_invite_code($cl["invite_code"]) : false;
+		$cl["http_res"] = cl_template("guest/content");
 	}
 	else{
-		cl_redirect("feed");
+		require_once(cl_full_path("core/apps/feed/app_ctrl.php"));
+
+		$cl["page_title"] = $cl["config"]["name"];
+		$cl["page_desc"]  = $cl["config"]["description"];
+		$cl["page_kw"]    = $cl["config"]["keywords"];
+		$cl["pn"]         = "feed";
+		$cl["sbr"]        = true;
+		$cl["sbl"]        = true;
+		$cl["feed"]       = cl_get_guest_feed(false, 30);
+		$cl["admin_pinned_post"] = cl_get_admin_pinned_post();
+		$cl["http_res"]   = cl_template("feed/content");
 	}
 }
 else {
@@ -34,7 +59,7 @@ else {
 		)
 	);
 
-	$cl["page_title"]    = cl_translate("Homepage");
+	$cl["page_title"]    = $cl["config"]["title"];
 	$cl["page_desc"]     = $cl["config"]["description"];
 	$cl["page_kw"]       = $cl["config"]["keywords"];
 	$cl["pn"]            = "home";
