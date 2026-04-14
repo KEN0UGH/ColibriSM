@@ -741,6 +741,51 @@
 		        });
 			}
 
+			_smc.record_view = function(id = false) {
+				if ($.isNumeric(id) && id) {
+					$.ajax({
+						url: '<?php echo cl_link("native_api/main/record_view"); ?>',
+						type: 'POST',
+						dataType: 'json',
+						data: {id: id},
+					}).done(function(data) {
+						if (data.status == 200) {
+							$('div[data-list-item="' + id + '"] span.ctrls-item-views').text(data.views_count);
+						}
+					}).fail(function() {
+						// Silently fail - view tracking is not critical
+					});
+				}
+			}
+
+			_smc.track_post_views = function() {
+				// Track views for all visible posts that haven't been tracked yet
+				$('div[data-list-item]:visible').each(function() {
+					var postId = $(this).data('list-item');
+					if (postId && !$(this).data('views-tracked')) {
+						$(this).data('views-tracked', true);
+						_smc.record_view(postId);
+					}
+				});
+			}
+
+			// Track views on page load
+			$(document).ready(function() {
+				_smc.track_post_views();
+			});
+
+			// Intercept AJAX responses and track views for newly added posts
+			// But exclude our own record_view API calls
+			$(document).ajaxSuccess(function(event, xhr, settings) {
+				// Don't track on our own view recording API calls
+				if (settings.url.indexOf('record_view') === -1) {
+					// Small delay to ensure DOM is updated
+					setTimeout(function() {
+						_smc.track_post_views();
+					}, 50);
+				}
+			});
+
 			_smc.like_post = function(id = false, event = false) {
 				if (_smc.is_logged()) {
 					if ($.isNumeric(id) && id) {

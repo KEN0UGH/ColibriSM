@@ -17,6 +17,49 @@
 # @ Copyright (c)  ColibriSM. All rights reserved                           @
 # @*************************************************************************@
 
+function cl_apply_text_formatting($text = "") {
+	if (empty($text)) {
+		return $text;
+	}
+
+	// Bold text: __text__
+	$text = preg_replace('/__(.+?)__/s', '<strong>$1</strong>', $text);
+	
+	// Greentext: lines starting with > (like 4chan)
+	// Handle both raw > and HTML-encoded &gt;
+	$lines = explode("<br />", $text);
+	$result = array();
+	
+	foreach ($lines as $line) {
+		$trimmed = ltrim($line);
+		// Check if line starts with > or &gt;
+		if (strpos($trimmed, '>') === 0 || strpos($trimmed, '&gt;') === 0) {
+			// Preserve leading whitespace if any
+			$leadingSpaces = strlen($line) - strlen($trimmed);
+			$line = str_repeat(' ', $leadingSpaces) . '<span style="color:rgb(186, 193, 114);">' . $trimmed . '</span>';
+		}
+		$result[] = $line;
+	}
+	$text = implode("<br />", $result);
+	
+	// Red strikethrough-like text: --text--
+	$text = preg_replace('/--(.+?)--/s', '<span style="color: red;">--$1</span>', $text);
+	
+	// Rainbow colored text: ==text==
+	$text = preg_replace('/==(.+?)==/s', '<span style="animation: rainbow 2s linear infinite; color: rgb(245, 84, 89); font-size: 2rem; padding-left: 5px;">$1</span>', $text);
+	
+	// H2 header: =h2=text=h2=
+	$text = preg_replace('/=h2=(.+?)=h2=/s', '<span style="font-size: 20px;">$1</span>', $text);
+	
+	// H1 header: =h1=text=h1=
+	$text = preg_replace('/=h1=(.+?)=h1=/s', '<span style="font-size: 30px;">$1</span>', $text);
+	
+	// Centered text: -center-text-center-
+	$text = preg_replace('/-center-(.+?)-center-/s', '<span style="display: block; text-align: center;">$1</span>', $text);
+	
+	return $text;
+}
+
 function cl_create_orphan_post($user_id = null, $type = "text") {
 	global $db;
 
@@ -364,6 +407,21 @@ function cl_update_thread_replys($id = false, $count = "plus") {
 	return $replys_count;
 }
 
+function cl_ensure_post_views_column() {
+	global $db;
+	
+	// Check if views_count column exists
+	$result = $db->rawQuery("SHOW COLUMNS FROM " . T_PUBS . " LIKE 'views_count'");
+	
+	if (empty($result)) {
+		// Column doesn't exist, add it
+		$db->rawQuery("ALTER TABLE " . T_PUBS . " ADD `views_count` INT(11) NOT NULL DEFAULT '0' AFTER `likes_count`");
+		return true;
+	}
+	
+	return false;
+}
+
 function cl_post_data($post = array()) {
 	global $cl;
 
@@ -397,6 +455,7 @@ function cl_post_data($post = array()) {
     $post["replys_count"]  = cl_number($post["replys_count"]);
     $post["reposts_count"] = cl_number($post["reposts_count"]);
     $post["likes_count"]   = cl_number($post["likes_count"]);
+    $post["views_count"]   = (isset($post["views_count"]) && is_posnum($post["views_count"])) ? cl_number($post["views_count"]) : 0;
     $post["can_delete"]    = false;
     $post["can_edit"]      = false;
     $post["content_view"]  = true;

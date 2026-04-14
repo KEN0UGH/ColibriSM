@@ -59,7 +59,7 @@ else {
 		)
 	);
 
-	$cl["page_title"]    = $cl["config"]["title"];
+	$cl["page_title"]    = $cl["config"]["name"];
 	$cl["page_desc"]     = $cl["config"]["description"];
 	$cl["page_kw"]       = $cl["config"]["keywords"];
 	$cl["pn"]            = "home";

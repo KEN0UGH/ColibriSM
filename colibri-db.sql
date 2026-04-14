@@ -1200,6 +1200,10 @@
 {%end%}
 
 {%begin%}
+  ALTER TABLE `cl_publications` ADD `views_count` INT(11) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' AFTER `likes_count`;
+{%end%}
+
+{%begin%}
   INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'User wallet status', 'user_wallet_status', 'on', '/^(on|off)$/');
 {%end%}
 

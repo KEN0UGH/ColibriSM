@@ -249,6 +249,7 @@
 											<?php 
 												$cl['li']['text'] = cl_rn2br($cl['li']['text']);
 												$cl['li']['text'] = cl_strip_brs($cl['li']['text']);
+												$cl['li']['text'] = cl_apply_text_formatting($cl['li']['text']);
 											?>
 											<div class="publication-text" data-post-text="<?php echo($cl['li']['id']); ?>">
 												<?php echo($cl['li']['text']); ?>
@@ -546,6 +547,15 @@
 													<?php echo cl_ficon('comment'); ?>
 												</span>
 												<span class="num"><?php echo $cl['li']['replys_count']; ?></span>
+											</a>
+										</button>
+
+										<button class="ctrls-item">
+											<a class="ctrls-item__inner-link" href="<?php echo $cl['li']['url']; ?>" data-spa="true" title="<?php echo cl_translate('Views'); ?>">
+												<span class="ctrls-item__icon">
+													<?php echo cl_ficon('eye_show'); ?>
+												</span>
+												<span class="num ctrls-item-views"><?php echo (isset($cl['li']['views_count']) ? $cl['li']['views_count'] : 0); ?></span>
 											</a>
 										</button>
 

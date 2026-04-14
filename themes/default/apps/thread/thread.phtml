@@ -160,6 +160,7 @@
 									<?php 
 										$cl['thread_data']['post']['text'] = cl_rn2br($cl['thread_data']['post']['text']);
 										$cl['thread_data']['post']['text'] = cl_strip_brs($cl['thread_data']['post']['text']);
+										$cl['thread_data']['post']['text'] = cl_apply_text_formatting($cl['thread_data']['post']['text']);
 									?>
 									<div class="publication-text" data-post-text="<?php echo($cl['thread_data']['post']['id']); ?>">
 										<?php echo($cl['thread_data']['post']['text']); ?>
@@ -656,6 +657,60 @@
 												</div>
 											</button>
 										</div>
+										<div class="publication-privacy">
+											<button class="privacy-settings dropleft" type="button">
+												<div class="dropdown-toggle" data-toggle="dropdown">
+													<?php if ($cl['thread_data']['post']['incognito_wcr'] == "cognito"): ?>
+														<span class="d-inline-flex align-items-center flex-wn">
+															<span class="flex-item icon">
+																<?php echo cl_ficon('earth'); ?>
+															</span>
+															<span class="flex-item flex-grow-1 label">
+																<?php echo cl_translate('Cognito'); ?>
+															</span>
+														</span>
+													<?php else: ?>
+														<span class="d-inline-flex align-items-center flex-wn">
+															<span class="flex-item icon">
+																<?php echo cl_ficon('followers'); ?>
+															</span>
+															<span class="flex-item flex-grow-1 label">
+																<?php echo cl_translate('Incognito'); ?>
+															</span>
+														</span>
+													<?php endif; ?>
+												</div>
+												<div class="dropdown-menu dropdown-icons">
+													<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.post_incognito('cognito', <?php echo $cl['thread_data']['post']['id']; ?>);">
+														<span class="flex-item dropdown-item-icon">
+															<?php echo cl_ficon('earth'); ?>
+														</span>
+														<span class="flex-item">
+															<?php echo cl_translate('Cognito'); ?>
+														</span>
+														<?php if ($cl['thread_data']['post']['incognito_wcr'] == "cognito"): ?>
+															<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+																<?php echo cl_ficon('checkmark'); ?>
+															</span>
+														<?php endif; ?>
+													</a>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.post_incognito('incognito', <?php echo $cl['thread_data']['post']['id']; ?>);">
+														<span class="flex-item dropdown-item-icon">
+															<?php echo cl_ficon('followers'); ?>
+														</span>
+														<span class="flex-item">
+															<?php echo cl_translate('Incognito'); ?>
+														</span>
+														<?php if ($cl['thread_data']['post']['incognito_wcr'] == "incognito"): ?>
+															<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+																<?php echo cl_ficon('checkmark'); ?>
+															</span>
+														<?php endif; ?>
+													</a>
+												</div>
+											</button>
+										</div>
 									<?php endif; ?>
 								<?php endif; ?>
 							</div>
@@ -675,6 +730,15 @@
 										<span class="num"><?php echo $cl['thread_data']['post']['replys_count']; ?></span>
 									</button>
 								<?php endif; ?>
+
+								<button class="ctrls-item">
+									<a class="ctrls-item__inner-link" href="javascript:void(0);" title="<?php echo cl_translate('Views'); ?>">
+										<span class="ctrls-item__icon">
+											<?php echo cl_ficon('eye_show'); ?>
+										</span>
+										<span class="num ctrls-item-views"><?php echo (isset($cl['thread_data']['post']['views_count']) ? $cl['thread_data']['post']['views_count'] : 0); ?></span>
+									</a>
+								</button>
 
 								<?php if (empty($cl['thread_data']['post']['has_liked'])): ?>
 									<button class="ctrls-item" onclick="SMColibri.like_post('<?php echo $cl['thread_data']['post']['id']; ?>', this);">

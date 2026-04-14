@@ -21,6 +21,15 @@
 @include font('Inter', normal, 800, '../fonts/Inter/woff2/Inter-ExtraBold.woff2');
 @include font('Inter', normal, 900, '../fonts/Inter/woff2/Inter-Black.woff2');
 
+@keyframes rainbow {
+  0% { color: rgb(245, 84, 89); }
+  16% { color: rgb(245, 136, 89); }
+  33% { color: rgb(245, 188, 89); }
+  50% { color: rgb(89, 245, 136); }
+  66% { color: rgb(89, 136, 245); }
+  83% { color: rgb(188, 89, 245); }
+  100% { color: rgb(245, 84, 89); }
+}
 
 /* ===================================================== */
 
