@@ -90,6 +90,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group" data-an="email_change_direct_method-input">
+                                    <label>
+                                        Allow users to change email without SMTP verification
+                                    </label>
+                                    <div class="form-line form-select">
+                                        <select name="email_change_direct_method" class="form-control">
+                                            <option value="on" <?php if($cl['config']['email_change_direct_method'] == 'on') { echo('selected'); } ?>>Yes - Allow direct email change</option>
+                                            <option value="off" <?php if($cl['config']['email_change_direct_method'] == 'off') { echo('selected'); } ?>>No - Require SMTP verification</option>
+                                        </select>
+                                    </div>
+                                    <small class="info-feedback">
+                                        <p>
+                                            If enabled, users can change their email address directly without needing to verify it via SMTP. If disabled, users must verify their new email address by entering a code sent to them.
+                                        </p>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-sm-12 no-mb">
                                 <div class="form-group no-mb">

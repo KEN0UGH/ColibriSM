@@ -111,29 +111,43 @@ else if ($action == "save_profile_email") {
     }
 
     else {
+        // Check if direct method is enabled in config
+        $allow_direct_change = $cl['config']['email_change_direct_method'] ?? 'on';
 
-        $rand_code         = rand(100000,999999);
-        $cl['email_data']  = array('name' => $me["name"], 'code' => $rand_code);
-        $send_email_data   = array(
-            'from_email'   => $cl['config']['email'],
-            'from_name'    => $cl['config']['name'],
-            'to_email'     => $email,
-            'to_name'      => $me['name'],
-            'subject'      => cl_translate("Confirm email on - {@name@}", array("name" => $cl['config']['name'])),
-            'charSet'      => 'UTF-8',
-            'is_html'      => true,
-            'message_body' => cl_template('emails/confirm_email')
-        ); 
-
-        if (cl_send_mail($send_email_data)) {
+        if ($allow_direct_change === 'on') {
+            // Direct email change without verification
             cl_update_user_data($me["id"], array(
-                "email_conf_code" => json(array(
-                    "email" => cl_text_secure($email), 
-                    "code" => $rand_code
-                ), true)
+                'email' => $email,
+                'email_conf_code' => ""
             ));
-
             $data['status'] = 200;
+            $data['method'] = 'direct';
+        } else {
+            // Send email verification (default method)
+            $rand_code         = rand(100000,999999);
+            $cl['email_data']  = array('name' => $me["name"], 'code' => $rand_code);
+            $send_email_data   = array(
+                'from_email'   => $cl['config']['email'],
+                'from_name'    => $cl['config']['name'],
+                'to_email'     => $email,
+                'to_name'      => $me['name'],
+                'subject'      => cl_translate("Confirm email on - {@name@}", array("name" => $cl['config']['name'])),
+                'charSet'      => 'UTF-8',
+                'is_html'      => true,
+                'message_body' => cl_template('emails/confirm_email')
+            ); 
+
+            if (cl_send_mail($send_email_data)) {
+                cl_update_user_data($me["id"], array(
+                    "email_conf_code" => json(array(
+                        "email" => cl_text_secure($email), 
+                        "code" => $rand_code
+                    ), true)
+                ));
+
+                $data['status'] = 200;
+                $data['method'] = 'send_email';
+            }
         }
     }
 }

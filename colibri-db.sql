@@ -960,6 +960,10 @@
 {%end%}
 
 {%begin%}
+  INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Email change direct method', 'email_change_direct_method', 'on', '/^(on|off)$/');
+{%end%}
+
+{%begin%}
   CREATE TABLE `cl_wallet_payout` (`id` INT(11) NOT NULL AUTO_INCREMENT , `user_id` INT(11) NOT NULL DEFAULT '0' , `amount` VARCHAR(11) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.00' , `method` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'None' , `requisites` VARCHAR(620) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' , `time` VARCHAR(25) NOT NULL DEFAULT '0' , PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci;
 {%end%}
 
