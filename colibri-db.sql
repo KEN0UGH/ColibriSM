@@ -992,6 +992,10 @@
 {%end%}
 
 {%begin%}
+  ALTER TABLE `cl_users` ADD `password_auto_generated` TINYINT(1) NOT NULL DEFAULT '0' AFTER `password`;
+{%end%}
+
+{%begin%}
   ALTER TABLE `cl_publications` ADD `poll_status` ENUM('active','stopped') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'active' AFTER `poll_data`;
 {%end%}
 

@@ -24,8 +24,8 @@
 	    </div>
     <?php else: ?>
 		<div class="form-group">
-	        <label><?php echo cl_translate("Email address"); ?></label>
-	        <input name="email" v-model.trim.lazy="$v.email.$model" type="email" class="form-control" placeholder="<?php echo cl_translate("Enter your email address"); ?>">
+	        <label><?php echo cl_translate("Email address"); ?> <span class="optional-field">(<?php echo cl_translate("Optional"); ?>)</span></label>
+	        <input name="email" v-model.trim.lazy="$v.email.$model" type="email" class="form-control" placeholder="<?php echo cl_translate("Enter your email address (or leave blank)"); ?>">
 			<div class="invalid-main-feedback" v-if="is_valid_email">
 				{{invalid_feedback_email}}
 			</div>
@@ -34,10 +34,10 @@
 
 	<div class="form-group">
         <label>
-        	<?php echo cl_translate("Password"); ?>
+        	<?php echo cl_translate("Password"); ?> <span class="optional-field">(<?php echo cl_translate("Optional"); ?>)</span>
         </label>
         <div class="password-ctrl">
-        	<input name="password" v-model.trim.lazy="$v.password.$model" v-bind:type="password1_display" class="form-control" placeholder="<?php echo cl_translate("Create a password for your account"); ?>">
+        	<input name="password" v-model.trim.lazy="$v.password.$model" v-bind:type="password1_display" class="form-control" placeholder="<?php echo cl_translate("Create a password, or leave blank for auto-generated"); ?>">
         	
         	<button class="password-ctrl" type="button" v-on:click="password1_display_toggle">
 				<span v-if="password1_display == 'password'">

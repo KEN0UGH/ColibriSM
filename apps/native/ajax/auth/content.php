@@ -189,10 +189,12 @@ else if ($action == 'signup') {
                 $email_code       = sha1(time() + rand(111,999));
                 
                 // Generate random password if not provided
+                $password_auto_generated = 0;
                 $final_password = $user_data_fileds["password"];
                 if (empty($final_password)) {
                     $final_password = bin2hex(random_bytes(8)); // 16 character random password
                     $user_data_fileds["password"] = $final_password;
+                    $password_auto_generated = 1;
                 }
                 
                 $password_hashed  = password_hash($final_password, PASSWORD_DEFAULT);
@@ -228,6 +230,7 @@ else if ($action == 'signup') {
                     'lname'       => "",
                     'username'    => cl_text_secure($user_data_fileds["uname"]),
                     'password'    => $password_hashed,
+                    'password_auto_generated' => $password_auto_generated,
                     'email'       => cl_text_secure($user_data_fileds["email"]),
                     'phone'       => cl_text_secure($user_data_fileds["phone"]),
                     'admin'       => $is_admin,
@@ -255,10 +258,12 @@ else if ($action == 'signup') {
 
             else {
                 // Generate random password if not provided (for account validation case)
+                $password_auto_generated = 0;
                 $final_password = $user_data_fileds["password"];
                 if (empty($final_password)) {
                     $final_password = bin2hex(random_bytes(8)); // 16 character random password
                     $user_data_fileds["password"] = $final_password;
+                    $password_auto_generated = 1;
                 }
                 
                 // Generate temporary email if not provided (for email confirmation system)
@@ -271,6 +276,7 @@ else if ($action == 'signup') {
 
                 if ($cl["config"]["signup_conf_system"] == "phone") {
                     $user_data_fileds['phone_conf_code'] = $rand_code;
+                    $user_data_fileds['password_auto_generated'] = $password_auto_generated;
                     $sms_sent = false;
 
                     try {
@@ -354,6 +360,7 @@ else if ($action == 'signup') {
                 }
                 else{
                     $user_data_fileds['em_code'] = $rand_code;
+                    $user_data_fileds['password_auto_generated'] = $password_auto_generated;
                     $user_name         = $user_data_fileds["uname"];
                     $user_email        = $user_data_fileds['email'];
                     $cl['email_data']  = array('name' => $user_name, 'code' => $rand_code);
@@ -461,6 +468,7 @@ else if($action == 'confirm_registration') {
                     'lname'       => "",
                     'username'    => cl_text_secure($acc_validation_data["uname"]),
                     'password'    => $password_hashed,
+                    'password_auto_generated' => fetch_or_get($acc_validation_data["password_auto_generated"], 0),
                     'active'      => '1',
                     'admin'       => fetch_or_get($acc_validation_data["admin"], "0"),
                     'last_active' => time(),
