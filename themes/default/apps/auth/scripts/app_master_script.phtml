@@ -74,17 +74,14 @@
 							}
 						}
 
-						if (_app_.captcha.toLowerCase() !== _app_.captcha.toLowerCase()) { // Placeholder; actual check in backend
-							_app_.captcha_error = true;
-							return false;
-						}
-
 						$(_self.target).ajaxSubmit({
 							url: "<?php echo cl_link("native_api/auth/login"); ?>",
 							type: 'POST',
 							dataType: 'json',
 							beforeSend: function() {
 								_app_.submitting = true;
+								_app_.captcha_error = false;
+								_app_.grecaptcha_error = false;
 							},
 							success: function(data) {
 								if (data.status == 200) {
@@ -96,11 +93,19 @@
 								}
 
 								else {
-									_app_.unsuccessful_attempt = true;
+									if (data.err_code == "captcha_error") {
+										_app_.captcha_error = true;
+									}
+									else if (data.err_code == "grecaptcha_error") {
+										_app_.grecaptcha_error = true;
+									}
+									else {
+										_app_.unsuccessful_attempt = true;
 
-									delay(function() {
-										_app_.unsuccessful_attempt = false;
-									}, 3000);
+										delay(function() {
+											_app_.unsuccessful_attempt = false;
+										}, 3000);
+									}
 								}
 							},
 							complete: function() {
@@ -277,11 +282,6 @@
 							}
 						}
 						
-						if (_app_.captcha.toLowerCase() !== _app_.captcha.toLowerCase()) { // Placeholder; actual check in backend
-							_app_.captcha_error = true;
-							return false;
-						}
-
 						$(_self.target).ajaxSubmit({
 							url: "<?php echo cl_link("native_api/auth/signup"); ?>",
 							type: 'POST',
@@ -298,6 +298,8 @@
 								_app_.email_denied   = false;
 								_app_.process_failed = false;
 								_app_.phone_server_error = false;
+								_app_.captcha_error = false;
+								_app_.grecaptcha_error = false;
 							},
 							success: function(data) {
 								if (data.status == 200) {
@@ -337,6 +339,14 @@
 
 									else if(data.err_code == "denied_uname") {
 										_app_.uname_denied = true;
+									}
+
+									else if (data.err_code == "captcha_error") {
+										_app_.captcha_error = true;
+									}
+
+									else if (data.err_code == "grecaptcha_error") {
+										_app_.grecaptcha_error = true;
 									}
 
 									else {
