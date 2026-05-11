@@ -569,6 +569,10 @@
 {%end%}
 
 {%begin%}
+  ALTER TABLE `cl_publications` ADD `views_count` INT(11) NOT NULL DEFAULT '0';
+{%end%}
+
+{%begin%}
   ALTER TABLE `cl_users` ADD `swift` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `settings`;
 {%end%}
 
@@ -1197,10 +1201,6 @@
 
 {%begin%}
   INSERT INTO `cl_ui_langs` (`id`, `name`, `slug`, `status`, `is_rtl`, `is_native`) VALUES (NULL, 'Japanese - 日本語', 'japanese', '1', 'N', '1');
-{%end%}
-
-{%begin%}
-  ALTER TABLE `cl_publications` ADD `views_count` INT(11) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' AFTER `likes_count`;
 {%end%}
 
 {%begin%}

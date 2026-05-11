@@ -200,9 +200,7 @@
 					},
 					<?php else: ?>
 					is_valid_email: function() {
-						if (this.$v.email.required == true && this.$v.email.$error) {
-							this.invalid_feedback_email = "<?php echo cl_translate("The email address you entered does not match the valid format."); ?>";
-							return true;
+							if (this.email.length > 0 && this.$v.email.$error) {
 						}
 
 						else if (this.email_taken == true) {
@@ -222,7 +220,7 @@
 					},
 					<?php endif; ?>
 					is_valid_password: function() {
-						if (this.$v.password.required == true && this.$v.password.$error) {
+						if (this.password.length > 0 && (this.$v.password.min_length == false || this.$v.password.max_length == false)) {
 							this.invalid_feedback_pass = "<?php echo cl_translate("Password must be between 6 and 20 characters long"); ?>";
 							return true;
 						}
@@ -252,14 +250,12 @@
 					},
 					<?php else: ?>
 					email: {
-						required: window.validators.required,
 						email: window.validators.email,
 						min_length: window.validators.minLength(8),
 						max_length: window.validators.maxLength(55)
 					},
 					<?php endif; ?>
 					password: {
-						required: window.validators.required,
 						min_length: window.validators.minLength(6),
 						max_length: window.validators.maxLength(20)
 					}
@@ -461,7 +457,7 @@
 					},
 					computed: {
 						is_valid_password: function() {
-							if (this.$v.password.required == true && this.$v.password.$error) {
+							if (this.password.length > 0 && (this.$v.password.min_length == false || this.$v.password.max_length == false)) {
 								this.invalid_feedback_pass = "<?php echo cl_translate("Password must be between 6 and 20 characters long"); ?>";
 								return true;
 							}

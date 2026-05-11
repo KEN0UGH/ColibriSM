@@ -128,20 +128,18 @@ else if ($action == 'signup') {
             }
 
             else if ($field_name == 'email' && $cl["config"]["signup_conf_system"] == "email") {
-                if (empty($field_val)) {
-                    $data['err_code'] = "invalid_email"; break;
-                }
+                if (not_empty($field_val)) {
+                    if (!filter_var(trim($field_val), FILTER_VALIDATE_EMAIL) || len($field_val) > 55) {
+                        $data['err_code'] = "invalid_email"; break;
+                    }
 
-                else if (!filter_var(trim($field_val), FILTER_VALIDATE_EMAIL) || len($field_val) > 55) {
-                    $data['err_code'] = "invalid_email"; break;
-                }
+                    else if (cl_email_exists($field_val)) {
+                        $data['err_code'] = "doubling_email"; break;
+                    }
 
-                else if (cl_email_exists($field_val)) {
-                    $data['err_code'] = "doubling_email"; break;
-                }
-
-                else if(in_array($field_val, $useremail_restricts)) {
-                    $data['err_code'] = "denied_email"; break;
+                    else if(in_array($field_val, $useremail_restricts)) {
+                        $data['err_code'] = "denied_email"; break;
+                    }
                 }
             }
 
@@ -160,7 +158,7 @@ else if ($action == 'signup') {
             }
 
             else if ($field_name == 'password') {
-                if (empty($field_val) || len_between($field_val,6,20) != true) {
+                if (not_empty($field_val) && len_between($field_val,6,20) != true) {
                     $data['err_code'] = "invalid_password"; break;
                 }
             }
@@ -189,7 +187,15 @@ else if ($action == 'signup') {
         if (empty($data['err_code'])) {
             if ($cl['config']['acc_validation'] == 'off') {
                 $email_code       = sha1(time() + rand(111,999));
-                $password_hashed  = password_hash($user_data_fileds["password"], PASSWORD_DEFAULT);
+                
+                // Generate random password if not provided
+                $final_password = $user_data_fileds["password"];
+                if (empty($final_password)) {
+                    $final_password = bin2hex(random_bytes(8)); // 16 character random password
+                    $user_data_fileds["password"] = $final_password;
+                }
+                
+                $password_hashed  = password_hash($final_password, PASSWORD_DEFAULT);
                 $user_ip          = cl_get_ip();
                 $user_ip          = ((filter_var($user_ip, FILTER_VALIDATE_IP) == true) ? $user_ip : '0.0.0.0');
                 $is_admin         = "0";
@@ -211,6 +217,10 @@ else if ($action == 'signup') {
                 }
                 else{
                     $user_data_fileds["phone"] = "";
+                    // Generate temporary email if not provided
+                    if (empty($user_data_fileds["email"])) {
+                        $user_data_fileds["email"] = $user_data_fileds["uname"] . "_" . time() . "@temp.local";
+                    }
                 }
 
                 $insert_data      = array(
@@ -244,6 +254,18 @@ else if ($action == 'signup') {
             }
 
             else {
+                // Generate random password if not provided (for account validation case)
+                $final_password = $user_data_fileds["password"];
+                if (empty($final_password)) {
+                    $final_password = bin2hex(random_bytes(8)); // 16 character random password
+                    $user_data_fileds["password"] = $final_password;
+                }
+                
+                // Generate temporary email if not provided (for email confirmation system)
+                if ($cl["config"]["signup_conf_system"] == "email" && empty($user_data_fileds["email"])) {
+                    $user_data_fileds["email"] = $user_data_fileds["uname"] . "_" . time() . "@temp.local";
+                }
+                
                 $rand_code = rand(100000,999999);
                 $vud_id = sha1(rand(11111, 99999)) . time() . md5(microtime() . $rand_code);
 

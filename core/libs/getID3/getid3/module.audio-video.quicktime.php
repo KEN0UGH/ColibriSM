@@ -2713,7 +2713,7 @@ $this->warning('incomplete/incorrect handling of "stsd" with Parrot metadata in 
 						if ($denomninator == 0) {
 							$data[$i] = false;
 						} else {
-							$data[$i] = (double) $numerator / $denomninator;
+							$data[$i] = (float) $numerator / $denomninator;
 						}
 					}
 					$offset += (8 * $data_size);

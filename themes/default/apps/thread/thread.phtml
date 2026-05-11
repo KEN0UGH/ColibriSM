@@ -204,7 +204,7 @@
 											<div class="lozad-media">
 												<div class="publication-video">
 													<div class="cl-html5-video">
-														<video data-video-ratio="<?php echo(fetch_or_get($cl['thread_data']['post']['media'][0]['x']["ratio"],'16:9')); ?>" preload="metadata" playsinline controls>
+														<video data-video-ratio="<?php echo(fetch_or_get($cl['thread_data']['post']['media'][0]['x']["ratio"],'16:9')); ?>" preload="metadata" style="width: 100%;" playsinline controls>
 															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/mp4">
 															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/webm">
 															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/mov">
@@ -502,7 +502,7 @@
 										<?php endif; ?>
 									</div>
 								<?php else: ?>
-									<?php if (not_empty($cl['thread_data']['post']['is_owner']) && $cl['thread_data']['post']['target'] == 'publication'): ?>
+									<?php if ((not_empty($cl['thread_data']['post']['is_owner']) || not_empty($cl["is_admin"])) && $cl['thread_data']['post']['target'] == 'publication'): ?>
 										<div class="publication-privacy">
 											<button class="privacy-settings dropleft" type="button">
 												<div class="dropdown-toggle" data-toggle="dropdown">

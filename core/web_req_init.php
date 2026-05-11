@@ -62,9 +62,6 @@ $db            = new MysqliDb($mysqli);
 $url           = $site_url;
 $config        = cl_get_configurations();
 
-// Ensure post views_count column exists for backwards compatibility
-cl_ensure_post_views_column();
-
 $cl["update_date"] = "05012024-1"; 
 
 date_default_timezone_set($config["timezone"]);

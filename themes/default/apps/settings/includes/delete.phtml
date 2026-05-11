@@ -57,7 +57,7 @@
 	                </div>
 	                <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
 	                <div class="form-group no-mb d-flex">
-	                	<button v-if="submitting != true" v-bind:disabled="$v.$invalid == true" type="submit" class="ml-auto btn btn-custom main-red lg">
+                	<button v-if="submitting != true" v-bind:disabled="password_required && $v.$invalid == true" type="submit" class="ml-auto btn btn-custom main-red lg">
 	                        <?php echo cl_translate("Delete account"); ?>
 	                    </button>
 	                    <button v-else disabled="true" type="button" class="ml-auto btn btn-custom main-inline lg">
@@ -84,10 +84,16 @@
 					invalid_feedback_pass: "",
 					password: "",
 					invalid_pass: false,
-					password_display: "password"
+					password_display: "password",
+					password_required: <?php echo (fetch_or_get($me['password_auto_generated'], 0) == 0) ? 'true' : 'false'; ?>
 				},
 				computed: {
 					is_valid_password: function() {
+						// If password not required, always valid
+						if (!this.password_required) {
+							return false;
+						}
+
 						if (this.$v.password.required == true && this.$v.password.$error) {
 							this.invalid_feedback_pass = "<?php echo cl_translate("Please enter your current password!"); ?>";
 							return true;
@@ -106,7 +112,10 @@
 				},
 				validations: {
 					password: {
-						required: VueValids.required,
+						required: function() {
+							// Only require password if password_required is true
+							return this.password_required ? VueValids.required(this.password) : true;
+						}.bind(this),
 						min_length: VueValids.minLength(6),
 						max_length: VueValids.maxLength(20)
 					}

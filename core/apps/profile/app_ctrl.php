@@ -44,7 +44,7 @@ function cl_get_profile_posts($user_id = false, $limit = 30, $media = false, $of
 			$post_data = cl_raw_post_data($row['publication_id']);
 			if (not_empty($post_data) && in_array($post_data['status'], array('active'))) {
 				
-				if ($post_data['incognito_wcr'] == 'incognito' || $post_data['incognito_wcs'] == 'incognito' && empty($cl['is_admin']) && $post_data['user_id'] != $viewer_id) {
+				if (($post_data['incognito_wcr'] == 'incognito' || $post_data['incognito_wcs'] == 'incognito') && empty($cl['is_admin']) && $post_data['user_id'] != $viewer_id) {
 					continue;
 				}
 				$post_data['offset_id']   = $row['offset_id'];
@@ -133,7 +133,7 @@ function cl_get_profile_replies($user_id = false, $limit = 30, $offset = false) 
             $post_data = cl_raw_post_data($row['publication_id']);
             if (not_empty($post_data) && in_array($post_data['status'], array('active'))) {
 
-				if ($post_data['incognito_wcr'] == 'incognito' || $post_data['incognito_wcs'] == 'incognito' && empty($cl['is_admin']) && $post_data['user_id'] != $viewer_id) {
+				if (($post_data['incognito_wcr'] == 'incognito' || $post_data['incognito_wcs'] == 'incognito') && empty($cl['is_admin']) && $post_data['user_id'] != $viewer_id) {
 					continue;
 				}
                 $post_data['offset_id']   = $row['offset_id'];

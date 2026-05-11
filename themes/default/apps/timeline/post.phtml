@@ -294,7 +294,7 @@
 													<div class="lozad-media">
 														<div class="publication-video">
 															<div class="cl-html5-video">
-																<video data-video-ratio="<?php echo(fetch_or_get($cl['li']['media'][0]['x']["ratio"],'16:9')); ?>" preload="metadata" playsinline controls>
+																<video data-video-ratio="<?php echo(fetch_or_get($cl['li']['media'][0]['x']["ratio"],'16:9')); ?>" preload="metadata" style="width: 100%;" playsinline controls>
 																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mp4">
 																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/webm">
 																	<source src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" type="video/mov">
