@@ -61,12 +61,13 @@
     transition: opacity 0.3s ease !important;
 }
 
-/* 4. Hover State - Remove blur and text */
-.post-list-item[data-mature]:hover [class*="publication-"]::before,
-.post-list-item[data-mature]:hover .lozad-media::before,
-.post-list-item[data-mature]:hover [class*="publication-"]::after,
-.post-list-item[data-mature]:hover .lozad-media::after {
+/* 4. Click State - Remove blur and text */
+.post-list-item[data-mature].blur-removed [class*="publication-"]::before,
+.post-list-item[data-mature].blur-removed .lozad-media::before,
+.post-list-item[data-mature].blur-removed [class*="publication-"]::after,
+.post-list-item[data-mature].blur-removed .lozad-media::after {
     opacity: 0 !important;
+    cursor: pointer !important;
 }
 
 .timeline-reply-box-container {
@@ -78,3 +79,12 @@ body.modal-open {
     scrollbar-width: none;
     overflow: hidden;
 }
+
+div.guest-welcome h4 {
+  color: var(--cl-primary-text-color);
+}
+div.guest-welcome p {
+  color: var(--cl-primary-text-color);
+  text-align: center;
+}
+

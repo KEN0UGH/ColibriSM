@@ -1,15 +1,5 @@
 <div class="left-sb-container sidebar" data-app="left-sidebar">
 	<div class="sidebar__inner">
-		<div class="guest-welcome">
-			<div class="login-form">
-				<h4>
-					<?php echo cl_translate('Welcome to Hikichan'); ?>
-				</h4>
-				<p>
-					<?php echo cl_translate('We are a community of NEETS whit nothing better to do than to shitpost'); ?>
-				</p>
-			</div>
-		</div>
 		<div class="sidebar__nav">
 			<div class="sidebar__nav-group">
 				<div data-navitem="home" class="sidebar__nav-item <?php if($cl['pn'] == 'home') {echo('active');} ?>">
@@ -24,14 +14,45 @@
 				</div>
 				<div data-navitem="search" class="sidebar__nav-item <?php if($cl['pn'] == 'search') {echo('active');} ?>">
 					<span class="icon">
+						<?php echo cl_ficon('trending'); ?>
+					</span>
+					<span class="text">
+						<a href="<?php echo cl_link("explore/htags"); ?>" data-spa="true">
+							<?php echo cl_translate('Tags'); ?>
+						</a>
+					</span>
+				</div>
+				<div data-navitem="search" class="sidebar__nav-item <?php if($cl['pn'] == 'search') {echo('active');} ?>">
+					<span class="icon">
+						<?php echo cl_ficon('emoji'); ?>
+					</span>
+					<span class="text">
+						<a href="<?php echo cl_link("explore/people"); ?>" data-spa="true">
+							<?php echo cl_translate('People'); ?>
+						</a>
+					</span>
+				</div>
+				<div data-navitem="search" class="sidebar__nav-item <?php if($cl['pn'] == 'search') {echo('active');} ?>">
+					<span class="icon">
 						<?php echo cl_ficon('compass_northwest'); ?>
 					</span>
 					<span class="text">
 						<a href="<?php echo cl_link("search"); ?>" data-spa="true">
-							<?php echo cl_translate('Explore'); ?>
+							<?php echo cl_translate('Search'); ?>
 						</a>
 					</span>
 				</div>
+			</div>
+		</div>
+		<div class="guest-welcome">
+			<div class="login-form">
+				<h4>
+					<?php echo cl_translate('Welcome to Hikichan'); ?>
+				</h4>
+				<p>
+					<?php echo cl_translate('We are a community of NEETS with nothing better to do than to shitpost'); ?>
+					<iframe class="rumble" width="235" height="125" src="https://rumble.com/embed/v33njzd/?pub=4" frameborder="0" allowfullscreen></iframe>
+				</p>
 			</div>
 		</div>
 		<div class="guest-welcome">

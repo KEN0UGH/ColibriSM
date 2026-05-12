@@ -8,7 +8,7 @@
 		<label class="input-label">
 			<?php echo cl_translate("Username or E-mail"); ?>
 		</label>
-		<input name="email" v-model.trim.lazy="$v.email.$model" type="text" class="form-control" placeholder="<?php echo cl_translate("Email address or username"); ?>">
+		<input name="email" v-model.trim="$v.email.$model" type="text" class="form-control" placeholder="<?php echo cl_translate("Email address or username"); ?>">
 		<div class="invalid-main-feedback" v-if="is_valid_email">
 			{{invalid_feedback_email}}
 		</div>

@@ -563,6 +563,7 @@ else if ($action == "save_privacy_settings") {
 else if ($action == 'save_profile_pass') {
     $data['status']     =  400;
     $data['err_code']   =  null;
+    $password_auto_generated = fetch_or_get($_POST['password_auto_generated'], 0);
     $user_data_fields   =  array(
         'curr_password' => fetch_or_get($_POST['curr_password'],null),
         'new_password'  => fetch_or_get($_POST['new_password'],null),
@@ -571,8 +572,10 @@ else if ($action == 'save_profile_pass') {
 
     foreach ($user_data_fields as $field_name => $field_val) {
         if ($field_name == 'curr_password') {
-            if (empty($field_val) || (password_verify($field_val, $me['password']) != true)) {
-                $data['err_code'] = "invalid_curr_pass"; break;
+            if ($password_auto_generated == 0) {
+                if (empty($field_val) || (password_verify($field_val, $me['password']) != true)) {
+                    $data['err_code'] = "invalid_curr_pass"; break;
+                }
             }
         }
 
@@ -594,6 +597,7 @@ else if ($action == 'save_profile_pass') {
         $user_id        =  $me['id'];
         $update_data    =  array(
             'password'  => password_hash(cl_text_secure($user_data_fields['new_password']), PASSWORD_DEFAULT),
+            'password_auto_generated' => 0,
         ); 
 
         cl_update_user_data($user_id, $update_data);

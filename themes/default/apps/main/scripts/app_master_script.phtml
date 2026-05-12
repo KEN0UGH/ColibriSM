@@ -1493,7 +1493,7 @@
 								clearInterval(timer_id);
 							}
 						});
-					}, (Number(_smc.msb_upinterval) * 1000));
+					}, (Number(_smc.msb_upinterval) * 100));
 				}
 			}
 
@@ -1560,7 +1560,14 @@
 		
 
 
-						timeline.find('[data-el="timeline-content"]').html($(data.html));
+timeline.find('[data-el="timeline-content"]').html($(data.html)).promise().done(function() {
+						if ($("div.publication-text:not([data-readmore])").length) {
+							$("div.publication-text").readmore({
+								moreLink: '<span class="readmore-toggle"><?php echo cl_translate("Read more"); ?></span>',
+								lessLink: '<span class="readmore-toggle"><?php echo cl_translate("Read less"); ?></span>'
+							});
+						}
+					});
 
 						left_sidebar.find('[data-navitem]').each(function(index, el) {
 							$(el).removeClass('active');

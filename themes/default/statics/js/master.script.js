@@ -87,6 +87,12 @@ $(document).ready(function(){
         }
     });
 
+    $(document).on('click', '.post-list-item[data-mature]', function(event) {
+        if ($(event.target).closest('[class*="publication-"], .lozad-media').length) {
+            $(this).toggleClass('blur-removed');
+        }
+    });
+
     $(document).on('click.bs.dropdown.data-api', 'div.vue-dropdown-multiselect', function (e) {
         e.stopPropagation();
     });

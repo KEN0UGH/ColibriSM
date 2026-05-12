@@ -3088,8 +3088,8 @@ body main.main-content-container div.main-content-container-inner div.right-sb-c
   margin-bottom: 0px;
 }
 body main.main-content-container div.main-content-container-inner div.right-sb-container div.sidebar__inner div.right-sidebar div.right-sidebar__body div.sidebar-content div.sidebar-content__body div.sidebar-hashtags {
-  display: flex;
-  flex-wrap: wrap;
+  display: block;
+  /*flex-wrap: wrap;*/
   margin-right: -10px;
 }
 body main.main-content-container div.main-content-container-inner div.right-sb-container div.sidebar__inner div.right-sidebar div.right-sidebar__body div.sidebar-content div.sidebar-content__body div.sidebar-hashtags div.sidebar-hashtags__item {
@@ -3097,7 +3097,7 @@ body main.main-content-container div.main-content-container-inner div.right-sb-c
   margin-right: 7px;
 }
 body main.main-content-container div.main-content-container-inner div.right-sb-container div.sidebar__inner div.right-sidebar div.right-sidebar__body div.sidebar-content div.sidebar-content__body div.sidebar-hashtags div.sidebar-hashtags__item a.sidebar-hashtags__item-data {
-  border: 1px solid var(--cl-secondary-border-color);
+  border-bottom: 1px solid var(--cl-secondary-border-color);
   border-radius: 5em;
   text-decoration: none;
   padding: 5px 10px;

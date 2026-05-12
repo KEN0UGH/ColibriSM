@@ -473,6 +473,13 @@ var pubbox_form_app_mixin = Object({
 									setTimeout(function() {
 										home_timeline.find('div[data-an="entry-list"]').find('[data-list-item]').first().removeClass('animated fadeIn');
 									}, 1000);
+									
+									if ($("div.publication-text:not([data-readmore])").length) {
+										$("div.publication-text").readmore({
+											moreLink: '<span class="readmore-toggle"><?php echo cl_translate("Read more"); ?></span>',
+											lessLink: '<span class="readmore-toggle"><?php echo cl_translate("Read less"); ?></span>'
+										});
+									}
 								});
 							}
 							else {
@@ -494,6 +501,13 @@ var pubbox_form_app_mixin = Object({
 									setTimeout(function() {
 										thread_timeline.find('div[data-an="replys-list"]').find('[data-list-item]').first().removeClass('animated fadeIn');
 									}, 1000);
+									
+									if ($("div.publication-text:not([data-readmore])").length) {
+										$("div.publication-text").readmore({
+											moreLink: '<span class="readmore-toggle"><?php echo cl_translate("Read more"); ?></span>',
+											lessLink: '<span class="readmore-toggle"><?php echo cl_translate("Read less"); ?></span>'
+										});
+									}
 								});
 							}
 							else {
