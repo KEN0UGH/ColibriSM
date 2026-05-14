@@ -422,6 +422,34 @@ function cl_ensure_post_views_column() {
 	return false;
 }
 
+function cl_increment_view_count($post_id = false) {
+	global $db;
+	
+	if (not_num($post_id)) {
+		return false;
+	}
+	
+	// Ensure the views_count column exists
+	cl_ensure_post_views_column();
+	
+	// Get current view count
+	$db = $db->where("id", $post_id);
+	$post = $db->getOne(T_PUBS, array("views_count"));
+	
+	if (!cl_queryset($post)) {
+		return false;
+	}
+	
+	$current_views = (is_posnum($post['views_count'])) ? $post['views_count'] : 0;
+	$new_views = $current_views + 1;
+	
+	// Update view count
+	$db->where("id", $post_id);
+	$update_result = $db->update(T_PUBS, array("views_count" => $new_views));
+	
+	return is_posnum($update_result) ? $new_views : false;
+}
+
 function cl_post_data($post = array()) {
 	global $cl;
 
@@ -663,14 +691,6 @@ function cl_recursive_delete_post($post_id = false) {
 
 	if (not_empty($post_data)) {
 
-		if (not_empty($post_data["og_data"])) {
-			$post_data['og_data'] = json($post_data['og_data']);
-
-			if (not_empty($post_data['og_data']["image_loc"])) {
-				cl_delete_media($post_data['og_data']["image_loc"]);
-			}
-		}
-
 		$post_data['media']  = cl_get_post_media($post_id);
 		$db                  = $db->where('thread_id', $post_id);
 		$post_data['replys'] = $db->get(T_PUBS,null,array('id'));
@@ -678,6 +698,7 @@ function cl_recursive_delete_post($post_id = false) {
 		foreach ($post_data['media'] as $row) {
 			if (in_array($row['type'], array('image', 'video', "document", "audio", "donation", "gif"))) {
 				cl_delete_media($row['src']);
+				cl_delete_media($og_data['image']);
 
 				if (not_empty($row['x']['image_thumb'])) {
 					cl_delete_media($row['x']['image_thumb']);
@@ -685,6 +706,15 @@ function cl_recursive_delete_post($post_id = false) {
 				else if(not_empty($row['x']['poster_thumb'])) {
 					cl_delete_media($row['x']['poster_thumb']);
 				}
+			}
+		}
+
+		// Delete OG data image if it's locally stored
+		if (not_empty($post_data['og_data'])) {
+			$og_data = json($post_data['og_data']);
+
+			if (is_array($og_data) && not_empty($og_data['image']) && not_empty($og_data['image_loc'])) {
+				cl_delete_media($og_data['image']);
 			}
 		}
 

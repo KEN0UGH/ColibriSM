@@ -33,6 +33,9 @@ function cl_get_thread_data($post_id = false) {
 	);
 
 	if (cl_queryset($post) && $post["status"] != "orphan") {
+		// Increment view count when user accesses the thread
+		cl_increment_view_count($post_id);
+		
 		$data['can_reply'] = cl_can_reply($post);
 		$data['post']      = cl_post_data($post);
 		$data['next']      = cl_get_thread_child_posts($post_id, 30);
