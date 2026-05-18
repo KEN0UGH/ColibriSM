@@ -20,6 +20,7 @@
 define("PROJ_RP", dirname(dirname(__FILE__)));
 define("T_USERS", "cl_users");
 define("T_SESSIONS", "cl_sessions");
+define("T_SESSION_DATA", "cl_session_data");
 define("T_POSTS", "cl_posts");
 define("T_PUBS", "cl_publications");
 define("T_PUBMEDIA", "cl_pubmedia");

@@ -21,8 +21,6 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-session_start();
-
 error_reporting(E_ALL);
 
 require_once("settings.php");
@@ -61,6 +59,7 @@ $query         = $mysqli->query("SET NAMES utf8");
 $set_charset   = $mysqli->set_charset('utf8mb4');
 $set_charset   = $mysqli->query("SET collation_connection = utf8mb4_unicode_ci");
 $db            = new MysqliDb($mysqli);
+cl_db_session_init();
 $url           = $site_url;
 $config        = cl_get_configurations();
 

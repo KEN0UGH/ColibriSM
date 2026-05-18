@@ -67,9 +67,14 @@ if ($action == "login") {
             }
         }
         if ($cl["config"]["captcha"] == "on") {        
-            $captcha_input = fetch_or_get($_POST['captcha'], '');
-            if (strtolower($captcha_input) !== strtolower($_SESSION['captcha'])) {
+            $captcha_input  = fetch_or_get($_POST['captcha'], '');
+            $captcha_code   = cl_session('captcha');
+
+            if (strtolower($captcha_input) !== strtolower($captcha_code)) {
                 $data['err_code'] = "captcha_error";
+            }
+            else {
+                cl_session_unset('captcha');
             }
         }
 
@@ -178,9 +183,14 @@ else if ($action == 'signup') {
             }
         }
         if ($cl["config"]["captcha"] == "on") {
-            $captcha_input = fetch_or_get($_POST['captcha'], '');
-            if (strtolower($captcha_input) !== strtolower($_SESSION['captcha'])) {
+            $captcha_input  = fetch_or_get($_POST['captcha'], '');
+            $captcha_code   = cl_session('captcha');
+
+            if (strtolower($captcha_input) !== strtolower($captcha_code)) {
                 $data['err_code'] = "captcha_error";
+            }
+            else {
+                cl_session_unset('captcha');
             }
         }
 

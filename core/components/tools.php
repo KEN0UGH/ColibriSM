@@ -1209,9 +1209,28 @@ function cl_linkify_urls($text = "") {
 }
 
 function cl_session($key = null, $val = null) { 
+    if (!isset($_SESSION) || !is_array($_SESSION)) {
+        $_SESSION = array();
+    }
+
     if (not_empty($key) && is_string($key)) {
         if ($key && $val) {
             $_SESSION[$key] = $val;
+
+            if (!empty($GLOBALS['db'])) {
+                $session_id = cl_db_session_id();
+                $db = $GLOBALS['db'];
+                $db->where('session_id', $session_id);
+                $db->where('name', $key);
+                $db->delete(T_SESSION_DATA);
+                $db->insert(T_SESSION_DATA, array(
+                    'session_id' => $session_id,
+                    'name'       => $key,
+                    'value'      => serialize($val),
+                    'time'       => time()
+                ));
+            }
+
             return true;
         } 
         else {
@@ -1223,9 +1242,65 @@ function cl_session($key = null, $val = null) {
 }
 
 function cl_session_unset($key = null) { 
+    if (!isset($_SESSION) || !is_array($_SESSION)) {
+        $_SESSION = array();
+    }
+
     if (not_empty($key) && isset($_SESSION[$key])) {
         unset($_SESSION[$key]);
+
+        if (!empty($GLOBALS['db'])) {
+            $session_id = cl_db_session_id();
+            $db = $GLOBALS['db'];
+            $db->where('session_id', $session_id);
+            $db->where('name', $key);
+            $db->delete(T_SESSION_DATA);
+        }
     }
+}
+
+function cl_db_session_id() {
+    if (not_empty($_COOKIE['cl_session_id'])) {
+        return $_COOKIE['cl_session_id'];
+    }
+
+    $session_id = cl_strf("cl_%s", md5(uniqid(cl_genkey(16, 32), true)));
+    setcookie('cl_session_id', $session_id, time() + 31536000, '/');
+    $_COOKIE['cl_session_id'] = $session_id;
+
+    return $session_id;
+}
+
+function cl_db_session_init() {
+    global $db;
+
+    if (!isset($_SESSION) || !is_array($_SESSION)) {
+        $_SESSION = array();
+    }
+
+    if (empty($db)) {
+        return false;
+    }
+
+    $session_id = cl_db_session_id();
+
+    if (empty($session_id)) {
+        return false;
+    }
+
+    $session_rows = $db->where('session_id', $session_id)->get(T_SESSION_DATA, null, array('name', 'value'));
+    if (is_array($session_rows)) {
+        foreach ($session_rows as $row) {
+            $session_value = @unserialize($row['value']);
+            if ($session_value === false && $row['value'] !== 'b:0;') {
+                $session_value = $row['value'];
+            }
+
+            $_SESSION[$row['name']] = $session_value;
+        }
+    }
+
+    return $session_id;
 }
 
 function cl_rn2br($text = "") {

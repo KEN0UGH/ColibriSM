@@ -49,6 +49,7 @@ $cl_tables = array(
 	"cl_pubmedia",
 	"cl_pub_reports",
 	"cl_sessions",
+	"cl_session_data",
 	"cl_subscriptions",
 	"cl_ui_langs",
 	"cl_users",

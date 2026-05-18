@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once('../../../../core/web_req_init.php');
 
 $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 $captcha_code = '';
@@ -8,8 +8,8 @@ for ($i = 0; $i < 6; $i++) {
     $captcha_code .= $characters[rand(0, strlen($characters) - 1)];
 }
 
-$_SESSION['captcha']      = $captcha_code;
-$_SESSION['captcha_time'] = time();
+cl_session('captcha', $captcha_code);
+cl_session('captcha_time', time());
 
 header('Content-Type: image/png');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
