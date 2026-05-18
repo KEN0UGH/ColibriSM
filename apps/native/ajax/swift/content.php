@@ -62,6 +62,7 @@ if ($cl["config"]["swift_system_status"] == "on") {
                         );
 
                         $data['status'] = 200;
+                        $data['err_code'] = 0;
                         $data['img']    = array(
                             "url"       => cl_get_media($file_upload['filename'])
                         );
@@ -179,6 +180,7 @@ if ($cl["config"]["swift_system_status"] == "on") {
                             );
 
                             $data['status'] = 200;
+                            $data['err_code'] = 0;
                             $data['video']  = array(
                                 "source"    => cl_get_media($file_upload['filename'])
                             );

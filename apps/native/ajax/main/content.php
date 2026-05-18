@@ -78,6 +78,7 @@ if ($action == 'upload_post_image' && $cl["config"]["post_images_system"] == "on
                         ));
 
                         if (is_posnum($img_id)) {
+                            $data['err_code'] = 0;
                             $data['img']     = array("id" => $img_id, "url" => cl_get_media($file_upload['cropped']));
                             $data['status']  = 200;
                         }
@@ -189,6 +190,7 @@ else if ($action == 'upload_post_video' && $cl["config"]["post_videos_system"] =
                             ));
 
                             if (is_posnum($img_id)) {
+                                $data['err_code'] = 0;
                                 $data['status'] =  200;
                                 $data['video']  =  array(
                                     "source"    => cl_get_media($file_upload['filename']),

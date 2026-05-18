@@ -1208,99 +1208,113 @@ function cl_linkify_urls($text = "") {
     }
 }
 
-function cl_session($key = null, $val = null) { 
-    if (!isset($_SESSION) || !is_array($_SESSION)) {
-        $_SESSION = array();
-    }
-
-    if (not_empty($key) && is_string($key)) {
-        if ($key && $val) {
-            $_SESSION[$key] = $val;
-
-            if (!empty($GLOBALS['db'])) {
-                $session_id = cl_db_session_id();
-                $db = $GLOBALS['db'];
-                $db->where('session_id', $session_id);
-                $db->where('name', $key);
-                $db->delete(T_SESSION_DATA);
-                $db->insert(T_SESSION_DATA, array(
-                    'session_id' => $session_id,
-                    'name'       => $key,
-                    'value'      => serialize($val),
-                    'time'       => time()
-                ));
-            }
-
-            return true;
-        } 
-        else {
-            return isset($_SESSION[$key]) ? $_SESSION[$key] : false;
-        }
-    }
-
-    return false;
-}
-
-function cl_session_unset($key = null) { 
-    if (!isset($_SESSION) || !is_array($_SESSION)) {
-        $_SESSION = array();
-    }
-
-    if (not_empty($key) && isset($_SESSION[$key])) {
-        unset($_SESSION[$key]);
-
-        if (!empty($GLOBALS['db'])) {
-            $session_id = cl_db_session_id();
-            $db = $GLOBALS['db'];
-            $db->where('session_id', $session_id);
-            $db->where('name', $key);
-            $db->delete(T_SESSION_DATA);
-        }
-    }
-}
-
+// Generate or retrieve session ID with better entropy
 function cl_db_session_id() {
-    if (not_empty($_COOKIE['cl_session_id'])) {
+    if (!empty($_COOKIE['cl_session_id'])) {
         return $_COOKIE['cl_session_id'];
     }
 
-    $session_id = cl_strf("cl_%s", md5(uniqid(cl_genkey(16, 32), true)));
-    setcookie('cl_session_id', $session_id, time() + 31536000, '/');
-    $_COOKIE['cl_session_id'] = $session_id;
+    $session_id = 'cl_' . bin2hex(random_bytes(32)); // Much stronger than md5+uniqid
+    $expire = time() + (86400 * 30); // 30 days, adjustable
 
+    setcookie('cl_session_id', $session_id, [
+        'expires'  => $expire,
+        'path'     => '/',
+        'domain'   => '', 
+        'secure'   => true,      // Force HTTPS
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+
+    $_COOKIE['cl_session_id'] = $session_id;
     return $session_id;
 }
 
+// Initialize session from DB
 function cl_db_session_init() {
     global $db;
+    if (empty($db)) return false;
 
     if (!isset($_SESSION) || !is_array($_SESSION)) {
-        $_SESSION = array();
-    }
-
-    if (empty($db)) {
-        return false;
+        $_SESSION = [];
     }
 
     $session_id = cl_db_session_id();
+    $rows = $db->where('session_id', $session_id)
+               ->get(T_SESSION_DATA, null, ['name', 'value', 'updated_at']);
 
-    if (empty($session_id)) {
-        return false;
-    }
-
-    $session_rows = $db->where('session_id', $session_id)->get(T_SESSION_DATA, null, array('name', 'value'));
-    if (is_array($session_rows)) {
-        foreach ($session_rows as $row) {
-            $session_value = @unserialize($row['value']);
-            if ($session_value === false && $row['value'] !== 'b:0;') {
-                $session_value = $row['value'];
+    if (is_array($rows)) {
+        foreach ($rows as $row) {
+            $value = @unserialize($row['value']);
+            if ($value === false && $row['value'] !== 'b:0;') {
+                $value = $row['value'];
             }
-
-            $_SESSION[$row['name']] = $session_value;
+            $_SESSION[$row['name']] = $value;
         }
     }
 
     return $session_id;
+}
+
+// Main session handler
+function cl_session($key = null, $val = null) {
+    if (!isset($_SESSION) || !is_array($_SESSION)) {
+        $_SESSION = [];
+    }
+
+    if (empty($key) || !is_string($key)) {
+        return false;
+    }
+
+    global $db;
+    $session_id = cl_db_session_id();
+
+    if ($val !== null) { // Set value
+        $_SESSION[$key] = $val;
+
+        if (!empty($db)) {
+            $db->where('session_id', $session_id)
+               ->where('name', $key)
+               ->delete(T_SESSION_DATA);
+
+            $db->insert(T_SESSION_DATA, [
+                'session_id' => $session_id,
+                'name'       => $key,
+                'value'      => serialize($val),
+                'updated_at' => time()
+            ]);
+        }
+        return true;
+    } else { // Get value
+        return $_SESSION[$key] ?? null;
+    }
+}
+
+function cl_session_unset($key = null) {
+    if (empty($key) || !isset($_SESSION[$key])) {
+        return false;
+    }
+
+    unset($_SESSION[$key]);
+
+    global $db;
+    if (!empty($db)) {
+        $session_id = cl_db_session_id();
+        $db->where('session_id', $session_id)
+           ->where('name', $key)
+           ->delete(T_SESSION_DATA);
+    }
+    return true;
+}
+
+// Garbage Collection - call periodically (e.g. in cron or randomly)
+function cl_session_gc($max_lifetime = 86400 * 30) { // 30 days
+    global $db;
+    if (empty($db)) return false;
+
+    $db->where('updated_at', time() - $max_lifetime, '<')
+       ->delete(T_SESSION_DATA);
+    return true;
 }
 
 function cl_rn2br($text = "") {
