@@ -1,0 +1,119 @@
+<script>
+    "use strict";
+
+    $(document).ready(function() {
+        var _app     = $('[data-app="media-cleanup"]');
+        var _scan    = _app.find('[data-an="scan-ctrl"]');
+        var _delete  = _app.find('[data-an="delete-ctrl"]');
+        var _reset   = _app.find('[data-an="reset-ctrl"]');
+        var _results = _app.find('[data-an="results"]');
+        var _token   = '<?php echo fetch_or_get($cl["csrf_token"], "none"); ?>';
+
+        function setButtons(state) {
+            _scan.prop('disabled', state);
+            _delete.prop('disabled', state);
+        }
+
+        function restoreInitialState() {
+            _results.html('<div class="alert alert-secondary mb-0">Click "Scan for unused media" to detect orphaned uploads.</div>');
+            _reset.hide();
+            _scan.show();
+            _delete.prop('disabled', true);
+        }
+
+        function renderResults(data) {
+            var html = '<div class="alert alert-success">';
+
+            if (data.total_orphans == 0) {
+                html += '<strong>No unused files found.</strong>';
+            }
+            else {
+                html += '<strong>Unused files found: ' + data.total_orphans + '</strong>';
+                html += '<ul class="list-unstyled mt-3">';
+                html += '<li>Unused avatars: ' + data.counts.avatars + '</li>';
+                html += '<li>Unused covers: ' + data.counts.covers + '</li>';
+                html += '<li>Unused post/media files: ' + data.counts.media + '</li>';
+                html += '<li>Unused documents/audio: ' + data.counts.other + '</li>';
+                html += '</ul>';
+
+                if (data.example_files && data.example_files.length) {
+                    html += '<hr>';
+                    html += '<div class="text-muted">Showing example orphaned files:</div>';
+                    html += '<div class="mt-2" style="max-height:240px;overflow:auto;border:1px solid rgba(0,0,0,.05);padding:.85rem;background:#fff;">';
+                    html += '<ul class="list-unstyled mb-0 small">';
+
+                    data.example_files.forEach(function(file) {
+                        html += '<li>' + file + '</li>';
+                    });
+
+                    html += '</ul>';
+                    html += '</div>';
+                }
+            }
+
+            html += '</div>';
+            _results.html(html);
+        }
+
+        _scan.on('click', function(e) {
+            e.preventDefault();
+
+            setButtons(true);
+            _results.html('<div class="alert alert-info">Scanning storage, please wait...</div>');
+            SMC_CPanel.waitme('show');
+
+            $.post('<?php echo cl_link("native_api/cpanel/media_cleanup_scan"); ?>', {
+                hash: _token
+            }, function(data) {
+                if (data.status == 200) {
+                    renderResults(data);
+                    _delete.prop('disabled', data.total_orphans == 0);
+                    _reset.show();
+                }
+                else {
+                    SMC_CPanel.errorMSG();
+                    _results.html('<div class="alert alert-danger">Unable to scan unused media.</div>');
+                }
+            }, 'json').fail(function() {
+                SMC_CPanel.errorMSG();
+                _results.html('<div class="alert alert-danger">Unable to scan unused media.</div>');
+            }).always(function() {
+                setButtons(false);
+                SMC_CPanel.waitme();
+            });
+        });
+
+        _delete.on('click', function(e) {
+            e.preventDefault();
+
+            setButtons(true);
+            _results.html('<div class="alert alert-warning">Deleting unused files, please wait...</div>');
+            SMC_CPanel.waitme('show');
+
+            $.post('<?php echo cl_link("native_api/cpanel/media_cleanup_delete"); ?>', {
+                hash: _token
+            }, function(data) {
+                if (data.status == 200) {
+                    cl_bs_notify('Unused files removed successfully', 3000);
+                    _results.html('<div class="alert alert-success"><strong>Deleted ' + data.deleted_count + ' unused file(s).</strong></div>');
+                    _delete.prop('disabled', true);
+                }
+                else {
+                    SMC_CPanel.errorMSG();
+                    _results.html('<div class="alert alert-danger">Unable to delete unused media.</div>');
+                }
+            }, 'json').fail(function() {
+                SMC_CPanel.errorMSG();
+                _results.html('<div class="alert alert-danger">Unable to delete unused media.</div>');
+            }).always(function() {
+                setButtons(false);
+                SMC_CPanel.waitme();
+            });
+        });
+
+        _reset.on('click', function(e) {
+            e.preventDefault();
+            restoreInitialState();
+        });
+    });
+</script>

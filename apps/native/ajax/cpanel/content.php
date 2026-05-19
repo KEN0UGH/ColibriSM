@@ -17,6 +17,117 @@
 # @ Copyright (c)  ColibriSM. All rights reserved                           @
 # @*************************************************************************@
 
+function cl_admin_media_cleanup_normalize_path($src = '') {
+    global $cl;
+
+    if (empty($src)) {
+        return '';
+    }
+
+    $src = trim($src);
+    $src = str_replace('\\', '/', $src);
+
+    if (strpos($src, 'http://') === 0 || strpos($src, 'https://') === 0) {
+        $src = preg_replace('/^https?:\/\//i', '', $src);
+        $src = preg_replace('/^([^\/]+)\//', '', $src);
+    }
+
+    if (!empty($cl['config']['url'])) {
+        $src = str_replace($cl['config']['url'], '', $src);
+    }
+
+    return ltrim($src, '/');
+}
+
+function cl_admin_get_unused_media_files() {
+    global $db, $cl;
+
+    $references = array();
+    $scan_dirs  = array(
+        'upload/avatars',
+        'upload/covers',
+        'upload/images',
+        'upload/videos',
+        'upload/audios',
+        'upload/documents'
+    );
+
+    $pubmedia = $db->get(T_PUBMEDIA, null, array('src', 'json_data'));
+    if (not_empty($pubmedia)) {
+        foreach ($pubmedia as $media) {
+            $path = cl_admin_media_cleanup_normalize_path($media['src']);
+            if (strpos($path, 'upload/') === 0) {
+                $references[$path] = true;
+            }
+
+            $json_data = json($media['json_data']);
+            if (is_array($json_data)) {
+                if (!empty($json_data['image_thumb'])) {
+                    $thumb_path = cl_admin_media_cleanup_normalize_path($json_data['image_thumb']);
+                    if (strpos($thumb_path, 'upload/') === 0) {
+                        $references[$thumb_path] = true;
+                    }
+                }
+                if (!empty($json_data['poster_thumb'])) {
+                    $poster_path = cl_admin_media_cleanup_normalize_path($json_data['poster_thumb']);
+                    if (strpos($poster_path, 'upload/') === 0) {
+                        $references[$poster_path] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    $users = $db->get(T_USERS, null, array('avatar', 'cover', 'cover_orig'));
+    if (not_empty($users)) {
+        foreach ($users as $user) {
+            foreach (array('avatar', 'cover', 'cover_orig') as $field) {
+                $path = cl_admin_media_cleanup_normalize_path($user[$field]);
+                if (strpos($path, 'upload/') === 0) {
+                    $references[$path] = true;
+                }
+            }
+        }
+    }
+
+    $root = str_replace('\\', '/', cl_full_path('')) . '/';
+    $orphans = array();
+
+    foreach ($scan_dirs as $dir_path) {
+        $full_dir = cl_full_path($dir_path);
+
+        if (!is_dir($full_dir)) {
+            continue;
+        }
+
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($full_dir, FilesystemIterator::SKIP_DOTS));
+
+        foreach ($iterator as $item) {
+            if ($item->isFile() !== true) {
+                continue;
+            }
+
+            $file_path = str_replace('\\', '/', $item->getPathname());
+            $relative  = str_replace($root, '', $file_path);
+            $relative  = ltrim($relative, '/');
+
+            if (strpos($relative, 'upload/default/') === 0) {
+                continue;
+            }
+
+            if (strpos($relative, 'upload/') !== 0) {
+                continue;
+            }
+
+            if (!isset($references[$relative])) {
+                $orphans[] = $relative;
+            }
+        }
+    }
+
+    return $orphans;
+}
+
 if (empty($cl['is_admin'])) {
 	$data['status'] = 400;
     $data['error']  = 'Invalid access token';
@@ -923,6 +1034,85 @@ else if($action == "delete_spam_accounts") {
 
 	$db = $db->where("time", (time() - 604800), "<");
 	$qr = $db->delete(T_ACC_VALIDS);
+}
+
+else if($action == "media_cleanup_scan") {
+
+    $orphan_files = cl_admin_get_unused_media_files();
+    $counts       = array(
+        'avatars' => 0,
+        'covers'  => 0,
+        'media'   => 0,
+        'other'   => 0
+    );
+
+    foreach ($orphan_files as $file_path) {
+        if (strpos($file_path, 'upload/avatars/') === 0) {
+            $counts['avatars']++;
+        }
+        else if (strpos($file_path, 'upload/covers/') === 0) {
+            $counts['covers']++;
+        }
+        else if (strpos($file_path, 'upload/images/') === 0 || strpos($file_path, 'upload/videos/') === 0 || strpos($file_path, 'upload/audios/') === 0 || strpos($file_path, 'upload/documents/') === 0) {
+            $counts['media']++;
+        }
+        else {
+            $counts['other']++;
+        }
+    }
+
+    $data['status']        = 200;
+    $data['total_orphans'] = count($orphan_files);
+    $data['counts']        = $counts;
+    $data['example_files'] = array_slice($orphan_files, 0, 50);
+}
+
+else if($action == "media_cleanup_delete") {
+
+    $orphan_files = cl_admin_get_unused_media_files();
+    $deleted      = 0;
+
+    foreach ($orphan_files as $file_path) {
+        $local_path = cl_full_path($file_path);
+
+        if (is_file($local_path)) {
+            @unlink($local_path);
+            $deleted++;
+        }
+    }
+
+    $counts = array(
+        'avatars' => 0,
+        'covers'  => 0,
+        'media'   => 0,
+        'other'   => 0
+    );
+
+    foreach ($orphan_files as $file_path) {
+        if (strpos($file_path, 'upload/avatars/') === 0) {
+            $counts['avatars']++;
+        }
+        else if (strpos($file_path, 'upload/covers/') === 0) {
+            $counts['covers']++;
+        }
+        else if (strpos($file_path, 'upload/images/') === 0 || strpos($file_path, 'upload/videos/') === 0 || strpos($file_path, 'upload/audios/') === 0 || strpos($file_path, 'upload/documents/') === 0) {
+            $counts['media']++;
+        }
+        else {
+            $counts['other']++;
+        }
+    }
+
+    $data['status']            = 200;
+    $data['deleted_count']     = $deleted;
+    $data['total_orphans']     = count($orphan_files);
+    $data['remaining_orphans'] = max(0, count($orphan_files) - $deleted);
+    $data['counts']            = $counts;
+}
+
+else if($action == "media_cleanup_reset") {
+    $data['status'] = 200;
+    $data['reset']  = true;
 }
 
 else if($action == "create_invite_link") {

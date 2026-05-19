@@ -295,8 +295,12 @@ $cl["bg_colors"] = array(
 $cl["media_mime_types"] = array(
     'image/png',
     'image/jpeg',
+    'image/jpg',
+    'image/jpe',
     'image/gif',
     'image/webp',
+    'image/x-png',
+    'image/x-webp',
     'video/mp4',
     'video/quicktime',
     'video/3gpp',
@@ -1722,6 +1726,10 @@ $cl['morer_perms'] = array(
     "media_optimization" => array(
         "page_name" => "Media optimization tools",
         "desc" => "Permission to edit media optimization system settings page"
+    ),
+    "media_cleanup" => array(
+        "page_name" => "Media cleanup",
+        "desc" => "Permission to scan and remove unused media and profile images"
     ),
     "oauth_settings" => array(
         "page_name" => "Social login (oAuth)",

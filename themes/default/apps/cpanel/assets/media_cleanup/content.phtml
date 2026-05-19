@@ -1,0 +1,59 @@
+<div class="cp-app-container" data-app="media-cleanup">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Media cleanup
+            </h1>
+        </div>
+    </div>
+    <div class="card">
+        <div class="header">
+            <h2>
+                Scan and remove unused media files
+            </h2>
+        </div>
+        <div class="body">
+            <div class="inline-alertbox-wrapper">
+                <div class="inline-alertbox info">
+                    <div class="icon">
+                        <?php echo cl_ficon("info"); ?>
+                    </div>
+                    <div class="alert-message">
+                        <p>
+                            This tool scans uploaded media files and removes files that are not referenced by publications or currently used user avatars/covers.
+                        </p>
+                        <p>
+                            The scan covers upload folders for avatars, covers, images, videos, audio, and documents. It will not delete default system images.
+                        </p>
+                        <p>
+                            Image thumbnails and video posters (512x512) are automatically recognized as used.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group mb-0">
+                        <button data-an="scan-ctrl" type="button" class="btn btn-primary">
+                            Scan for unused media
+                        </button>
+                        <button data-an="delete-ctrl" type="button" class="btn btn-danger ml-2" disabled>
+                            Delete unused files
+                        </button>
+                        <button data-an="reset-ctrl" type="button" class="btn btn-outline-secondary ml-2" style="display:none;">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <div data-an="results" class="alert alert-secondary mb-0">
+                        Click "Scan for unused media" to detect orphaned uploads.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/media_cleanup/scripts/app_master_script'); ?>

@@ -176,7 +176,7 @@
     `session_id` varchar(120) NOT NULL DEFAULT '',
     `name` varchar(120) NOT NULL DEFAULT '',
     `value` text NOT NULL,
-    `time` varchar(25) NOT NULL DEFAULT '0',
+    `updated_at` varchar(25) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     KEY (`session_id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

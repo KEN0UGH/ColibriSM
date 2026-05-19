@@ -170,6 +170,16 @@
                 </span>
             </a>
         </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'media_cleanup') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/media_cleanup'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("delete"); ?>
+                </span>
+                <span class="text">
+                    Media cleanup
+                </span>
+            </a>
+        </li>
         <li class="menu-list-item <?php if($cl["cp_section"] == 'themes') {echo('active');} ?>">
             <a href="<?php echo cl_link('admin_panel/themes'); ?>" class="menu-list-item-link">
                 <span class="icon">
