@@ -555,88 +555,131 @@ else if($action == 'import_og_data') {
     if (empty($cl["is_logged"])) {
         $data['status'] = 400;
         $data['error']  = 'Invalid access token';
-    }
-
-    else {
+    } else {
         $data['err_code'] = "invalid_req_data";
         $data['status']   = 400;
 
-        if(empty($_POST['url']) || is_url($_POST['url'])) {
-            $post_data = $me['draft_post'];
-            $og_url    = fetch_or_get($_POST['url'], "");
+        if (!empty($_POST['url']) && is_url($_POST['url'])) {  // ← bug fixed
+            $og_url = fetch_or_get($_POST['url'], "");
 
             try {
-                require_once(cl_full_path("core/libs/htmlParser/simple_html_dom.php"));
+                $is_x_post = preg_match(
+                    '#^https?://(www\.)?(twitter\.com|x\.com)/\w+/status/\d+#i',
+                    $og_url
+                );
 
-                $og_data_object = file_get_html($og_url);
+                // ── X.com / Twitter ───────────────────────────────────────────
+                if ($is_x_post) {
+                    $oembed_url  = 'https://publish.twitter.com/oembed?url='
+                        . urlencode($og_url) . '&omit_script=true';
+                    $oembed_json = file_get_contents($oembed_url);
 
-                if ($og_data_object) {
-                    $og_data_values = array(
-                        "title" => "",
-                        "description" => "",
-                        "image" => "",
-                        "type" => ""
-                    );
+                    if ($oembed_json) {
+                        $oembed      = json_decode($oembed_json, true);
+                        $embed_html  = $oembed['html']        ?? '';
+                        $author_name = $oembed['author_name'] ?? '';
+                        $tweet_text  = trim(strip_tags(
+                            preg_replace('/<a[^>]*>.*?<\/a>/is', '', $embed_html)
+                        ));
 
-                    foreach(array_keys($og_data_values) as $og_val) {
-                        if ($og_val == "title") {
-                            if ($og_data_object->find('title', 0)) {
-                                $og_data_values["title"] = $og_data_object->find('title', 0)->plaintext;
-                            }
-
-                            else if ($og_data_object->find("meta[name='og:title']", 0)) {
-                                $og_data_values["title"] = $og_data_object->find("meta[name='og:title']", 0)->content;
-                            }
-                        }
-
-                        else if($og_val == "description") {
-                            if ($og_data_object->find("meta[name='description']", 0)) {
-                                $og_data_values["description"] = $og_data_object->find("meta[name='description']", 0)->content;
-                            }
-
-                            else if($og_data_object->find("meta[property='og:description']", 0)) {
-                                $og_data_values["description"] = $og_data_object->find("meta[property='og:description']", 0)->content;
-                            }
-                        }
-
-                        else if($og_val == "image") {
-                            if($og_data_object->find("meta[name='image']", 0)) {
-                                $og_data_values["image"] = $og_data_object->find("meta[name='image']", 0)->content;
-                            }
-
-                            else if($og_data_object->find("meta[property='og:image']", 0)) {
-                                $og_data_values["image"] = $og_data_object->find("meta[property='og:image']", 0)->content;
+                        // Try to grab og:image from the page
+                        $image_url = '';
+                        $context   = stream_context_create(['http' => [
+                            'header'  => "User-Agent: Mozilla/5.0 (compatible; bot)\r\n",
+                            'timeout' => 10
+                        ]]);
+                        $html_content = @file_get_contents($og_url, false, $context);
+                        if ($html_content) {
+                            require_once(cl_full_path("core/libs/htmlParser/simple_html_dom.php"));
+                            $dom = str_get_html($html_content);
+                            if ($dom) {
+                                $img_meta  = $dom->find("meta[property='og:image']", 0)
+                                          ?? $dom->find("meta[name='og:image']", 0);
+                                $image_url = $img_meta ? $img_meta->content : '';
                             }
                         }
 
-                        else if($og_val == "type") {
-                            if($og_data_object->find("meta[property='og:type']", 0)) {
-                                $og_data_values["type"] = $og_data_object->find("meta[property='og:type']", 0)->content;
-                            }
+                        $og_data_values = [
+                            'title'       => cl_croptxt($author_name . ': ' . $tweet_text, 160, '..'),
+                            'description' => cl_croptxt($tweet_text, 300, '..'),
+                            'image'       => $image_url,
+                            'type'        => 'article',
+                            'url'         => $og_url,
+                            'author'      => $author_name,
+                            'embed_html'  => $embed_html
+                        ];
 
-                            else if($og_data_object->find("meta[name='type']", 0)) {
-                                $og_data_values["type"] = $og_data_object->find("meta[name='type']", 0)->content;
-                            }
-                        } 
+                        if (not_empty($og_data_values['title'])) {
+                            $data['status']  = 200;
+                            $data['og_data'] = $og_data_values;
+                        }
                     }
 
-                    $og_data_values = array(
-                        'title'       => cl_croptxt($og_data_values["title"], 160, '..'),
-                        'description' => cl_croptxt($og_data_values["description"], 300, '..'),
-                        'image'       => $og_data_values["image"],
-                        'type'        => $og_data_values["type"],
-                        'url'         => $og_url
-                    );
+                // ── All other URLs (localhost, normal sites, etc.) ────────────
+                } else {
+                    require_once(cl_full_path("core/libs/htmlParser/simple_html_dom_short.php"));
 
-                    if (not_empty($og_data_values['title'])) {
-                        $data['status']  = 200;
-                        $data['og_data'] = $og_data_values;
+                    // Use a context so localhost and LAN URLs work too
+                    $context = stream_context_create(['http' => [
+                        'header'  => "User-Agent: Mozilla/5.0 (compatible; bot)\r\n",
+                        'timeout' => 10
+                    ]]);
+
+                    $og_data_object = file_get_html($og_url, false, $context); // ← pass context
+
+                    if ($og_data_object) {
+                        $og_data_values = [
+                            "title"       => "",
+                            "description" => "",
+                            "image"       => "",
+                            "type"        => ""
+                        ];
+
+                        foreach (array_keys($og_data_values) as $og_val) {
+                            if ($og_val == "title") {
+                                if ($og_data_object->find('title', 0)) {
+                                    $og_data_values["title"] = $og_data_object->find('title', 0)->plaintext;
+                                } else if ($og_data_object->find("meta[property='og:title']", 0)) {
+                                    $og_data_values["title"] = $og_data_object->find("meta[property='og:title']", 0)->content;
+                                }
+                            } else if ($og_val == "description") {
+                                if ($og_data_object->find("meta[name='description']", 0)) {
+                                    $og_data_values["description"] = $og_data_object->find("meta[name='description']", 0)->content;
+                                } else if ($og_data_object->find("meta[property='og:description']", 0)) {
+                                    $og_data_values["description"] = $og_data_object->find("meta[property='og:description']", 0)->content;
+                                }
+                            } else if ($og_val == "image") {
+                                if ($og_data_object->find("meta[name='image']", 0)) {
+                                    $og_data_values["image"] = $og_data_object->find("meta[name='image']", 0)->content;
+                                } else if ($og_data_object->find("meta[property='og:image']", 0)) {
+                                    $og_data_values["image"] = $og_data_object->find("meta[property='og:image']", 0)->content;
+                                }
+                            } else if ($og_val == "type") {
+                                if ($og_data_object->find("meta[property='og:type']", 0)) {
+                                    $og_data_values["type"] = $og_data_object->find("meta[property='og:type']", 0)->content;
+                                } else if ($og_data_object->find("meta[name='type']", 0)) {
+                                    $og_data_values["type"] = $og_data_object->find("meta[name='type']", 0)->content;
+                                }
+                            }
+                        }
+
+                        $og_data_values = [
+                            'title'       => cl_croptxt($og_data_values["title"], 160, '..'),
+                            'description' => cl_croptxt($og_data_values["description"], 300, '..'),
+                            'image'       => $og_data_values["image"],
+                            'type'        => $og_data_values["type"],
+                            'url'         => $og_url
+                        ];
+
+                        if (not_empty($og_data_values['title'])) {
+                            $data['status']  = 200;
+                            $data['og_data'] = $og_data_values;
+                        }
                     }
                 }
-            } 
 
-            catch (Exception $e) {
-                /*pass*/ 
+            } catch (Exception $e) {
+                /*pass*/
             }
         }
     }
