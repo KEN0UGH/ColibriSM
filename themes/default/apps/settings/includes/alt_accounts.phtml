@@ -1,0 +1,276 @@
+<div class="timeline-container">
+    <div class="timeline-header" data-el="tl-header">
+        <div class="timeline-header__botline">
+            <div class="lp">
+                <div class="nav-link-holder">
+                    <a href="<?php echo cl_link("settings/alt_accounts"); ?>" data-spa="true">
+                        <?php echo cl_translate("Alternate accounts"); ?>
+                    </a>
+                </div>
+            </div>
+            <div class="cp">
+                <a href="<?php echo cl_link("home"); ?>">
+                    <img src="{%config site_logo%}" alt="Logo">
+                </a>
+            </div>
+            <div class="rp">
+                <div class="nav-link-holder">
+                    <span class="go-back" onclick="SMColibri.go_back();">
+                        <?php echo cl_ficon('arrow_back'); ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-settings">
+        <div class="profile-settings__content">
+            <div class="settings-form">
+                <form class="form" id="cl-alt-accounts-settings-vue-app" v-on:submit="submit_form($event)">
+                    
+                    <!-- Add Alternate Account Form -->
+                    <div class="row">
+                        <div class="col-12 col-lg-7">
+                            <div class="form-group">
+                                <label>
+                                    <?php echo cl_translate("Username or email"); ?>
+                                </label>
+                                <input v-model.trim="$v.alt_identifier.$model" 
+                                       type="text" 
+                                       name="alt_identifier" 
+                                       class="form-control" 
+                                       placeholder="<?php echo cl_translate("enter_username_or_email"); ?>">
+                                <div class="invalid-main-feedback" v-if="is_invalid_alt_identifier">
+                                    {{ invalid_feedback_alt_identifier }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <?php echo cl_translate("Password"); ?>
+                                </label>
+                                <div class="password-ctrl">
+                                    <input v-model.trim="$v.alt_password.$model" 
+                                           name="alt_password" 
+                                           v-bind:type="password_display" 
+                                           class="form-control" 
+                                           placeholder="<?php echo cl_translate("enter_password_of_your_alternate_account"); ?>">
+                                    <button type="button" class="password-ctrl" v-on:click="password_display_toggle">
+                                        <span v-if="password_display == 'password'">
+                                            <?php echo cl_ficon("eye_show"); ?>
+                                        </span>
+                                        <span v-else>
+                                            <?php echo cl_ficon("eye_hide"); ?>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="invalid-main-feedback" v-if="is_invalid_alt_password">
+                                    {{ invalid_feedback_alt_password }}
+                                </div>
+                            </div>
+
+                            <div class="form-group" v-if="unsuccessful_attempt">
+                                <div class="invalid-main-feedback">
+                                    <?php echo cl_translate("Something went wrong while trying to save your changes, please try again later"); ?>
+                                </div>
+                            </div>
+                            <div class="form-group" v-else>
+                                <div class="form-info-label">
+                                    <?php echo cl_translate("add_alternate_account_help"); ?>
+                                </div>
+                            </div>
+
+                            <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+
+                            <div class="form-group no-mb d-flex">
+                                <button v-if="submitting != true" 
+                                        v-bind:disabled="$v.$invalid == true" 
+                                        type="submit" 
+                                        class="ml-auto btn btn-custom main-inline lg">
+                                    <?php echo cl_translate("add_alternate_account"); ?>
+                                </button>
+                                <button v-else disabled="true" type="button" class="ml-auto btn btn-custom main-inline lg">
+                                    <?php echo cl_translate("Please wait"); ?>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linked Alternate Accounts -->
+                    <div class="mt-5">
+                        <h4><?php echo cl_translate("linked_alternate_accounts"); ?></h4>
+                        <div class="alternate-accounts-list">
+                            <?php
+                            $alt_accounts = cl_get_alt_accounts($me['id']);
+                            if (is_array($alt_accounts) && not_empty($alt_accounts)) {
+                                foreach ($alt_accounts as $alt_account) {
+                                    if (not_empty($alt_account)) {
+                            ?>
+                            <div class="alt-account-item d-flex align-items-center justify-content-between flex-wrap">
+                                <div class="alt-account-meta d-flex align-items-center">
+                                    <div class="alt-account-avatar mr-3">
+                                        <img src="<?php echo($alt_account['avatar']); ?>" 
+                                             alt="<?php echo htmlspecialchars($alt_account['name'], ENT_QUOTES, 'UTF-8'); ?>" 
+                                             class="rounded-circle" 
+                                             style="width:48px;height:48px;object-fit:cover;">
+                                    </div>
+                                    <div class="alt-account-text flex-grow-1 min-width-0">
+                                        <div class="alt-account-name"><?php echo htmlspecialchars($alt_account['name'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                        <div class="alt-account-username">@<?php echo htmlspecialchars($alt_account['raw_uname'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                    </div>
+                                </div>
+                                <div class="alt-account-actions d-flex align-items-center">
+                                    <button type="button" class="btn btn-custom sm mr-2" v-on:click="login_alt_account('<?php echo($alt_account['id']); ?>')">
+                                        <?php echo cl_translate("login"); ?>
+                                    </button>
+                                    <button type="button" class="btn btn-custom sm" v-on:click="remove_alt_account('<?php echo($alt_account['id']); ?>')">
+                                        <?php echo cl_translate("Remove"); ?>
+                                    </button>
+                                </div>
+                            </div>
+                            <?php
+                                    } else {
+                            ?>
+                            <div class="alt-account-item d-flex align-items-center justify-content-between">
+                                <div class="alt-account-text flex-grow-1 min-width-0">
+                                    <div class="alt-account-name"><?php echo cl_translate("account_no_longer_available"); ?></div>
+                                </div>
+                            </div>
+                            <?php
+                                    }
+                                }
+                            } else {
+                            ?>
+                            <div class="no-alt-accounts">
+                                <?php echo cl_translate("no_alternate_accounts_linked_yet"); ?>
+                            </div>
+                            <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+
+    $(document).ready(function($) {
+        Vue.use(window.vuelidate.default);
+        var VueValids = window.validators;
+
+        new Vue({
+            el: "#cl-alt-accounts-settings-vue-app",
+            data: {
+                submitting: false,
+                unsuccessful_attempt: false,
+                invalid_feedback_alt_identifier: "",
+                invalid_feedback_alt_password: "",
+                alt_identifier: "",
+                alt_password: "",
+                password_display: "password"
+            },
+            computed: {
+                is_invalid_alt_identifier: function() {
+                    if (this.$v.alt_identifier.$error) {
+                        this.invalid_feedback_alt_identifier = "<?php echo cl_translate("Please enter a username or email address."); ?>";
+                        return true;
+                    }
+                    this.invalid_feedback_alt_identifier = "";
+                    return false;
+                },
+                is_invalid_alt_password: function() {
+                    if (this.$v.alt_password.$error) {
+                        this.invalid_feedback_alt_password = "<?php echo cl_translate("Please enter the password for the alternate account."); ?>";
+                        return true;
+                    }
+                    this.invalid_feedback_alt_password = "";
+                    return false;
+                }
+            },
+            validations: {
+                alt_identifier: {
+                    required: VueValids.required,
+                    minLength: VueValids.minLength(3),
+                    maxLength: VueValids.maxLength(60)
+                },
+                alt_password: {
+                    required: VueValids.required,
+                    minLength: VueValids.minLength(6),
+                    maxLength: VueValids.maxLength(20)
+                }
+            },
+            methods: {
+                submit_form: function(_self) {
+                    _self.preventDefault();
+                    var _app_ = this;
+
+                    $(_self.target).ajaxSubmit({
+                        url: "<?php echo cl_link("native_api/settings/save_alt_account"); ?>",
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function() {
+                            _app_.submitting = true;
+                            _app_.unsuccessful_attempt = false;
+                        },
+                        success: function(data) {
+                            if (data.status == 200) {
+                                cl_bs_notify("<?php echo cl_translate("Alternate account added successfully"); ?>", 5000, "success");
+                                window.location.reload();
+                            } else {
+                                _app_.unsuccessful_attempt = true;
+                            }
+                        },
+                        complete: function() {
+                            _app_.submitting = false;
+                        }
+                    });
+                },
+
+                password_display_toggle: function() {
+                    this.password_display = (this.password_display == 'password') ? 'text' : 'password';
+                },
+
+                remove_alt_account: function(alt_id) {
+                    if (!alt_id || alt_id == 0) return;
+
+                    var _app_ = this;
+
+                    $.post("<?php echo cl_link("native_api/settings/remove_alt_account"); ?>", {
+                        alt_id: alt_id,
+                        hash: "<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>"
+                    }, function(data) {
+                        if (data.status == 200) {
+                            cl_bs_notify("<?php echo cl_translate("Alternate account removed successfully"); ?>", 5000, "success");
+                            window.location.reload();
+                        } else {
+                            _app_.unsuccessful_attempt = true;
+                        }
+                    }, 'json');
+                },
+
+                login_alt_account: function(alt_id) {
+                    if (!alt_id || alt_id == 0) return;
+
+                    var _app_ = this;
+
+                    $.post("<?php echo cl_link("native_api/settings/login_alt_account"); ?>", {
+                        alt_id: alt_id,
+                        hash: "<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>"
+                    }, function(data) {
+                        if (data.status == 200) {
+                            cl_bs_notify("<?php echo cl_translate("alternate_account_logged_in_successfully"); ?>", 5000, "success");
+                            window.location.reload();
+                        } else {
+                            _app_.unsuccessful_attempt = true;
+                        }
+                    }, 'json');
+                }
+            }
+        });
+    });
+</script>

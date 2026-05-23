@@ -152,7 +152,114 @@ else if ($action == "save_profile_email") {
     }
 }
 
-else if ($action == "save_profile_phone" && $cl["config"]["signup_conf_system"] == "phone") {
+else if ($action == "save_alt_account") {
+        $data['err_code'] = 0;
+        $data['status']   = 400;
+        $alt_identifier   = fetch_or_get($_POST['alt_identifier'], null);
+        $alt_password     = fetch_or_get($_POST['alt_password'], null);
+
+        if (empty($alt_identifier) || empty($alt_password)) {
+            $data['err_code'] = "invalid_alt_account";
+        }
+        else {
+            $alt_identifier = cl_text_secure($alt_identifier);
+            
+            // Try to find user by username first, then by email
+            $alt_user = $db->where('username', $alt_identifier)->getOne(T_USERS, array('id', 'username', 'email', 'password'));
+            
+            if (empty($alt_user)) {
+                $alt_user = $db->where('email', $alt_identifier)->getOne(T_USERS, array('id', 'username', 'email', 'password'));
+            }
+
+            if (empty($alt_user)) {
+                $data['err_code'] = "invalid_alt_account";
+            } 
+            else if ((int) $alt_user['id'] == (int) $me['id']) {
+                $data['err_code'] = "invalid_alt_account";
+            }
+            else if (!password_verify($alt_password, $alt_user['password'])) {
+                $data['err_code'] = "invalid_alt_account";
+            }
+            else {
+                $current_alts = cl_get_alt_account_ids($me['id']);
+                
+                if (in_array((int)$alt_user['id'], $current_alts)) {
+                    $data['err_code'] = "alternate_account_already_linked";
+                }
+                else {
+                    $all_ids = array_merge(array((int)$me['id']), $current_alts, array((int)$alt_user['id']));
+                    $all_ids = array_unique(array_filter($all_ids));
+                    
+                    $group = cl_sync_alt_account_group($all_ids);
+
+                    if (empty($group)) {
+                        $data['err_code'] = "invalid_alt_account";
+                    }
+                    else {
+                        $data['status'] = 200;
+                        $data['message'] = "Alternate account added successfully";
+                    }
+                }
+            }
+        }
+    }
+
+    else if ($action == "remove_alt_account") {
+        $data['err_code'] = 0;
+        $data['status']   = 400;
+        $alt_id          = fetch_or_get($_POST['alt_id'], null);
+
+        if (!is_numeric($alt_id)) {
+            $data['err_code'] = "invalid_alt_account";
+        }
+        else {
+            $alt_id = (int)$alt_id;
+            $alt_accounts = cl_get_alt_account_ids($me['id']);
+
+            if (!in_array($alt_id, $alt_accounts)) {
+                $data['err_code'] = "invalid_alt_account";
+            }
+            else {
+                cl_remove_alt_account_link($me['id'], $alt_id);
+
+                $data['status'] = 200;
+                $data['message'] = "Alternate account removed successfully";
+            }
+        }
+    }
+
+    else if ($action == "login_alt_account") {
+        $data['err_code'] = 0;
+        $data['status']   = 400;
+        $alt_id          = fetch_or_get($_POST['alt_id'], null);
+
+        if (!is_numeric($alt_id)) {
+            $data['err_code'] = "invalid_alt_account";
+        }
+        else {
+            $alt_id = (int)$alt_id;
+            $alt_accounts = cl_get_alt_account_ids($me['id']);
+
+            if (!in_array($alt_id, $alt_accounts)) {
+                $data['err_code'] = "invalid_alt_account";
+            }
+            else {
+                $alt_account = cl_user_data($alt_id);
+
+                if (empty($alt_account)) {
+                    $data['err_code'] = "invalid_alt_account";
+                }
+                else {
+                    cl_create_user_session($alt_account['id'], "web");
+
+                    $data['status']  = 200;
+                    $data['message'] = "Alternate account logged in successfully";
+                }
+            }
+        }
+    }
+
+    else if ($action == "save_profile_phone" && $cl["config"]["signup_conf_system"] == "phone") {
     $data['err_code'] = 0;
     $data['status']   = 400;
     $phone            = trim(fetch_or_get($_POST['phone'], ""));

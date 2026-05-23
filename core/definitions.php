@@ -47,3 +47,5 @@ define("T_WALLET_POUT", "cl_wallet_payout");
 define("T_SUBSCRIPTIONS", "cl_subscriptions");
 define("T_PEND_PAYMS", "cl_pending_payments");
 define("T_ADMIN_PERMS", "cl_admin_permissions");
+define("T_ALT_ACCOUNT_GROUPS", "cl_alt_account_groups");
+define("T_ALT_ACCOUNT_GROUP_MEMBERS", "cl_alt_account_group_members");
