@@ -17,36 +17,6 @@
 # @ Copyright (c)  ColibriSM. All rights reserved                           @
 # @*************************************************************************@
 
-function cl_init_alt_account_tables() {
-    global $db;
-    
-    // Create alt account groups table if it doesn't exist
-    try {
-        $sql1 = "CREATE TABLE IF NOT EXISTS `" . T_ALT_ACCOUNT_GROUPS . "` (
-            `id` INT(11) NOT NULL AUTO_INCREMENT,
-            `time` VARCHAR(25) NOT NULL DEFAULT '0',
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-        
-        $db->rawQuery($sql1);
-        
-        // Create alt account group members table if it doesn't exist
-        $sql2 = "CREATE TABLE IF NOT EXISTS `" . T_ALT_ACCOUNT_GROUP_MEMBERS . "` (
-            `id` INT(11) NOT NULL AUTO_INCREMENT,
-            `group_id` INT(11) NOT NULL DEFAULT '0',
-            `user_id` INT(11) NOT NULL DEFAULT '0',
-            `time` VARCHAR(25) NOT NULL DEFAULT '0',
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `group_id_user_id` (`group_id`,`user_id`),
-            INDEX `user_id` (`user_id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-        
-        $db->rawQuery($sql2);
-    } catch (Exception $e) {
-        // Tables might already exist, continue
-    }
-}
-
 function cl_get_ip() {
     if (not_empty($_SERVER['HTTP_CLIENT_IP']) && filter_var($_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
         return $_SERVER['HTTP_CLIENT_IP'];
@@ -394,61 +364,34 @@ function cl_get_user_settings($user_id = 0) {
     return json($user_data["settings"]);
 }
 
-function cl_get_alt_account_group_id($user_id = 0) {
-    global $db;
-
-    if (not_num($user_id)) {
-        return false;
-    }
-
-    try {
-        $sql = "SELECT group_id FROM " . T_ALT_ACCOUNT_GROUP_MEMBERS . " WHERE user_id = ?";
-        $group = $db->rawQuery($sql, [$user_id]);
-        
-        if (not_empty($group) && is_array($group) && not_empty($group[0])) {
-            return $group[0]['group_id'];
-        }
-    } catch (Exception $e) {
-        return false;
-    }
-
-    return false;
-}
-
 function cl_get_alt_account_ids($user_id = 0) {
-    global $db;
-
     if (not_num($user_id)) {
         return array();
     }
 
-    $group_id = cl_get_alt_account_group_id($user_id);
+    $user_data = cl_raw_user_data($user_id);
 
-    if (not_num($group_id)) {
+    if (empty($user_data)) {
         return array();
     }
 
-    try {
-        $sql = "SELECT user_id FROM " . T_ALT_ACCOUNT_GROUP_MEMBERS . " WHERE group_id = ?";
-        $members = $db->rawQuery($sql, [$group_id]);
+    $settings = json($user_data['settings']);
 
-        if (empty($members) || !is_array($members)) {
-            return array();
-        }
+    if (empty($settings) || !is_array($settings) || empty($settings['alt_accounts'])) {
+        return array();
+    }
 
-        $alt_ids = array();
+    $alt_ids = array();
 
-        foreach ($members as $member) {
-            $member_id = isset($member['user_id']) ? $member['user_id'] : null;
-            if (is_numeric($member_id) && $member_id != $user_id) {
-                $alt_ids[] = (int) $member_id;
+    if (is_array($settings['alt_accounts'])) {
+        foreach ($settings['alt_accounts'] as $alt) {
+            if (isset($alt['id']) && is_numeric($alt['id'])) {
+                $alt_ids[] = (int) $alt['id'];
             }
         }
-
-        return array_values(array_unique($alt_ids));
-    } catch (Exception $e) {
-        return array();
     }
+
+    return array_values(array_unique($alt_ids));
 }
 
 function cl_get_alt_accounts($user_id = 0) {
@@ -472,6 +415,7 @@ function cl_get_alt_accounts($user_id = 0) {
         $alt_user = cl_user_data($alt_id);
 
         if (not_empty($alt_user)) {
+            // Add full user data for display purposes
             $alt_accounts[] = $alt_user;
         }
     }
@@ -480,8 +424,6 @@ function cl_get_alt_accounts($user_id = 0) {
 }
 
 function cl_sync_alt_account_group($user_ids = array()) {
-    global $db;
-
     if (!is_array($user_ids)) {
         return false;
     }
@@ -494,136 +436,134 @@ function cl_sync_alt_account_group($user_ids = array()) {
         return false;
     }
 
-    // Initialize table if needed
-    cl_init_alt_account_tables();
+    // Sync alt accounts across all linked accounts' settings
+    // Each user should have all other users in their alt_accounts list
+    $alt_account_list = array();
 
-    // Get all existing groups that these users belong to
-    try {
-        $query = "SELECT DISTINCT group_id FROM " . T_ALT_ACCOUNT_GROUP_MEMBERS . " WHERE user_id IN (" . implode(',', $user_ids) . ")";
-        $results = $db->rawQuery($query);
-        $existing_group_ids = array();
-        
-        if (!empty($results)) {
-            foreach ($results as $row) {
-                $existing_group_ids[] = (int)$row['group_id'];
-            }
-        }
-    } catch (Exception $e) {
-        return false;
-    }
-
-    // If no existing groups, create new one
-    if (empty($existing_group_ids)) {
-        try {
-            $group_id = $db->insert(T_ALT_ACCOUNT_GROUPS, array('time' => time()));
-            
-            if (!$group_id) {
-                return false;
-            }
-
-            foreach ($user_ids as $user_id) {
-                $db->insert(T_ALT_ACCOUNT_GROUP_MEMBERS, array(
-                    'group_id' => $group_id,
-                    'user_id'  => $user_id,
-                    'time'     => time()
-                ));
-            }
-
-            return $group_id;
-        } catch (Exception $e) {
+    // Build the common alt accounts list
+    foreach ($user_ids as $user_id) {
+        $user_data = cl_raw_user_data($user_id);
+        if (empty($user_data)) {
             return false;
         }
+        
+        $alt_account_list[] = array(
+            'id' => (int) $user_id,
+            'username' => $user_data['username'],
+            'linked_at' => time()
+        );
     }
 
-    // Use first group as target
-    $target_group_id = (int)$existing_group_ids[0];
+    // Update each user's settings with the full alt accounts list
+    foreach ($user_ids as $user_id) {
+        $user_data = cl_raw_user_data($user_id);
+        if (empty($user_data)) {
+            continue;
+        }
+        
+        $settings = json($user_data['settings']);
+        if (!is_array($settings)) {
+            $settings = array();
+        }
 
-    // If there are multiple groups, merge them into target
-    if (count($existing_group_ids) > 1) {
-        $other_groups = array_slice($existing_group_ids, 1);
-
-        foreach ($other_groups as $group_id) {
-            try {
-                // Get members from other group
-                $query = "SELECT user_id FROM " . T_ALT_ACCOUNT_GROUP_MEMBERS . " WHERE group_id = " . (int)$group_id;
-                $members = $db->rawQuery($query);
-
-                if (!empty($members)) {
-                    foreach ($members as $member) {
-                        $member_id = (int)$member['user_id'];
-                        
-                        // Check if already in target group
-                        $check_query = "SELECT id FROM " . T_ALT_ACCOUNT_GROUP_MEMBERS . " WHERE group_id = " . (int)$target_group_id . " AND user_id = " . (int)$member_id;
-                        $exists = $db->rawQuery($check_query);
-
-                        if (empty($exists)) {
-                            // Add to target group
-                            $db->insert(T_ALT_ACCOUNT_GROUP_MEMBERS, array(
-                                'group_id' => $target_group_id,
-                                'user_id'  => $member_id,
-                                'time'     => time()
-                            ));
-                        }
-                    }
-                }
-
-                // Delete from old group
-                $db->where('group_id', $group_id)->delete(T_ALT_ACCOUNT_GROUP_MEMBERS);
-                $db->where('id', $group_id)->delete(T_ALT_ACCOUNT_GROUPS);
-            } catch (Exception $e) {
-                continue;
+        // Build the alt accounts list for this user (exclude the user themselves)
+        $alt_accounts = array();
+        foreach ($alt_account_list as $alt) {
+            if ((int) $alt['id'] !== (int) $user_id) {
+                $alt_accounts[] = $alt;
             }
         }
+
+        $settings['alt_accounts'] = $alt_accounts;
+
+        // Update user settings
+        cl_update_user_data($user_id, array(
+            'settings' => json($settings, true)
+        ));
     }
 
-    // Ensure all specified users are in target group
-    try {
-        foreach ($user_ids as $user_id) {
-            $query = "SELECT id FROM " . T_ALT_ACCOUNT_GROUP_MEMBERS . " WHERE group_id = " . (int)$target_group_id . " AND user_id = " . (int)$user_id;
-            $exists = $db->rawQuery($query);
-
-            if (empty($exists)) {
-                $db->insert(T_ALT_ACCOUNT_GROUP_MEMBERS, array(
-                    'group_id' => $target_group_id,
-                    'user_id'  => $user_id,
-                    'time'     => time()
-                ));
-            }
-        }
-    } catch (Exception $e) {
-        return false;
-    }
-
-    return $target_group_id;
+    return true;
 }
 
 function cl_remove_alt_account_link($user_id = 0, $alt_id = 0) {
-    global $db;
-
     if (!is_numeric($user_id) || !is_numeric($alt_id)) {
         return false;
     }
 
-    $groups = $db->where('user_id', $user_id)->get(T_ALT_ACCOUNT_GROUP_MEMBERS, null, 'DISTINCT group_id');
+    $user_id = (int) $user_id;
+    $alt_id = (int) $alt_id;
 
-    if (empty($groups) || !is_array($groups)) {
+    // Get the current alt account list for this user
+    $user_data = cl_raw_user_data($user_id);
+    if (empty($user_data)) {
         return false;
     }
 
-    foreach ($groups as $group) {
-        $group_id = intval($group['group_id']);
+    $settings = json($user_data['settings']);
+    if (!is_array($settings) || empty($settings['alt_accounts'])) {
+        return false;
+    }
 
-        if ($group_id <= 0) {
-            continue;
+    // Get all alt IDs for this user
+    $alt_ids = cl_get_alt_account_ids($user_id);
+
+    // Remove the alt_id from this user's list
+    $new_alt_accounts = array();
+    foreach ($settings['alt_accounts'] as $alt) {
+        if ((int) $alt['id'] !== $alt_id) {
+            $new_alt_accounts[] = $alt;
+        }
+    }
+
+    // Also need to remove user_id from alt_id's alt list
+    $alt_user_data = cl_raw_user_data($alt_id);
+    if (!empty($alt_user_data)) {
+        $alt_settings = json($alt_user_data['settings']);
+        if (!is_array($alt_settings)) {
+            $alt_settings = array();
         }
 
-        $db->where('group_id', $group_id)->where('user_id', $alt_id)->delete(T_ALT_ACCOUNT_GROUP_MEMBERS);
+        $alt_new_accounts = array();
+        if (!empty($alt_settings['alt_accounts']) && is_array($alt_settings['alt_accounts'])) {
+            foreach ($alt_settings['alt_accounts'] as $acc) {
+                if ((int) $acc['id'] !== $user_id) {
+                    $alt_new_accounts[] = $acc;
+                }
+            }
+        }
 
-        $member_count = $db->where('group_id', $group_id)->getValue(T_ALT_ACCOUNT_GROUP_MEMBERS, 'count(*)');
+        $alt_settings['alt_accounts'] = $alt_new_accounts;
+        cl_update_user_data($alt_id, array(
+            'settings' => json($alt_settings, true)
+        ));
+    }
 
-        if ($member_count < 2) {
-            $db->where('group_id', $group_id)->delete(T_ALT_ACCOUNT_GROUP_MEMBERS);
-            $db->where('id', $group_id)->delete(T_ALT_ACCOUNT_GROUPS);
+    // Update current user's alt accounts
+    $settings['alt_accounts'] = $new_alt_accounts;
+    cl_update_user_data($user_id, array(
+        'settings' => json($settings, true)
+    ));
+
+    // If removing this link breaks the group (only 1 left), clear all alt accounts
+    $remaining_alts = count($new_alt_accounts);
+    if ($remaining_alts === 0) {
+        // All alts removed from this user
+        return true;
+    }
+
+    // For remaining alts, we need to check if they should still be linked
+    // If alt_id had other alts, we need to rebuild their groups
+    if (!empty($alt_ids) && count($alt_ids) > 1) {
+        // Rebuild the group for remaining alts (excluding alt_id)
+        $remaining_ids = array();
+        foreach ($alt_ids as $id) {
+            if ($id !== $alt_id) {
+                $remaining_ids[] = $id;
+            }
+        }
+
+        if (count($remaining_ids) > 1) {
+            cl_sync_alt_account_group($remaining_ids);
         }
     }
 

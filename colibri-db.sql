@@ -433,38 +433,6 @@
 {%end%}
 
 {%begin%}
-  CREATE TABLE `cl_alt_account_groups` ( `id` int(11) NOT NULL, `time` varchar(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-{%end%}
-
-{%begin%}
-  ALTER TABLE `cl_alt_account_groups` ADD PRIMARY KEY(`id`);
-{%end%}
-
-{%begin%}
-  ALTER TABLE `cl_alt_account_groups` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
-{%end%}
-
-{%begin%}
-  CREATE TABLE `cl_alt_account_group_members` ( `id` int(11) NOT NULL, `group_id` int(11) NOT NULL DEFAULT '0', `user_id` int(11) NOT NULL DEFAULT '0', `time` varchar(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-{%end%}
-
-{%begin%}
-  ALTER TABLE `cl_alt_account_group_members` ADD PRIMARY KEY(`id`);
-{%end%}
-
-{%begin%}
-  ALTER TABLE `cl_alt_account_group_members` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
-{%end%}
-
-{%begin%}
-  ALTER TABLE `cl_alt_account_group_members` ADD UNIQUE `group_id_user_id`(`group_id`,`user_id`);
-{%end%}
-
-{%begin%}
-  ALTER TABLE `cl_alt_account_group_members` ADD INDEX `user_id`(`user_id`);
-{%end%}
-
-{%begin%}
   CREATE TABLE `cl_affiliate_payouts` ( `id` INT(11) NOT NULL AUTO_INCREMENT ,  `user_id` INT(11) NOT NULL DEFAULT '0' ,  `amount` VARCHAR(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.00' ,  `bonuses` INT(11) NOT NULL DEFAULT '0' ,  `status` ENUM('pending','paid','declined') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'pending' ,  `time` VARCHAR(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,    PRIMARY KEY  (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci;
 {%end%}
 

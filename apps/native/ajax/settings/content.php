@@ -158,6 +158,27 @@ else if ($action == "save_alt_account") {
         $alt_identifier   = fetch_or_get($_POST['alt_identifier'], null);
         $alt_password     = fetch_or_get($_POST['alt_password'], null);
 
+        // init settings container if missing
+        if (empty($me['settings']) || is_string($me['settings'])) {
+            $me['settings'] = (is_string($me['settings']) && function_exists('json')) ? json($me['settings']) : array();
+            if (empty($me['settings']) || !is_array($me['settings'])) {
+                $me['settings'] = array();
+            }
+        }
+
+        $attempts = intval(fetch_or_get($me['settings']['alt_add_failed_attempts'], 0));
+        $lock_until = intval(fetch_or_get($me['settings']['alt_add_lock_until'], 0));
+
+        // if currently locked out
+        if ($lock_until > time()) {
+            $data['err_code'] = 'alt_add_locked';
+            $data['status']   = 400;
+            $data['message']  = 'Too many failed attempts. Try again later.';
+            $data['lock_until'] = $lock_until;
+            $data['locked'] = true;
+            return; // early return to enforce lockout
+        }
+
         if (empty($alt_identifier) || empty($alt_password)) {
             $data['err_code'] = "invalid_alt_account";
         }
@@ -178,7 +199,32 @@ else if ($action == "save_alt_account") {
                 $data['err_code'] = "invalid_alt_account";
             }
             else if (!password_verify($alt_password, $alt_user['password'])) {
-                $data['err_code'] = "invalid_alt_account";
+                // increment failed attempts
+                $attempts++;
+
+                // if reached threshold, lock for 5 minutes and reset attempts
+                if ($attempts >= 6) {
+                    $me['settings']['alt_add_failed_attempts'] = 0;
+                    $me['settings']['alt_add_lock_until'] = time() + (5 * 60);
+                    cl_update_user_data($me['id'], array(
+                        'settings' => json($me['settings'], true)
+                    ));
+
+                    $data['err_code'] = 'alt_add_locked';
+                    $data['status']   = 400;
+                    $data['message']  = 'Too many failed attempts. Try again later.';
+                    $data['lock_until'] = $me['settings']['alt_add_lock_until'];
+                    $data['locked'] = true;
+                }
+                else {
+                    $me['settings']['alt_add_failed_attempts'] = $attempts;
+                    $me['settings']['alt_add_lock_until'] = 0;
+                    cl_update_user_data($me['id'], array(
+                        'settings' => json($me['settings'], true)
+                    ));
+
+                    $data['err_code'] = "invalid_alt_account";
+                }
             }
             else {
                 $current_alts = cl_get_alt_account_ids($me['id']);
@@ -187,17 +233,31 @@ else if ($action == "save_alt_account") {
                     $data['err_code'] = "alternate_account_already_linked";
                 }
                 else {
+                    // Build list of all IDs to link together
                     $all_ids = array_merge(array((int)$me['id']), $current_alts, array((int)$alt_user['id']));
                     $all_ids = array_unique(array_filter($all_ids));
                     
-                    $group = cl_sync_alt_account_group($all_ids);
+                    // Sync all accounts with each other
+                    if (cl_sync_alt_account_group($all_ids)) {
+                        // Refetch updated settings from database
+                        $updated_user = cl_raw_user_data($me['id']);
+                        if (not_empty($updated_user)) {
+                            $me['settings'] = json($updated_user['settings']);
+                        }
+                        
+                        // reset failed attempts & lock on success
+                        $me['settings']['alt_add_failed_attempts'] = 0;
+                        $me['settings']['alt_add_lock_until'] = 0;
+                        cl_update_user_data($me['id'], array(
+                            'settings' => json($me['settings'], true)
+                        ));
 
-                    if (empty($group)) {
-                        $data['err_code'] = "invalid_alt_account";
-                    }
-                    else {
                         $data['status'] = 200;
                         $data['message'] = "Alternate account added successfully";
+                        $data['lock_until'] = 0;
+                    }
+                    else {
+                        $data['err_code'] = "invalid_alt_account";
                     }
                 }
             }
@@ -220,10 +280,13 @@ else if ($action == "save_alt_account") {
                 $data['err_code'] = "invalid_alt_account";
             }
             else {
-                cl_remove_alt_account_link($me['id'], $alt_id);
-
-                $data['status'] = 200;
-                $data['message'] = "Alternate account removed successfully";
+                if (cl_remove_alt_account_link($me['id'], $alt_id)) {
+                    $data['status'] = 200;
+                    $data['message'] = "Alternate account removed successfully";
+                }
+                else {
+                    $data['err_code'] = "invalid_alt_account";
+                }
             }
         }
     }

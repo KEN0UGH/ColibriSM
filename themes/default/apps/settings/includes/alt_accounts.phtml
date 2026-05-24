@@ -69,7 +69,17 @@
                                 </div>
                             </div>
 
-                            <div class="form-group" v-if="unsuccessful_attempt">
+                            <div class="form-group" v-if="alt_locked">
+                                <div class="invalid-main-feedback">
+                                    Too many failed attempts. Please try again in {{ remaining_seconds }} seconds.
+                                </div>
+                            </div>
+                            <div class="form-group" v-else-if="alt_password_wrong">
+                                <div class="invalid-main-feedback">
+                                    <?php echo cl_translate("Invalid username, email, or password"); ?>
+                                </div>
+                            </div>
+                            <div class="form-group" v-else-if="unsuccessful_attempt">
                                 <div class="invalid-main-feedback">
                                     <?php echo cl_translate("Something went wrong while trying to save your changes, please try again later"); ?>
                                 </div>
@@ -168,6 +178,11 @@
             data: {
                 submitting: false,
                 unsuccessful_attempt: false,
+                alt_locked: false,
+                alt_password_wrong: false,
+                lock_message: "",
+                remaining_seconds: 0,
+                countdown_interval: null,
                 invalid_feedback_alt_identifier: "",
                 invalid_feedback_alt_password: "",
                 alt_identifier: "",
@@ -216,13 +231,31 @@
                         beforeSend: function() {
                             _app_.submitting = true;
                             _app_.unsuccessful_attempt = false;
+                            _app_.alt_locked = false;
+                            _app_.alt_password_wrong = false;
+                            _app_.lock_message = "";
+                            _app_.remaining_seconds = 0;
                         },
                         success: function(data) {
                             if (data.status == 200) {
                                 cl_bs_notify("<?php echo cl_translate("Alternate account added successfully"); ?>", 5000, "success");
                                 window.location.reload();
                             } else {
-                                _app_.unsuccessful_attempt = true;
+                                // Check for specific error codes
+                                if (data.err_code == 'alt_add_locked') {
+                                    _app_.alt_locked = true;
+                                    _app_.lock_message = data.message || "<?php echo cl_translate('Too many failed attempts. Try again later.'); ?>";
+                                    if (data.lock_until) {
+                                        _app_.remaining_seconds = Math.max(0, Math.ceil((data.lock_until - Math.floor(Date.now() / 1000))));
+                                        _app_.start_countdown();
+                                    }
+                                }
+                                else if (data.err_code == 'invalid_alt_account') {
+                                    _app_.alt_password_wrong = true;
+                                }
+                                else {
+                                    _app_.unsuccessful_attempt = true;
+                                }
                             }
                         },
                         complete: function() {
@@ -233,6 +266,22 @@
 
                 password_display_toggle: function() {
                     this.password_display = (this.password_display == 'password') ? 'text' : 'password';
+                },
+
+                start_countdown: function() {
+                    var _app_ = this;
+                    if (_app_.countdown_interval) {
+                        clearInterval(_app_.countdown_interval);
+                    }
+                    _app_.countdown_interval = setInterval(function() {
+                        _app_.remaining_seconds--;
+                        if (_app_.remaining_seconds <= 0) {
+                            clearInterval(_app_.countdown_interval);
+                            _app_.countdown_interval = null;
+                            _app_.alt_locked = false;
+                            _app_.remaining_seconds = 0;
+                        }
+                    }, 1000);
                 },
 
                 remove_alt_account: function(alt_id) {
