@@ -29,3 +29,16 @@ function cl_get_unconfirmed_accounts() {
 
 	return 0;
 }
+
+function cl_get_auto_generated_password_accounts() {
+	global $db;
+
+	$db = $db->where("password_auto_generated", 1);
+	$qr = $db->getValue(T_USERS, "COUNT(*)");
+
+	if (is_posnum($qr)) {
+		return $qr;
+	}
+
+	return 0;
+}

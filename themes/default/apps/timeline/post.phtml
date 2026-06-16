@@ -260,7 +260,7 @@
 											<?php if ($cl['li']['type'] == 'image' && not_empty($cl['li']['media'])): ?>
 												<?php if (count($cl['li']['media']) == 1): ?>
 													<div class="lozad-media">
-														<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($cl['li']['media'][0]['is_safe'], "Y")); ?>">
+														<div class="publication-image publication-image-solo issafe-<?php echo strtolower(fetch_or_get($cl['li']['media'][0]['is_safe'], "Y")); ?>">
 															<a href="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>" class="fbox-media">
 																<img class="lozad" data-src="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['x']['image_thumb'],'')); ?>" alt="Picture">
 															</a>

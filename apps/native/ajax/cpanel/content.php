@@ -1032,8 +1032,23 @@ else if($action == "delete_spam_accounts") {
 	$data['status']   = 200;
 	$data['err_code'] = 0;
 
-	$db = $db->where("time", (time() - 604800), "<");
-	$qr = $db->delete(T_ACC_VALIDS);
+	$type = fetch_or_get($_POST['type'], 'unconfirmed');
+
+	if ($type == 'auto_generated') {
+		// Delete accounts with auto-generated passwords
+		$db = $db->where("password_auto_generated", 1);
+		$qr = $db->get(T_USERS);
+
+		if (cl_queryset($qr)) {
+			foreach ($qr as $row) {
+				cl_delete_user_data($row['id']);
+			}
+		}
+	} else {
+		// Delete unconfirmed accounts (default behavior)
+		$db = $db->where("time", (time() - 604800), "<");
+		$qr = $db->delete(T_ACC_VALIDS);
+	}
 }
 
 else if($action == "media_cleanup_scan") {

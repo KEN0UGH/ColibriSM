@@ -30,79 +30,77 @@
                     
                     <!-- Add Alternate Account Form -->
                     <div class="row">
-                        <div class="col-12 col-lg-7">
-                            <div class="form-group">
-                                <label>
-                                    <?php echo cl_translate("Username or email"); ?>
-                                </label>
-                                <input v-model.trim="$v.alt_identifier.$model" 
-                                       type="text" 
-                                       name="alt_identifier" 
-                                       class="form-control" 
-                                       placeholder="<?php echo cl_translate("enter_username_or_email"); ?>">
-                                <div class="invalid-main-feedback" v-if="is_invalid_alt_identifier">
-                                    {{ invalid_feedback_alt_identifier }}
-                                </div>
+                        <div class="form-group">
+                            <label>
+                                <?php echo cl_translate("Username or email"); ?>
+                            </label>
+                            <input v-model.trim="$v.alt_identifier.$model" 
+                                    type="text" 
+                                    name="alt_identifier" 
+                                    class="form-control" 
+                                    placeholder="<?php echo cl_translate("enter_username_or_email"); ?>">
+                            <div class="invalid-main-feedback" v-if="is_invalid_alt_identifier">
+                                {{ invalid_feedback_alt_identifier }}
                             </div>
+                        </div>
 
-                            <div class="form-group">
-                                <label>
-                                    <?php echo cl_translate("Password"); ?>
-                                </label>
-                                <div class="password-ctrl">
-                                    <input v-model.trim="$v.alt_password.$model" 
-                                           name="alt_password" 
-                                           v-bind:type="password_display" 
-                                           class="form-control" 
-                                           placeholder="<?php echo cl_translate("enter_password_of_your_alternate_account"); ?>">
-                                    <button type="button" class="password-ctrl" v-on:click="password_display_toggle">
-                                        <span v-if="password_display == 'password'">
-                                            <?php echo cl_ficon("eye_show"); ?>
-                                        </span>
-                                        <span v-else>
-                                            <?php echo cl_ficon("eye_hide"); ?>
-                                        </span>
-                                    </button>
-                                </div>
-                                <div class="invalid-main-feedback" v-if="is_invalid_alt_password">
-                                    {{ invalid_feedback_alt_password }}
-                                </div>
-                            </div>
-
-                            <div class="form-group" v-if="alt_locked">
-                                <div class="invalid-main-feedback">
-                                    Too many failed attempts. Please try again in {{ remaining_seconds }} seconds.
-                                </div>
-                            </div>
-                            <div class="form-group" v-else-if="alt_password_wrong">
-                                <div class="invalid-main-feedback">
-                                    <?php echo cl_translate("Invalid username, email, or password"); ?>
-                                </div>
-                            </div>
-                            <div class="form-group" v-else-if="unsuccessful_attempt">
-                                <div class="invalid-main-feedback">
-                                    <?php echo cl_translate("Something went wrong while trying to save your changes, please try again later"); ?>
-                                </div>
-                            </div>
-                            <div class="form-group" v-else>
-                                <div class="form-info-label">
-                                    <?php echo cl_translate("add_alternate_account_help"); ?>
-                                </div>
-                            </div>
-
-                            <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
-
-                            <div class="form-group no-mb d-flex">
-                                <button v-if="submitting != true" 
-                                        v-bind:disabled="$v.$invalid == true" 
-                                        type="submit" 
-                                        class="ml-auto btn btn-custom main-inline lg">
-                                    <?php echo cl_translate("add_alternate_account"); ?>
-                                </button>
-                                <button v-else disabled="true" type="button" class="ml-auto btn btn-custom main-inline lg">
-                                    <?php echo cl_translate("Please wait"); ?>
+                        <div class="form-group">
+                            <label>
+                                <?php echo cl_translate("Password"); ?>
+                            </label>
+                            <div class="password-ctrl">
+                                <input v-model.trim="$v.alt_password.$model" 
+                                        name="alt_password" 
+                                        v-bind:type="password_display" 
+                                        class="form-control" 
+                                        placeholder="<?php echo cl_translate("enter_password_of_your_alternate_account"); ?>">
+                                <button type="button" class="password-ctrl" v-on:click="password_display_toggle">
+                                    <span v-if="password_display == 'password'">
+                                        <?php echo cl_ficon("eye_show"); ?>
+                                    </span>
+                                    <span v-else>
+                                        <?php echo cl_ficon("eye_hide"); ?>
+                                    </span>
                                 </button>
                             </div>
+                            <div class="invalid-main-feedback" v-if="is_invalid_alt_password">
+                                {{ invalid_feedback_alt_password }}
+                            </div>
+                        </div>
+
+                        <div class="form-group" v-if="alt_locked">
+                            <div class="invalid-main-feedback">
+                                Too many failed attempts. Please try again in {{ remaining_seconds }} seconds.
+                            </div>
+                        </div>
+                        <div class="form-group" v-else-if="alt_password_wrong">
+                            <div class="invalid-main-feedback">
+                                <?php echo cl_translate("Invalid username, email, or password"); ?>
+                            </div>
+                        </div>
+                        <div class="form-group" v-else-if="unsuccessful_attempt">
+                            <div class="invalid-main-feedback">
+                                <?php echo cl_translate("Something went wrong while trying to save your changes, please try again later"); ?>
+                            </div>
+                        </div>
+                        <div class="form-group" v-else>
+                            <div class="form-info-label">
+                                <?php echo cl_translate("add_alternate_account_help"); ?>
+                            </div>
+                        </div>
+
+                        <input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
+
+                        <div class="form-group no-mb d-flex">
+                            <button v-if="submitting != true" 
+                                    v-bind:disabled="$v.$invalid == true" 
+                                    type="submit" 
+                                    class="ml-auto btn btn-custom main-inline lg">
+                                <?php echo cl_translate("add_alternate_account"); ?>
+                            </button>
+                            <button v-else disabled="true" type="button" class="ml-auto btn btn-custom main-inline lg">
+                                <?php echo cl_translate("Please wait"); ?>
+                            </button>
                         </div>
                     </div>
 

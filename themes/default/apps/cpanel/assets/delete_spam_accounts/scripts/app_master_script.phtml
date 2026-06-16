@@ -3,12 +3,15 @@
 
 	$(document).ready(function($) {
 		var _app  = $('[data-app="delete-spam-accounts"]');
+		
+		// Handle unconfirmed accounts form
 		var _data = _app.find('form[data-an="form"]');
 
 		_data.ajaxForm({
 			url: '<?php echo cl_link("native_api/cpanel/delete_spam_accounts"); ?>',
 			type: 'POST',
 			dataType: 'json',
+			data: {type: 'unconfirmed'},
 			beforeSend: function() {
 				
 				SMC_CPanel.waitme("show");
@@ -26,7 +29,36 @@
 			complete: function() {
 				SMC_CPanel.waitme();
 
-				_data.find('[data-an="submit-ctrl"]').removeAttr('disabled').text("Delete");
+				_data.find('[data-an="submit-ctrl"]').removeAttr('disabled').text("Delete spam accounts");
+			}
+		});
+
+		// Handle auto-generated password accounts form
+		var _data_autogen = _app.find('form[data-an="form-autogen"]');
+
+		_data_autogen.ajaxForm({
+			url: '<?php echo cl_link("native_api/cpanel/delete_spam_accounts"); ?>',
+			type: 'POST',
+			dataType: 'json',
+			data: {type: 'auto_generated'},
+			beforeSend: function() {
+				
+				SMC_CPanel.waitme("show");
+
+				_data_autogen.find('[data-an="submit-ctrl-autogen"]').attr('disabled', 'true').text("Please wait");
+			},
+			success: function(data) {
+				if (data.status == 200) {
+					cl_bs_notify("Database cleanup operation completed successfully", 3000);
+				}
+				else {
+					SMC_CPanel.errorMSG();
+				}
+			},
+			complete: function() {
+				SMC_CPanel.waitme();
+
+				_data_autogen.find('[data-an="submit-ctrl-autogen"]').removeAttr('disabled').text("Delete accounts");
 			}
 		});
 	});

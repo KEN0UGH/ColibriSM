@@ -228,13 +228,19 @@ else if ($action == "save_alt_account") {
             }
             else {
                 $current_alts = cl_get_alt_account_ids($me['id']);
+                $new_user_alts = cl_get_alt_account_ids($alt_user['id']);
                 
                 if (in_array((int)$alt_user['id'], $current_alts)) {
                     $data['err_code'] = "alternate_account_already_linked";
                 }
                 else {
-                    // Build list of all IDs to link together
-                    $all_ids = array_merge(array((int)$me['id']), $current_alts, array((int)$alt_user['id']));
+                    // Build list of all IDs to link together (include both groups of alt accounts)
+                    $all_ids = array_merge(
+                        array((int)$me['id']), 
+                        $current_alts, 
+                        array((int)$alt_user['id']),
+                        $new_user_alts
+                    );
                     $all_ids = array_unique(array_filter($all_ids));
                     
                     // Sync all accounts with each other

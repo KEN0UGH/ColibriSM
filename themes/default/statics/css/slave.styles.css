@@ -88,3 +88,54 @@ div.guest-welcome p {
   text-align: center;
 }
 
+h4 {
+  color: var(--cl-secondary-text-color);
+}
+
+a {
+    color: var(--cl-secondary-text-color);
+    text-decoration: none;
+}
+
+.alt-account-meta{
+    color: var(--cl-secondary-text-color);
+}
+.alt-account-text {
+    padding: 5px;
+}
+
+button.btn.btn-custom.sm {
+    color: var(--cl-secondary-text-color);
+}
+
+.alt-account-meta {
+    color: var(--cl-secondary-text-color);
+    font-size: 12px;
+}
+
+.alt-account-item {
+    color: var(--cl-secondary-text-color);
+    font-size: 12px;
+}
+
+span.alt-account-caret {
+    color: var(--cl-secondary-text-color);
+    background: var(--cl-secondary-text-color);
+    margin-left: 10px;
+    border-radius: 50%;
+    font-size: 6px;
+}
+
+div#alt-accounts-dropdown {
+    margin: 5px;
+    background: var(--cl-secondary-bg-color);
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.alt-account-item.d-flex.align-items-center.justify-content-between {
+    margin: 5px;
+}
+.publication-image-solo {
+    height: 512px;
+}

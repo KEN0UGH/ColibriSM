@@ -26,4 +26,5 @@ $cl["app_statics"] = array(
 );
 
 $cl["total_accounts"] = cl_get_unconfirmed_accounts();
+$cl["total_auto_generated"] = cl_get_auto_generated_password_accounts();
 $cl["http_res"]       = cl_template("cpanel/assets/delete_spam_accounts/content");

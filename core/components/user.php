@@ -848,6 +848,38 @@ function cl_delete_user_data($user_id = false) {
                 cl_delete_media($user_data['cover_orig']);
             }
             
+            /*===== Remove user from all linked alternate accounts =====*/
+                $alt_account_ids = cl_get_alt_account_ids($user_id);
+                
+                if (!empty($alt_account_ids)) {
+                    foreach ($alt_account_ids as $alt_id) {
+                        $alt_user_data = cl_raw_user_data($alt_id);
+                        
+                        if (!empty($alt_user_data)) {
+                            $alt_settings = json($alt_user_data['settings']);
+                            
+                            if (!is_array($alt_settings)) {
+                                $alt_settings = array();
+                            }
+                            
+                            // Remove the deleted user from this alt account's list
+                            $new_alt_accounts = array();
+                            if (!empty($alt_settings['alt_accounts']) && is_array($alt_settings['alt_accounts'])) {
+                                foreach ($alt_settings['alt_accounts'] as $acc) {
+                                    if ((int) $acc['id'] !== (int) $user_id) {
+                                        $new_alt_accounts[] = $acc;
+                                    }
+                                }
+                            }
+                            
+                            $alt_settings['alt_accounts'] = $new_alt_accounts;
+                            cl_update_user_data($alt_id, array(
+                                'settings' => json($alt_settings, true)
+                            ));
+                        }
+                    }
+                }
+            /*====================================*/
 
             $db = $db->where('user_id', $user_id);
             $qr = $db->delete(T_SESSIONS);
