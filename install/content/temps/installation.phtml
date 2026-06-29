@@ -24,7 +24,6 @@ if (isset($_POST['install'])) {
 	$success = false;
 	$errors = array();
 	$form_fields = array(
-		'purchase_code' => ((empty($_POST['purchase_code'])) ? null : strval($_POST['purchase_code'])),
 		'sql_host'      => ((empty($_POST['sql_host'])) ? null : strval($_POST['sql_host'])),
 		'sql_user'      => ((empty($_POST['sql_user'])) ? null : strval($_POST['sql_user'])),
 		'sql_pass'      => ((empty($_POST['sql_pass'])) ? null : strval($_POST['sql_pass'])),
@@ -38,7 +37,6 @@ if (isset($_POST['install'])) {
 		'site_password' => ((empty($_POST['site_password'])) ? null : strval($_POST['site_password'])),
 	);
 
-	$_SESSION['purchase_code'] = $purchase_code = $form_fields['purchase_code'];
 	$_SESSION['sql_host']      = $sql_host      = $form_fields['sql_host'];
 	$_SESSION['sql_user']      = $sql_user      = $form_fields['sql_user'];
 	$_SESSION['sql_pass']      = $sql_pass      = $form_fields['sql_pass'];
@@ -51,11 +49,7 @@ if (isset($_POST['install'])) {
 	$_SESSION['site_email']    = $site_email    = $form_fields['site_email'];
 	$_SESSION['site_password'] = $site_password = $form_fields['site_password'];
 
-	if (empty($purchase_code)) {
-		$errors[] = "Please enter your purchase code";
-	}
-
-	else if(empty($sql_host) || empty($sql_user) || empty($sql_pass) || empty($sql_db_name)) {
+	if(empty($sql_host) || empty($sql_user) || empty($sql_pass) || empty($sql_db_name)) {
 		$errors[] = "Please enter all credentials of your database. T. e.  (DB host, DB name, DB username and DB user password) ";
 	}
 
@@ -123,109 +117,91 @@ if (isset($_POST['install'])) {
 	   	}
 
 	   	else {
-	   		$verif_purch_url = "https://www.mansurtl.com/ajax_api/verif_envato_pcode?purchase_code=" . $purchase_code;
-	   		$verif_purch_response = true; //file_get_contents($verif_purch_url);
-	   		$purchased = true;
 
-	   		// if (empty($verif_purch_response) != true) {
-	   		// 	$verif_purch_response = json_decode($verif_purch_response, true);
+			$settings_file_content = $settings_file_content = "<?php\n# MySQL db host name\n\$sql_db_host = \"" . $sql_host . "\";\n\n# MySQL db User\n\$sql_db_user = \"" . $sql_user . "\";\n\n# MySQL db Password\n\$sql_db_pass = \"" . $sql_pass . "\";\n\n# MySQL db Name\n\$sql_db_name = \"" . $sql_db_name. "\";\n\n# Site URL\n\$site_url    = \"" . $site_url . "\"; // E.g (https://www.colibrism.com)\n?>";
+		
+			$config_file = file_put_contents(PROJ_RP . '/core/settings.php', trim($settings_file_content));
 
-	   		// 	if (is_array($verif_purch_response) && $verif_purch_response["status"] == 200) {
-	   		// 		$purchased = true;
-	   		// 	}
-	   		// }
+			if ($config_file) {
+				$db_sql_query  = file_get_contents(PROJ_RP . '/colibri-db.sql');
+				$insert_status = true;
 
-			if ($purchased) {
-				$settings_file_content = $settings_file_content = "<?php\n# MySQL db host name\n\$sql_db_host = \"" . $sql_host . "\";\n\n# MySQL db User\n\$sql_db_user = \"" . $sql_user . "\";\n\n# MySQL db Password\n\$sql_db_pass = \"" . $sql_pass . "\";\n\n# MySQL db Name\n\$sql_db_name = \"" . $sql_db_name. "\";\n\n# Site URL\n\$site_url    = \"" . $site_url . "\"; // E.g (https://www.colibrism.com)\n?>";
-			
-				$config_file = file_put_contents(PROJ_RP . '/core/settings.php', trim($settings_file_content));
+				preg_match_all('/\{\%begin\%\}(.+?)\{\%end\%\}/is',$db_sql_query, $matches, PREG_PATTERN_ORDER);
 
-				if ($config_file) {
-					$db_sql_query  = file_get_contents(PROJ_RP . '/colibri-db.sql');
-					$insert_status = true;
+				if (isset($matches[1]) && is_array($matches[1])) {
+					
+					$set_names   = $mysqlcon->query("SET NAMES utf8");
+					$set_charset = $mysqlcon->set_charset('utf8mb4');
+					$set_charset = $mysqlcon->query("SET collation_connection = utf8mb4_unicode_ci");
 
-					preg_match_all('/\{\%begin\%\}(.+?)\{\%end\%\}/is',$db_sql_query, $matches, PREG_PATTERN_ORDER);
+					foreach ($matches[1] as $query) {
+						$query_status = mysqli_query($mysqlcon, $query);
 
-					if (isset($matches[1]) && is_array($matches[1])) {
-						
-						$set_names   = $mysqlcon->query("SET NAMES utf8");
-						$set_charset = $mysqlcon->set_charset('utf8mb4');
-						$set_charset = $mysqlcon->query("SET collation_connection = utf8mb4_unicode_ci");
+						if (empty($query_status)) {
+							$errors[]      = mysqli_error($mysqlcon);
+							$errors[]      = "Error at: <code>$query</code>";
+							$insert_status = false;
 
-						foreach ($matches[1] as $query) {
-				        	$query_status = mysqli_query($mysqlcon, $query);
-
-				        	if (empty($query_status)) {
-				        		$errors[]      = mysqli_error($mysqlcon);
-				        		$errors[]      = "Error at: <code>$query</code>";
-				        		$insert_status = false;
-
-								foreach ($cl_tables as $t_name) {
-									try {
-										mysqli_query($mysqlcon,"DROP TABLE `{$t_name}`");
-									} catch (Exception $e) { /*pass*/ }
-								}
-
-								break;
-				        	}
-				        }
-
-				        if ($insert_status) {
-							$site_name  = mysqli_real_escape_string($mysqlcon, $site_name);
-							$site_desc  = mysqli_real_escape_string($mysqlcon, $site_desc);
-							$site_seokw = mysqli_real_escape_string($mysqlcon, $site_seokw);
-							$site_title = mysqli_real_escape_string($mysqlcon, $site_title);
-							$site_email = mysqli_real_escape_string($mysqlcon, $site_email);
-							$db         = $db->where('name','name');
-							$qr         = $db->update('cl_configs',array('value' => $site_name));
-
-							if (empty($site_desc) != true) {
-								$db = $db->where('name','description');
-								$qr = $db->update('cl_configs',array('value' => htmlspecialchars($site_desc)));
-							}
-							
-							if (empty($site_seokw) != true) {
-								$db = $db->where('name','keywords');
-								$qr = $db->update('cl_configs',array('value' => $site_seokw));
+							foreach ($cl_tables as $t_name) {
+								try {
+									mysqli_query($mysqlcon,"DROP TABLE `{$t_name}`");
+								} catch (Exception $e) { /*pass*/ }
 							}
 
-							$db = $db->where('name','title');
-							$qr = $db->update('cl_configs',array('value' => $site_title));
-							$db = $db->where('name','email');
-							$qr = $db->update('cl_configs',array('value' => $site_email));
-							$insert_data      = array(
-								'fname'       => 'Administrator',
-								'lname'       => '',
-								'username'    => 'administrator',
-								'avatar'      => 'upload/default/admin-avatar.png',
-								'email'       => $site_email,
-								'admin'       => '1',
-								'is_root'     => 'Y',
-								'active'      => '1',
-								'country_id'  => '1',
-								'verified'    => '1',
-								'start_up'    => 'done',
-								'language'    => 'english',
-								'last_active' => time(),
-								'joined'      => time(),
-								'ip_address'  => '0.0.0.0',
-								'password'    => password_hash($site_password, PASSWORD_DEFAULT)
-							);
-
-							$user_id = $db->insert('cl_users', $insert_data);
-							$success = true;
+							break;
 						}
 					}
 
-					else {
-						$errors[] = "Error found while installing, please contact us.";
+					if ($insert_status) {
+						$site_name  = mysqli_real_escape_string($mysqlcon, $site_name);
+						$site_desc  = mysqli_real_escape_string($mysqlcon, $site_desc);
+						$site_seokw = mysqli_real_escape_string($mysqlcon, $site_seokw);
+						$site_title = mysqli_real_escape_string($mysqlcon, $site_title);
+						$site_email = mysqli_real_escape_string($mysqlcon, $site_email);
+						$db         = $db->where('name','name');
+						$qr         = $db->update('cl_configs',array('value' => $site_name));
+
+						if (empty($site_desc) != true) {
+							$db = $db->where('name','description');
+							$qr = $db->update('cl_configs',array('value' => htmlspecialchars($site_desc)));
+						}
+						
+						if (empty($site_seokw) != true) {
+							$db = $db->where('name','keywords');
+							$qr = $db->update('cl_configs',array('value' => $site_seokw));
+						}
+
+						$db = $db->where('name','title');
+						$qr = $db->update('cl_configs',array('value' => $site_title));
+						$db = $db->where('name','email');
+						$qr = $db->update('cl_configs',array('value' => $site_email));
+						$insert_data      = array(
+							'fname'       => 'Administrator',
+							'lname'       => '',
+							'username'    => 'administrator',
+							'avatar'      => 'upload/default/admin-avatar.png',
+							'email'       => $site_email,
+							'admin'       => '1',
+							'is_root'     => 'Y',
+							'active'      => '1',
+							'country_id'  => '1',
+							'verified'    => '1',
+							'start_up'    => 'done',
+							'language'    => 'english',
+							'last_active' => time(),
+							'joined'      => time(),
+							'ip_address'  => '0.0.0.0',
+							'password'    => password_hash($site_password, PASSWORD_DEFAULT)
+						);
+
+						$user_id = $db->insert('cl_users', $insert_data);
+						$success = true;
 					}
 				}
-			}
 
-			else{
-				$errors[] = "Your purchase code is invalid or incorrect. Installation cannot proceed without a valid purchase code";
-				$errors[] = "This error may occur if you entered the wrong purchase code, or your computer is not connected to the network if you are installing on a localhost";
+				else {
+					$errors[] = "Error found while installing, please contact us.";
+				}
 			}
 	   	}
    	}
@@ -326,16 +302,6 @@ if (isset($_POST['install'])) {
 						</div>
 						
 						<div class="row">
-							<div class="col-12">
-								<div class="form-group">
-									<label class="form-input-label">
-										Purchase code
-									</label>
-									<div class="form-input">
-										<input value="<?php echo ((isset($_SESSION['purchase_code'])) ? $_SESSION['purchase_code'] : ''); ?>" class="form-control" type="text" name="purchase_code" placeholder="Enter random code nulled by reishi">
-									</div>
-								</div>
-							</div>
 							<div class="col-6">
 								<div class="form-group">
 									<label class="form-input-label">
