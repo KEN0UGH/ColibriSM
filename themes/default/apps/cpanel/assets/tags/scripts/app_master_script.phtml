@@ -1,0 +1,102 @@
+<script>
+	"use strict";
+
+	$(document).ready(function($) {
+		var _app = $('[data-app="tags"]');
+
+		function load_tags(page, keyword) {
+            var tags_list = _app.find('[data-an="tags-list"]');
+            var search_value = (keyword !== undefined) ? keyword : $.trim(_app.find('#search-tag-name').val());
+
+            $.ajax({
+                url: '<?php echo cl_link("native_api/cpanel/get_tags"); ?>',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    page: page,
+                    keyword: search_value
+                },
+                beforeSend: function() {
+                    _app.find('a[data-an="pagination"]').removeClass('disabled');
+                    SMC_CPanel.waitme("show");
+                }
+            }).done(function(data) {
+                tags_list.html(data.html);
+                if (data.status == 200) {
+                    _app.attr('data-page', page);
+                }
+                else {
+                    _app.attr('data-page', 1);
+                }
+            }).always(function() {
+                delay(function() {
+                    SMC_CPanel.waitme();
+                }, 1000);
+            });
+        }
+
+		_app.find('button[data-an="add-tag-btn"]').on('click', function(event) {
+			var tag_name = $.trim(_app.find('#new-tag-name').val());
+
+			if (!tag_name) {
+				SMC_CPanel.errorMSG('Please enter a tag name');
+				return false;
+			}
+
+			$.ajax({
+				url: '<?php echo cl_link("native_api/cpanel/add_tag"); ?>',
+				type: 'POST',
+				dataType: 'json',
+				data: {tag: tag_name},
+				beforeSend: function() {
+					SMC_CPanel.waitme("show");
+				}
+			}).done(function(data) {
+				if (data.status == 200) {
+					_app.find('#new-tag-name').val('');
+					_app.find('[data-an="tags-list"]').html(data.html);
+					_app.attr('data-page', 1);
+					cl_bs_notify('Tag added successfully', 3000, 'success');
+				}
+				else {
+					SMC_CPanel.errorMSG(data.message || false);
+				}
+			}).always(function() {
+				delay(function() {
+					SMC_CPanel.waitme();
+				}, 1000);
+			});
+		});
+
+		_app.find('button[data-an="search-tag-btn"]').on('click', function(event) {
+            event.preventDefault();
+            load_tags(1);
+        });
+
+		_app.find('#search-tag-name').on('keyup', function(event) {
+            if (event.keyCode === 13) {
+                load_tags(1);
+            }
+            else {
+                delay(function() {
+                    load_tags(1);
+                }, 500);
+            }
+        });
+
+		_app.find('a[data-an="pagination"]').on('click',function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if ($(this).hasClass('disabled') != true) {
+
+                var current_page = parseInt(_app.attr('data-page') || 1);
+                var next_page = (($(this).data('dir') == 'prev') ? Math.max(1, current_page - 1) : current_page + 1);
+
+                load_tags(next_page);
+            }
+            else {
+                return false;
+            }
+        });
+	});
+</script>

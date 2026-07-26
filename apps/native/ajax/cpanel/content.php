@@ -308,6 +308,104 @@ else if ($action == 'get_posts') {
 	}
 }
 
+else if ($action == 'get_tags') {
+
+	require_once(cl_full_path("core/apps/cpanel/tags/app_ctrl.php"));
+
+	$page             = ((is_posnum($_GET['page'])) ? intval($_GET['page']) : 1);
+	$page             = max(1, $page);
+	$offset           = ($page - 1) * 10;
+	$keyword          = fetch_or_get($_GET['keyword'], '');
+	$keyword          = cl_text_secure($keyword);
+	$tags             = array();
+	$data['status']   = 404;
+	$data['err_code'] = 0;
+	$html_arr         = array();
+
+	$tags = cl_admin_get_tags(array(
+		'limit'   => 10,
+		'offset'  => $offset,
+		'order'   => 'DESC',
+		'keyword' => $keyword
+	));
+
+	if (not_empty($tags)) {
+		foreach ($tags as $cl['li']) {
+			array_push($html_arr, cl_template('cpanel/assets/tags/includes/list_item'));
+		}
+
+		$data['status'] = 200;
+		$data['html']   = implode('', $html_arr);
+	}
+	else {
+		$data['html'] = cl_template('cpanel/assets/users/includes/filter404');
+	}
+}
+
+else if($action == 'add_tag') {
+	$data['err_code'] = 0;
+	$data['status']   = 400;
+	$tag_name         = fetch_or_get($_POST['tag'], '');
+	$tag_name         = cl_text_secure($tag_name);
+	$tag_name         = trim($tag_name);
+
+	if (not_empty($tag_name)) {
+		$tag_exists = $db->where('tag', $tag_name)->getOne(T_HTAGS, array('id'));
+
+		if (empty($tag_exists)) {
+			$db->insert(T_HTAGS, array(
+				'tag'   => $tag_name,
+				'posts' => 0,
+				'time'  => time()
+			));
+
+			$created_tag = $db->where('tag', $tag_name)->getOne(T_HTAGS, array('id', 'tag', 'posts', 'time'));
+			if (not_empty($created_tag)) {
+				$created_tag['posts'] = cl_number($created_tag['posts']);
+				$created_tag['time']  = date('d M, Y h:m', $created_tag['time']);
+				$cl['li'] = $created_tag;
+				$data['status'] = 200;
+				$data['html']   = cl_template('cpanel/assets/tags/includes/list_item');
+			}
+		}
+		else {
+			$data['message'] = 'Tag already exists';
+		}
+	}
+}
+
+else if($action == 'delete_tag') {
+	$data['err_code'] = 0;
+	$data['status']   = 400;
+	$tag_id           = fetch_or_get($_POST['id'], 0);
+
+	if (is_posnum($tag_id)) {
+		$db->where('id', $tag_id)->delete(T_HTAGS);
+		$data['status'] = 200;
+	}
+}
+
+else if($action == 'edit_tag') {
+	$data['err_code'] = 0;
+	$data['status']   = 400;
+	$tag_id           = fetch_or_get($_POST['id'], 0);
+	$tag_name         = fetch_or_get($_POST['tag'], '');
+	$tag_name         = cl_text_secure($tag_name);
+	$tag_name         = trim($tag_name);
+
+	if (is_posnum($tag_id) && not_empty($tag_name)) {
+		$tag_exists = $db->where('tag', $tag_name)->where('id', $tag_id, '!=')->getOne(T_HTAGS, array('id'));
+
+		if (empty($tag_exists)) {
+			$db->where('id', $tag_id)->update(T_HTAGS, array('tag' => $tag_name));
+			$data['status'] = 200;
+		}
+		else {
+			$data['message'] = 'Tag already exists';
+		}
+	}
+}
+
 else if($action == 'delete_user') {
 	$data['status']   = 404;
 	$data['err_code'] = 0;

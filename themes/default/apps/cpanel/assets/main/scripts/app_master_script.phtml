@@ -124,6 +124,70 @@
 				}
 			}
 
+			_smc.delete_tag = function(id = false) {
+				if ($.isNumeric(id) && id) {
+		        		var promise = SMC_CPanel.confirm_action({
+						btn_1: "Cancel",
+						btn_2: "Delete",
+						title: "Please confirm your actions!",
+						message: "Please note that deleting this tag will remove it from the admin list and all references associated with it."
+					});
+
+					promise.done(function() {
+						$.ajax({
+							url: '<?php echo cl_link("native_api/cpanel/delete_tag"); ?>',
+							type: 'POST',
+							dataType: 'json',
+							data: {id: id},
+						}).done(function(data) {
+							if (data.status != 200) {
+								_smc.errorMSG();
+							}
+							else {
+								$('[data-list-item="{0}"]'.format(id)).slideUp(300, function() {
+									$(this).remove();
+
+									if ($('[data-list-item]').length < 1) {
+										$(window).reloadPage(500);
+									}
+								});
+							}
+						}).always(function() {
+							$("div.confirm-actions-modal").modal("hide");
+						});
+		        		});
+
+					promise.fail(function() {
+			            $("div.confirm-actions-modal").modal("hide");
+			        	});
+				}
+			}
+
+			_smc.edit_tag = function(id = false, tag = false) {
+				if ($.isNumeric(id) && tag) {
+					var new_tag = prompt("Edit tag", tag);
+
+					if (new_tag !== null) {
+						new_tag = $.trim(new_tag);
+						if (new_tag.length > 0 && new_tag !== tag) {
+							$.ajax({
+								url: '<?php echo cl_link("native_api/cpanel/edit_tag"); ?>',
+								type: 'POST',
+								dataType: 'json',
+								data: {id: id, tag: new_tag},
+							}).done(function(data) {
+								if (data.status == 200) {
+									$('[data-list-item="{0}"]'.format(id)).find('b').first().text('#' + new_tag);
+								}
+								else {
+									_smc.errorMSG(data.message || false);
+								}
+							});
+						}
+					}
+				}
+			}
+
 			_smc.extend_vue = function(app_name = "", vue_instance = {}) {
 				_smc.vue[app_name] = vue_instance;
 			}

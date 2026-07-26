@@ -1,0 +1,33 @@
+<tr data-list-item="<?php echo($cl['li']['id']); ?>">
+    <td scope="row">
+        <?php echo($cl['li']['id']); ?>
+    </td>
+    <td>
+        <b>#<?php echo($cl['li']['tag']); ?></b>
+    </td>
+    <td>
+        <b class="num">
+            <?php echo($cl['li']['posts']); ?>
+        </b>
+    </td>
+    <td>
+        <time>
+            <?php echo($cl['li']['time']); ?>
+        </time>
+    </td>
+    <td>
+        <div class="dropdown">
+            <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                <?php echo cl_ficon("chevron_down"); ?>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a href="javascript:void(0);" class="dropdown-item" onclick="SMC_CPanel.edit_tag('<?php echo($cl['li']['id']); ?>', '<?php echo addslashes($cl['li']['tag']); ?>');">
+                    Edit
+                </a>
+                <a href="javascript:void(0);" class="dropdown-item" onclick="SMC_CPanel.delete_tag('<?php echo($cl['li']['id']); ?>');">
+                    Delete
+                </a>
+            </div>
+        </div>
+    </td>
+</tr>

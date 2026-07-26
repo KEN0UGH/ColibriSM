@@ -139,7 +139,7 @@
                 </span>
             </a>
         </li>
-        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('publications', 'post_censor_settings'))) {echo('active open');} ?>">
+        <li class="menu-list-item <?php if(in_array($cl["cp_section"], array('publications', 'post_censor_settings', 'tags'))) {echo('active open');} ?>">
             <a data-toggle-menu="1" href="javascript:void(0);" class="menu-list-item-link">
                 <span class="icon">
                     <?php echo cl_ficon("note"); ?>
@@ -154,6 +154,9 @@
             <div class="submenu-list">
                 <a class="submenu-list-item <?php if($cl["cp_section"] == 'publications'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/publications'); ?>">
                     Posts management
+                </a>
+                <a class="submenu-list-item <?php if($cl["cp_section"] == 'tags'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/tags'); ?>">
+                    Tags management
                 </a>
                 <a class="submenu-list-item <?php if($cl["cp_section"] == 'post_censor_settings'){echo('active');} ?>" href="<?php echo cl_link('admin_panel/post_censor_settings'); ?>">
                     Posts censor settings
