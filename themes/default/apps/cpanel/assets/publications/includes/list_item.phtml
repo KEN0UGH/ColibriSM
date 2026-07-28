@@ -29,6 +29,17 @@
 		<?php endif; ?>
     </td>
     <td>
+    	<?php if (not_empty($cl['li']['text_excerpt'])): ?>
+    		<span class="post-excerpt" title="<?php echo(htmlspecialchars($cl['li']['text_excerpt'], ENT_QUOTES)); ?>">
+    			<?php echo(htmlspecialchars($cl['li']['text_excerpt'], ENT_QUOTES)); ?>
+    		</span>
+    	<?php else: ?>
+    		<span class="post-excerpt post-excerpt--empty">
+    			&mdash;
+    		</span>
+    	<?php endif; ?>
+    </td>
+    <td>
     	<b class="num">
     		<?php echo($cl['li']['replys_count']); ?>
     	</b>

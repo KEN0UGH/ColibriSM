@@ -17,6 +17,29 @@
 # @ Copyright (c)  ColibriSM. All rights reserved                           @
 # @*************************************************************************@
 
+function cl_admin_get_text_excerpt($text = '', $limit = 150) {
+    $text = (string) $text;
+    $text = stripcslashes($text);
+    $text = htmlspecialchars_decode($text, ENT_QUOTES);
+    $text = strip_tags($text);
+    $text = trim(preg_replace('/\s+/', ' ', $text));
+
+    if ($text === '') {
+        return '';
+    }
+
+    if (function_exists('mb_strlen')) {
+        if (mb_strlen($text) > $limit) {
+            $text = mb_substr($text, 0, $limit) . '...';
+        }
+    }
+    else if (strlen($text) > $limit) {
+        $text = substr($text, 0, $limit) . '...';
+    }
+
+    return $text;
+}
+
 function cl_admin_get_posts($args = array()) {
     global $cl, $me, $db;
 
@@ -56,6 +79,7 @@ function cl_admin_get_posts($args = array()) {
             $row['reposts_count'] = cl_number($row['reposts_count']);
             $row['likes_count']   = cl_number($row['likes_count']);
             $row['time']          = date('d M, Y h:m',$row['time']);
+            $row['text_excerpt']  = cl_admin_get_text_excerpt($row['text'], 150);
             $data[]               = $row;
         }
     }

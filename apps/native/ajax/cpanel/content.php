@@ -308,6 +308,33 @@ else if ($action == 'get_posts') {
 	}
 }
 
+else if ($action == 'search_posts') {
+
+	require_once(cl_full_path("core/apps/cpanel/posts/app_ctrl.php"));
+
+	$keyword          = fetch_or_get($_POST['keyword'], '');
+	$keyword          = cl_text_secure($keyword);
+	$data['err_code'] = 0;
+	$html_arr         = array();
+	$posts            = cl_admin_get_posts(array(
+		'limit'       => 10,
+		'keyword'     => $keyword
+	));
+
+	if (not_empty($posts)) {
+		foreach ($posts as $cl['li']) {
+			array_push($html_arr, cl_template('cpanel/assets/publications/includes/list_item'));
+		}
+
+		$data['status'] = 200;
+		$data['html']   = implode('', $html_arr);
+	}
+	else{
+		$data['status'] = 404;
+		$data['html']   = cl_template('cpanel/assets/publications/includes/filter404');
+	}
+}
+
 else if ($action == 'get_tags') {
 
 	require_once(cl_full_path("core/apps/cpanel/tags/app_ctrl.php"));

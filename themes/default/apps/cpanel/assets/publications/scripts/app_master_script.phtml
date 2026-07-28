@@ -4,6 +4,54 @@
 	$(document).ready(function($) {
 		var _app = $('[data-app="posts"]');
 
+		function search_posts(keyword) {
+			var posts_list = _app.find('[data-an="posts-list"]');
+			var pagination = _app.find('.table-pagination');
+
+			$.ajax({
+				url: '<?php echo cl_link("native_api/cpanel/search_posts"); ?>',
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					keyword: keyword
+				},
+				beforeSend: function() {
+					SMC_CPanel.waitme("show");
+				}
+			}).done(function(data) {
+				posts_list.html(data.html);
+
+				if (keyword) {
+					pagination.hide();
+				}
+				else {
+					pagination.show();
+				}
+			}).always(function() {
+				delay(function() {
+					SMC_CPanel.waitme();
+				}, 1000);
+			});
+		}
+
+		_app.find('[data-an="search-posts-btn"]').on('click', function(event) {
+			event.preventDefault();
+			search_posts($.trim(_app.find('[data-an="search-posts-input"]').val()));
+		});
+
+		_app.find('[data-an="search-posts-input"]').on('keyup', function(event) {
+			var keyword = $.trim($(this).val());
+
+			if (event.keyCode === 13) {
+				search_posts(keyword);
+			}
+			else {
+				delay(function() {
+					search_posts(keyword);
+				}, 500);
+			}
+		});
+
 		_app.find('a[data-an="pagination"]').on('click',function(event) {
             event.preventDefault();
             event.stopPropagation();

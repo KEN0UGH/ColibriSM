@@ -18,7 +18,7 @@ SELECT * FROM `<?php echo($data['t_pubs']) ?>`
 
 	<?php if($data['keyword']): ?>
 
-		AND `text` LIKE '%<?php echo($data["keyword"]) ?>%'
+		AND `text` LIKE '%<?php echo cl_text_secure($data["keyword"]) ?>%'
 
 	<?php endif; ?>
 
