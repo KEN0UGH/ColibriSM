@@ -191,6 +191,23 @@
                             </div>
 
                             <div class="col-sm-12">
+                                <div class="form-group" data-an="tag_system_status-input">
+                                    <label>
+                                        Tag system status
+                                    </label>
+                                    <div class="form-line form-select">
+                                        <select name="tag_system_status" class="form-control">
+                                            <option value="open" <?php if(empty($cl['config']['tag_system_status']) || $cl['config']['tag_system_status'] == 'open') { echo('selected'); } ?>>Open</option>
+                                            <option value="closed" <?php if($cl['config']['tag_system_status'] == 'closed') { echo('selected'); } ?>>Closed</option>
+                                        </select>
+                                    </div>
+                                    <small class="info-feedback">
+                                        Open mode lets users create tags automatically. Closed mode only allows hashtags that already exist in the tag manager.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12">
                                 <div class="form-group" data-an="default_sms_provider-input">
                                     <label>
                                         Default SMS provider

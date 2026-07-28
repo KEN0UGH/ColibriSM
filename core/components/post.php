@@ -217,7 +217,7 @@ function cl_update_post_data($post_id = null, $data = array()) {
 }
 
 function cl_upsert_htags($text = "") {
-	global $db;
+	global $db, $cl;
 
 	if (not_empty($text)) {
 
@@ -231,27 +231,33 @@ function cl_upsert_htags($text = "") {
 			foreach ($htags as $key => $htag) {
 				$htag      = cl_remove_emoji($htag);
 				$htag_id   = 0;
-				$db        = $db->where('tag', cl_text_secure($htag));
-				$htag_data = $db->getOne(T_HTAGS, array('id', 'posts'));
+				$tag_db    = clone $db;
+				$tag_db    = $tag_db->where('tag', cl_text_secure($htag));
+				$htag_data = $tag_db->getOne(T_HTAGS, array('id', 'posts'));
 
 				if (not_empty($htag_data)) {
-
 					$htag_id = $htag_data['id'];
 
-					$db->where('id', $htag_id)->update(T_HTAGS, array(
+					$tag_db->where('id', $htag_id)->update(T_HTAGS, array(
 						'time'  => time(),
 						'posts' => ($htag_data['posts'] += 1)
 					));
 				}
-				else{
-					$htag_id    = $db->insert(T_HTAGS, array(
-						'posts' => 1,
-						'tag'   => $htag,
-						'time'  => time()
-					));
+				else {
+					$allow_new_tags = empty($cl['config']['tag_system_status']) || $cl['config']['tag_system_status'] != 'closed';
+
+					if ($allow_new_tags) {
+						$htag_id = $tag_db->insert(T_HTAGS, array(
+							'posts' => 1,
+							'tag'   => $htag,
+							'time'  => time()
+						));
+					}
 				}
 
-				$text = preg_replace(cl_strf("/#%s\b/", $htag), cl_strf("{#id:%s#}", $htag_id), $text);
+				if (is_posnum($htag_id)) {
+					$text = preg_replace(cl_strf("/#%s\b/", $htag), cl_strf("{#id:%s#}", $htag_id), $text);
+				}
 			}
 		}
 	}
@@ -325,17 +331,35 @@ function cl_tagify_htags($text = "", $htags = array()) {
 }
 
 function cl_linkify_htags($text = "") {
-    $text = preg_replace_callback('/(?:\s|^)#{1,}([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]*\s]+)/iu', function($m) {
+    global $cl;
+
+    $text = preg_replace_callback('/(?:\s|^)#{1,}([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]*\s]+)/iu', function($m) use ($cl) {
 
         $tag = fetch_or_get($m[1], "");
 
-        if (not_empty($tag)) {
-        	return (" " . cl_html_el('a', cl_strf("#%s", $tag), array(
-	            'href' => cl_link(cl_strf("search/posts?q=%s",cl_remove_emoji($tag))),
-	            'class' => 'inline-link'
-	        )) . " ");
+        if (empty($tag)) {
+            return $m[0];
         }
 
+        $tag_value = cl_remove_emoji($tag);
+
+        if (empty($cl['config']['tag_system_status']) || $cl['config']['tag_system_status'] != 'closed') {
+            return (" " . cl_html_el('a', cl_strf("#%s", $tag_value), array(
+                'href' => cl_link(cl_strf("search/posts?q=%s", $tag_value)),
+                'class' => 'inline-link'
+            )) . " ");
+        }
+
+        $existing_tag = cl_db_get_item(T_HTAGS, array('tag' => cl_text_secure($tag_value)));
+
+        if (not_empty($existing_tag)) {
+            return (" " . cl_html_el('a', cl_strf("#%s", $tag_value), array(
+                'href' => cl_link(cl_strf("search/posts?q=%s", $tag_value)),
+                'class' => 'inline-link'
+            )) . " ");
+        }
+
+        return cl_strf("%s", $tag_value);
     }, $text);
 
     return $text;

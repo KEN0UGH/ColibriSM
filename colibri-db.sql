@@ -521,6 +521,10 @@
 {%end%}
 
 {%begin%}
+  INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Tag system status', 'tag_system_status', 'open', '/^(open|closed)$/');
+{%end%}
+
+{%begin%}
   ALTER TABLE `cl_users` ADD `settings` VARCHAR(3000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '{\"notifs\":{\"like\":1,\"subscribe\":1,\"subscribe_request\":1,\"subscribe_accept\":1,\"reply\":1,\"repost\":1,\"mention\":1}}' AFTER `refresh_token`;
 {%end%}
 
