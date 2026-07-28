@@ -95,6 +95,8 @@ if ($action == "login") {
 else if ($action == 'signup') {
     $invite_code = fetch_or_get($_POST["invite_code"], false);
     $invite_link = (not_empty($invite_code)) ? cl_db_get_item(T_USER_INVITES, array("code" => $invite_code)) : false;
+    $signup_email_required = (fetch_or_get($cl["config"]["signup_email_required"], "on") == "on");
+    $signup_password_required = (fetch_or_get($cl["config"]["signup_password_required"], "on") == "on");
 
     if ($cl['config']['user_signup'] == "on" || (not_empty($invite_link) && cl_verify_invite_code($invite_code))) {
         $data['err_code'] = 0;
@@ -133,7 +135,20 @@ else if ($action == 'signup') {
             }
 
             else if ($field_name == 'email' && $cl["config"]["signup_conf_system"] == "email") {
-                if (not_empty($field_val)) {
+                    if ($signup_email_required == true) {
+                        if (empty($field_val) || !filter_var(trim($field_val), FILTER_VALIDATE_EMAIL) || len($field_val) > 55) {
+                            $data['err_code'] = "invalid_email"; break;
+                        }
+
+                        else if (cl_email_exists($field_val)) {
+                            $data['err_code'] = "doubling_email"; break;
+                        }
+
+                        else if(in_array($field_val, $useremail_restricts)) {
+                            $data['err_code'] = "denied_email"; break;
+                        }
+                    }
+                    else if (not_empty($field_val)) {
                     if (!filter_var(trim($field_val), FILTER_VALIDATE_EMAIL) || len($field_val) > 55) {
                         $data['err_code'] = "invalid_email"; break;
                     }
@@ -163,7 +178,12 @@ else if ($action == 'signup') {
             }
 
             else if ($field_name == 'password') {
-                if (not_empty($field_val) && len_between($field_val,6,20) != true) {
+                    if ($signup_password_required == true) {
+                        if (empty($field_val) || len_between($field_val,6,20) != true) {
+                            $data['err_code'] = "invalid_password"; break;
+                        }
+                    }
+                    else if (not_empty($field_val) && len_between($field_val,6,20) != true) {
                     $data['err_code'] = "invalid_password"; break;
                 }
             }

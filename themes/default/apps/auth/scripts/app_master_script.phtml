@@ -155,6 +155,8 @@
 					password1_display: "password",
 					password2_display: "password",
 					invite_code: "<?php echo fetch_or_get($cl["invite_code"], ''); ?>",
+					signup_email_required: <?php echo((fetch_or_get($cl["config"]["signup_email_required"], "on") == "on") ? "true" : "false"); ?>,
+					signup_password_required: <?php echo((fetch_or_get($cl["config"]["signup_password_required"], "on") == "on") ? "true" : "false"); ?>,
 					grecaptcha: "{%config google_recaptcha%}",
 					captcha: "",
 					captcha_error: false
@@ -205,7 +207,9 @@
 					},
 					<?php else: ?>
 					is_valid_email: function() {
-							if (this.email.length > 0 && this.$v.email.$error) {
+						if ((this.signup_email_required == true && this.$v.email.$error) || (this.signup_email_required != true && this.email.length > 0 && this.$v.email.$error)) {
+							this.invalid_feedback_email = "<?php echo cl_translate("The email address you entered does not match the valid format."); ?>";
+							return true;
 						}
 
 						else if (this.email_taken == true) {
@@ -225,7 +229,7 @@
 					},
 					<?php endif; ?>
 					is_valid_password: function() {
-						if (this.password.length > 0 && (this.$v.password.min_length == false || this.$v.password.max_length == false)) {
+						if ((this.signup_password_required == true && this.$v.password.$error) || (this.signup_password_required != true && this.password.length > 0 && (this.$v.password.min_length == false || this.$v.password.max_length == false))) {
 							this.invalid_feedback_pass = "<?php echo cl_translate("Password must be between 6 and 20 characters long"); ?>";
 							return true;
 						}
@@ -255,12 +259,18 @@
 					},
 					<?php else: ?>
 					email: {
+						<?php if (fetch_or_get($cl["config"]["signup_email_required"], "on") == "on"): ?>
+						required: window.validators.required,
+						<?php endif; ?>
 						email: window.validators.email,
 						min_length: window.validators.minLength(8),
 						max_length: window.validators.maxLength(55)
 					},
 					<?php endif; ?>
 					password: {
+						<?php if (fetch_or_get($cl["config"]["signup_password_required"], "on") == "on"): ?>
+						required: window.validators.required,
+						<?php endif; ?>
 						min_length: window.validators.minLength(6),
 						max_length: window.validators.maxLength(20)
 					}

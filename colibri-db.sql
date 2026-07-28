@@ -724,6 +724,14 @@
 {%end%}
 
 {%begin%}
+  INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Require email address on signup', 'signup_email_required', 'on', '/^(on|off)$/');
+{%end%}
+
+{%begin%}
+  INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Require password on signup', 'signup_password_required', 'on', '/^(on|off)$/');
+{%end%}
+
+{%begin%}
   INSERT INTO `cl_configs` (`id`, `title`, `name`, `value`, `regex`) VALUES (NULL, 'Cookie warning popup', 'cookie_warning_popup', 'off', '/^(on|off)$/');
 {%end%}
 

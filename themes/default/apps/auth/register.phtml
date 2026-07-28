@@ -23,21 +23,23 @@
 			</div>
 	    </div>
     <?php else: ?>
+		<?php $signup_email_required = (fetch_or_get($cl["config"]["signup_email_required"], "on") == "on"); ?>
 		<div class="form-group">
-	        <label><?php echo cl_translate("Email address"); ?> <span class="optional-field">(<?php echo cl_translate("Optional"); ?>)</span></label>
-	        <input name="email" v-model.trim="$v.email.$model" type="email" class="form-control" placeholder="<?php echo cl_translate("Enter your email address (or leave blank)"); ?>">
+	        <label><?php echo cl_translate("Email address"); ?><?php if ($signup_email_required != true): ?> <span class="optional-field">(<?php echo cl_translate("Optional"); ?>)</span><?php endif; ?></label>
+	        <input name="email" v-model.trim="$v.email.$model" type="email" class="form-control" placeholder="<?php echo(($signup_email_required == true) ? cl_translate("Enter your email address") : cl_translate("Enter your email address (or leave blank)")); ?>">
 			<div class="invalid-main-feedback" v-if="is_valid_email">
 				{{invalid_feedback_email}}
 			</div>
 	    </div>
     <?php endif; ?>
 
+	<?php $signup_password_required = (fetch_or_get($cl["config"]["signup_password_required"], "on") == "on"); ?>
 	<div class="form-group">
         <label>
-        	<?php echo cl_translate("Password"); ?> <span class="optional-field">(<?php echo cl_translate("Optional"); ?>)</span>
+	        	<?php echo cl_translate("Password"); ?><?php if ($signup_password_required != true): ?> <span class="optional-field">(<?php echo cl_translate("Optional"); ?>)</span><?php endif; ?>
         </label>
         <div class="password-ctrl">
-        	<input name="password" v-model.trim="$v.password.$model" v-bind:type="password1_display" class="form-control" placeholder="<?php echo cl_translate("Create a password, or leave blank for auto-generated"); ?>">
+	        	<input name="password" v-model.trim="$v.password.$model" v-bind:type="password1_display" class="form-control" placeholder="<?php echo(($signup_password_required == true) ? cl_translate("Create a password") : cl_translate("Create a password, or leave blank for auto-generated")); ?>">
         	
         	<button class="password-ctrl" type="button" v-on:click="password1_display_toggle">
 				<span v-if="password1_display == 'password'">
