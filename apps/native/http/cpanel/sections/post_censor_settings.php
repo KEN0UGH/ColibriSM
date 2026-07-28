@@ -26,4 +26,6 @@ $cl["app_statics"] = array(
 $cl["post_censored_words_csv"] = cl_get_censored_words_array();
 $cl["post_censored_words_csv"] = implode(",", $cl["post_censored_words_csv"]);
 
+$cl["post_censored_words_replacements"] = cl_get_censored_words_replacements_array();
+
 $cl['http_res'] = cl_template("cpanel/assets/post_censor_settings/content");

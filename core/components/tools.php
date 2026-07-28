@@ -1795,9 +1795,26 @@ function cl_get_censored_words_array() {
 }
 
 
+function cl_get_censored_words_replacements_array() {
+    $data = array();
+
+    $replacements_list = file_get_contents(cl_full_path("core/loc_db/censor_words_replacements.json"));
+
+    if ($replacements_list) {
+        $replacements_list = json_decode($replacements_list, true);
+
+        if (is_array($replacements_list)) {
+            return $replacements_list;
+        }
+    }
+
+    return $data;
+}
+
 function cl_censore_post_text($text = "") {
 
-    $forbidden_words = cl_get_censored_words_array();
+    $forbidden_words  = cl_get_censored_words_array();
+    $word_replacements = cl_get_censored_words_replacements_array();
 
     $censored_text_count = str_word_count($text, 0);
 
@@ -1805,11 +1822,24 @@ function cl_censore_post_text($text = "") {
         return strlen($b) - strlen($a);
     });
 
+    usort($word_replacements, function($a, $b) {
+        return strlen(fetch_or_get($b['word'], '')) - strlen(fetch_or_get($a['word'], ''));
+    });
+
     if ($censored_text_count == 1) {
         $censored_text = " " . $text . " ";
     }
     else{
         $censored_text = $text;
+    }
+
+    foreach ($word_replacements as $item) {
+        $word        = fetch_or_get($item['word'], "");
+        $replacement = fetch_or_get($item['replacement'], "");
+
+        if ($word !== "") {
+            $censored_text = str_ireplace($word, $replacement, $censored_text);
+        }
     }
     
     $text = str_ireplace($forbidden_words, " " . str_repeat('*', rand(4,7)) . " ", $censored_text);

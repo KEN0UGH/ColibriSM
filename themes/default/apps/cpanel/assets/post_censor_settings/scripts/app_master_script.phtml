@@ -5,6 +5,30 @@
 		var _app  = $('[data-app="posts-censor-settings"]');
 		var _data = _app.find('form[data-an="form"]');
 
+		function build_replacement_row() {
+			var row = $('<div>', {'class': 'input-group mb-2', 'data-an': 'replacement-row'});
+
+			row.append($('<input>', {type: 'text', 'class': 'form-control', name: 'replacement_words[]', placeholder: 'Word to replace'}));
+			row.append($('<input>', {type: 'text', 'class': 'form-control', name: 'replacement_texts[]', placeholder: 'Replace with'}));
+
+			var append_wrap = $('<div>', {'class': 'input-group-append'});
+			append_wrap.append($('<button>', {type: 'button', 'class': 'btn btn-danger', 'data-an': 'remove-replacement-btn', text: 'Remove'}));
+
+			row.append(append_wrap);
+
+			return row;
+		}
+
+		_app.on('click', '[data-an="add-replacement-btn"]', function(event) {
+			event.preventDefault();
+			_app.find('[data-an="replacements-list"]').append(build_replacement_row());
+		});
+
+		_app.on('click', '[data-an="remove-replacement-btn"]', function(event) {
+			event.preventDefault();
+			$(this).closest('[data-an="replacement-row"]').remove();
+		});
+
 		_data.ajaxForm({
 			url: '<?php echo cl_link("native_api/cpanel/post_censor_settings"); ?>',
 			type: 'POST',
@@ -18,7 +42,7 @@
 					cl_bs_notify("Your changes have been saved successfully!", 3000);
 				}
 				else {
-					cl_bs_notify("Something went wrong while trying to store a list of censored words in a local database. Make sure file: (core/loc_db/censor_words.csv) is writable.", 7000, "danger");
+					cl_bs_notify("Something went wrong while trying to store the censor settings in a local database. Make sure files: (core/loc_db/censor_words.csv) and (core/loc_db/censor_words_replacements.json) are writable.", 7000, "danger");
 				}
 			},
 			complete: function() {

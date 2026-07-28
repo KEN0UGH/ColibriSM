@@ -1627,14 +1627,40 @@ else if ($action == 'post_censor_settings') {
 
 	$censored_words = fetch_or_get($_POST["words_list"], "");
 
-	$censored_words_db = cl_full_path("core/loc_db/censor_words.csv");
+	$replacement_words = fetch_or_get($_POST["replacement_words"], array());
+	$replacement_texts = fetch_or_get($_POST["replacement_texts"], array());
+
+	$word_replacements = array();
+
+	if (is_array($replacement_words)) {
+		foreach ($replacement_words as $index => $word) {
+			$word        = trim($word);
+			$replacement = isset($replacement_texts[$index]) ? trim($replacement_texts[$index]) : "";
+
+			if ($word !== "" && $replacement !== "") {
+				$word_replacements[] = array(
+					"word"        => $word,
+					"replacement" => $replacement
+				);
+			}
+		}
+	}
+
+	$censored_words_db    = cl_full_path("core/loc_db/censor_words.csv");
+	$word_replacements_db = cl_full_path("core/loc_db/censor_words_replacements.json");
 
 	if (is_writable($censored_words_db) != true) {
 		$data['err_code'] = "permission_denied";
 	}
 
+	else if (is_writable($word_replacements_db) != true) {
+		$data['err_code'] = "permission_denied";
+	}
+
 	else{
 		file_put_contents($censored_words_db, $censored_words);
+		file_put_contents($word_replacements_db, json_encode($word_replacements, JSON_UNESCAPED_UNICODE));
+
 		$data['status'] = 200;
 	}
 }
