@@ -128,6 +128,139 @@ function cl_admin_get_unused_media_files() {
     return $orphans;
 }
 
+function cl_admin_cache_get_opcache_status() {
+    $status = array(
+        'available'      => false,
+        'enabled'        => false,
+        'cached_scripts' => 0,
+        'hits'           => 0,
+        'misses'         => 0,
+        'hit_rate'       => 0,
+        'memory_used'    => 0,
+        'memory_free'    => 0,
+        'memory_wasted'  => 0
+    );
+
+    if (function_exists('opcache_get_status')) {
+        $ocs = @opcache_get_status(false);
+
+        if (is_array($ocs)) {
+            $status['available']      = true;
+            $status['enabled']        = (bool) fetch_or_get($ocs['opcache_enabled'], false);
+            $status['cached_scripts'] = fetch_or_get($ocs['opcache_statistics']['num_cached_scripts'], 0);
+            $status['hits']           = fetch_or_get($ocs['opcache_statistics']['hits'], 0);
+            $status['misses']         = fetch_or_get($ocs['opcache_statistics']['misses'], 0);
+            $status['hit_rate']       = round(fetch_or_get($ocs['opcache_statistics']['opcache_hit_rate'], 0), 2);
+            $status['memory_used']    = fetch_or_get($ocs['memory_usage']['used_memory'], 0);
+            $status['memory_free']    = fetch_or_get($ocs['memory_usage']['free_memory'], 0);
+            $status['memory_wasted']  = fetch_or_get($ocs['memory_usage']['wasted_memory'], 0);
+        }
+    }
+
+    return $status;
+}
+
+function cl_admin_cache_clear_opcache() {
+    if (function_exists('opcache_reset')) {
+        return (bool) @opcache_reset();
+    }
+
+    return false;
+}
+
+function cl_admin_cache_get_apcu_status() {
+    $status = array(
+        'available' => false,
+        'entries'   => 0,
+        'mem_size'  => 0
+    );
+
+    if (function_exists('apcu_enabled') && @apcu_enabled()) {
+        $status['available'] = true;
+
+        if (function_exists('apcu_cache_info')) {
+            $info = @apcu_cache_info(true);
+
+            if (is_array($info)) {
+                $status['entries']  = fetch_or_get($info['num_entries'], 0);
+                $status['mem_size'] = fetch_or_get($info['mem_size'], 0);
+            }
+        }
+    }
+
+    return $status;
+}
+
+function cl_admin_cache_clear_apcu() {
+    if (function_exists('apcu_clear_cache') && function_exists('apcu_enabled') && @apcu_enabled()) {
+        return (bool) @apcu_clear_cache();
+    }
+
+    return false;
+}
+
+function cl_admin_cache_get_realpath_status() {
+    return array(
+        'entries'     => (function_exists('realpath_cache_get')) ? count(realpath_cache_get()) : 0,
+        'cache_size'  => (function_exists('realpath_cache_size')) ? realpath_cache_size() : 0,
+        'cache_limit' => (string) ini_get('realpath_cache_size')
+    );
+}
+
+function cl_admin_cache_clear_realpath() {
+    clearstatcache(true);
+    return true;
+}
+
+function cl_admin_cache_get_sessions_status() {
+    global $db;
+
+    $max_lifetime = 86400 * 30;
+
+    return array(
+        'total_rows'   => (int) $db->getValue(T_SESSION_DATA, 'COUNT(*)'),
+        'expired_rows' => (int) $db->where('updated_at', (time() - $max_lifetime), '<')->getValue(T_SESSION_DATA, 'COUNT(*)')
+    );
+}
+
+function cl_admin_cache_clear_expired_sessions() {
+    global $db;
+
+    $before = (int) $db->getValue(T_SESSION_DATA, 'COUNT(*)');
+
+    cl_session_gc();
+
+    $after = (int) $db->getValue(T_SESSION_DATA, 'COUNT(*)');
+
+    return max(0, ($before - $after));
+}
+
+function cl_admin_cache_clear_all_sessions() {
+    global $db;
+
+    $before = (int) $db->getValue(T_SESSION_DATA, 'COUNT(*)');
+
+    $db->delete(T_SESSION_DATA);
+
+    return $before;
+}
+
+function cl_admin_cache_bump_asset_version() {
+    $new_version = cl_strf("%s-%s", date("mdY"), substr(bin2hex(random_bytes(2)), 0, 4));
+    cl_set_asset_cache_version($new_version);
+    return $new_version;
+}
+
+function cl_admin_cache_get_overview() {
+    return array(
+        'opcache'        => cl_admin_cache_get_opcache_status(),
+        'apcu'           => cl_admin_cache_get_apcu_status(),
+        'realpath_cache' => cl_admin_cache_get_realpath_status(),
+        'sessions'       => cl_admin_cache_get_sessions_status(),
+        'asset_version'  => cl_get_asset_cache_version()
+    );
+}
+
 if (empty($cl['is_admin'])) {
 	$data['status'] = 400;
     $data['error']  = 'Invalid access token';
@@ -1253,6 +1386,59 @@ else if($action == "media_cleanup_delete") {
 else if($action == "media_cleanup_reset") {
     $data['status'] = 200;
     $data['reset']  = true;
+}
+
+else if($action == "cache_overview") {
+    $data['status'] = 200;
+    $data['cache']  = cl_admin_cache_get_overview();
+}
+
+else if($action == "cache_clear_opcache") {
+    $data['status']  = 200;
+    $data['cleared'] = cl_admin_cache_clear_opcache();
+    $data['cache']   = cl_admin_cache_get_overview();
+}
+
+else if($action == "cache_clear_apcu") {
+    $data['status']  = 200;
+    $data['cleared'] = cl_admin_cache_clear_apcu();
+    $data['cache']   = cl_admin_cache_get_overview();
+}
+
+else if($action == "cache_clear_realpath") {
+    $data['status']  = 200;
+    $data['cleared'] = cl_admin_cache_clear_realpath();
+    $data['cache']   = cl_admin_cache_get_overview();
+}
+
+else if($action == "cache_clear_sessions") {
+    $data['status']  = 200;
+    $data['deleted'] = cl_admin_cache_clear_expired_sessions();
+    $data['cache']   = cl_admin_cache_get_overview();
+}
+
+else if($action == "cache_clear_all_sessions") {
+    $data['status']  = 200;
+    $data['deleted'] = cl_admin_cache_clear_all_sessions();
+    $data['cache']   = cl_admin_cache_get_overview();
+}
+
+else if($action == "cache_bump_asset_version") {
+    $data['status']        = 200;
+    $data['asset_version'] = cl_admin_cache_bump_asset_version();
+    $data['cache']         = cl_admin_cache_get_overview();
+}
+
+else if($action == "cache_clear_all") {
+    $data['status']  = 200;
+    $data['results'] = array(
+        'opcache'          => cl_admin_cache_clear_opcache(),
+        'apcu'             => cl_admin_cache_clear_apcu(),
+        'realpath_cache'   => cl_admin_cache_clear_realpath(),
+        'expired_sessions' => cl_admin_cache_clear_expired_sessions(),
+        'asset_version'    => cl_admin_cache_bump_asset_version()
+    );
+    $data['cache'] = cl_admin_cache_get_overview();
 }
 
 else if($action == "create_invite_link") {

@@ -1,0 +1,175 @@
+<div class="cp-app-container" data-app="cache-settings">
+    <div class="current-page-name">
+        <div class="lp">
+            <h1>
+                Cache management
+            </h1>
+        </div>
+    </div>
+    <div class="inline-alertbox-wrapper">
+        <div class="inline-alertbox info">
+            <div class="icon">
+                <?php echo cl_ficon("info"); ?>
+            </div>
+            <div class="alert-message">
+                <p>
+                    This page lets you inspect and clear the caching layers used by the server (PHP OPcache, APCu, filesystem realpath cache), the database-backed session storage, and the static assets (CSS/JS) cache-busting version.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Quick actions
+                    </h2>
+                </div>
+                <div class="body">
+                    <button data-an="clear-all-ctrl" type="button" class="btn btn-danger">
+                        Clear all caches
+                    </button>
+                    <div data-an="clear-all-results" class="mt-3" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        PHP OPcache
+                    </h2>
+                </div>
+                <div class="body">
+                    <div data-an="opcache-unavailable" class="alert alert-secondary" style="display:none;">
+                        OPcache is not available on this server.
+                    </div>
+                    <div data-an="opcache-info">
+                        <ul class="list-unstyled mb-3">
+                            <li>Status: <strong data-an="opcache-status">-</strong></li>
+                            <li>Cached scripts: <strong data-an="opcache-scripts">0</strong></li>
+                            <li>Hits / Misses: <strong data-an="opcache-hits">0</strong> / <strong data-an="opcache-misses">0</strong></li>
+                            <li>Hit rate: <strong data-an="opcache-hitrate">0</strong>%</li>
+                            <li>Memory used / free: <strong data-an="opcache-memused">0</strong> / <strong data-an="opcache-memfree">0</strong></li>
+                        </ul>
+                        <button data-an="clear-opcache-ctrl" type="button" class="btn btn-primary btn-sm">
+                            Reset OPcache
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        APCu user cache
+                    </h2>
+                </div>
+                <div class="body">
+                    <div data-an="apcu-unavailable" class="alert alert-secondary" style="display:none;">
+                        APCu is not available on this server.
+                    </div>
+                    <div data-an="apcu-info">
+                        <ul class="list-unstyled mb-3">
+                            <li>Entries: <strong data-an="apcu-entries">0</strong></li>
+                            <li>Memory size: <strong data-an="apcu-memsize">0</strong></li>
+                        </ul>
+                        <button data-an="clear-apcu-ctrl" type="button" class="btn btn-primary btn-sm">
+                            Clear APCu cache
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Filesystem (realpath) cache
+                    </h2>
+                </div>
+                <div class="body">
+                    <ul class="list-unstyled mb-3">
+                        <li>Cached entries: <strong data-an="realpath-entries">0</strong></li>
+                        <li>Cache size: <strong data-an="realpath-size">0</strong></li>
+                        <li>Cache limit: <strong data-an="realpath-limit">0</strong></li>
+                    </ul>
+                    <button data-an="clear-realpath-ctrl" type="button" class="btn btn-primary btn-sm">
+                        Clear realpath cache
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Static assets version
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="inline-alertbox-wrapper">
+                        <div class="inline-alertbox info">
+                            <div class="icon">
+                                <?php echo cl_ficon("info"); ?>
+                            </div>
+                            <div class="alert-message">
+                                <p>
+                                    Bumping the version forces every visitor's browser to download fresh CSS/JS files instead of serving old cached copies.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="list-unstyled mb-3">
+                        <li>Current version: <strong data-an="asset-version">-</strong></li>
+                    </ul>
+                    <button data-an="bump-version-ctrl" type="button" class="btn btn-primary btn-sm">
+                        Bump assets version
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Session data cache
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="inline-alertbox-wrapper">
+                        <div class="inline-alertbox warning">
+                            <div class="icon">
+                                <?php echo cl_ficon("warning"); ?>
+                            </div>
+                            <div class="alert-message">
+                                <p>
+                                    User sessions are stored in the database. Clearing expired sessions is safe. Clearing ALL sessions will sign out every logged-in user, including yourself.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="list-unstyled mb-3">
+                        <li>Total session rows: <strong data-an="sessions-total">0</strong></li>
+                        <li>Expired session rows (older than 30 days): <strong data-an="sessions-expired">0</strong></li>
+                    </ul>
+                    <button data-an="clear-expired-sessions-ctrl" type="button" class="btn btn-primary btn-sm">
+                        Clear expired sessions
+                    </button>
+                    <button data-an="clear-all-sessions-ctrl" type="button" class="btn btn-outline-danger btn-sm ml-2">
+                        Clear ALL sessions
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo cl_template('cpanel/assets/cache_settings/scripts/app_master_script'); ?>

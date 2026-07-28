@@ -454,6 +454,16 @@
                 </span>
             </a>
         </li>
+        <li class="menu-list-item <?php if($cl["cp_section"] == 'cache_settings') {echo('active');} ?>">
+            <a href="<?php echo cl_link('admin_panel/cache_settings'); ?>" class="menu-list-item-link">
+                <span class="icon">
+                    <?php echo cl_ficon("timer"); ?>
+                </span>
+                <span class="text">
+                    Cache management
+                </span>
+            </a>
+        </li>
         <li class="menu-list-item <?php if($cl["cp_section"] == 'languages') {echo('active');} ?>">
             <a href="<?php echo cl_link('admin_panel/languages'); ?>" class="menu-list-item-link">
                 <span class="icon">

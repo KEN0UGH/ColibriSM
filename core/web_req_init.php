@@ -63,7 +63,7 @@ cl_db_session_init();
 $url           = $site_url;
 $config        = cl_get_configurations();
 
-$cl["update_date"] = "05012024-1"; 
+$cl["update_date"] = cl_get_asset_cache_version();
 
 date_default_timezone_set($config["timezone"]);
 

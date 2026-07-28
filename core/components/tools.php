@@ -1317,6 +1317,36 @@ function cl_session_gc($max_lifetime = 86400 * 30) { // 30 days
     return true;
 }
 
+// Returns the current static assets (CSS/JS) cache-busting version string.
+// Stored in a plain text file so it can be bumped from the control panel
+// without requiring a database migration.
+function cl_get_asset_cache_version() {
+    $default_version = "05012024-1";
+    $file_path        = cl_full_path("core/configs/cache_version.txt");
+
+    if (is_file($file_path) && is_readable($file_path)) {
+        $version = trim(file_get_contents($file_path));
+
+        if (not_empty($version)) {
+            return $version;
+        }
+    }
+
+    return $default_version;
+}
+
+// Persists a new static assets cache-busting version string.
+function cl_set_asset_cache_version($version = "") {
+    $file_path = cl_full_path("core/configs/cache_version.txt");
+    $version   = trim($version);
+
+    if (empty($version)) {
+        return false;
+    }
+
+    return (bool) @file_put_contents($file_path, $version);
+}
+
 function cl_rn2br($text = "") {
     $text = str_ireplace("\r\n", "<br>", $text);
     $text = str_ireplace("\n\r", "<br>", $text);

@@ -1663,6 +1663,10 @@ $cl['morer_perms'] = array(
         "page_name" => "Bank transfer receipts",
         "desc" => "Permission to manage user bank transfer receipt requests"
     ),
+    "cache_settings" => array(
+        "page_name" => "Cache management",
+        "desc" => "Permission to view and clear the site cache (OPcache, APCu, realpath cache, session data and static assets version)"
+    ),
     "cookies" => array(
         "page_name" => "Cookies policy",
         "desc" => "Permission to edit the cookies policy page"

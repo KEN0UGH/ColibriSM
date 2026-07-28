@@ -1,0 +1,177 @@
+<script>
+    "use strict";
+
+    $(document).ready(function() {
+        var _app   = $('[data-app="cache-settings"]');
+        var _token = '<?php echo fetch_or_get($cl["csrf_token"], "none"); ?>';
+
+        function formatBytes(bytes) {
+            bytes = parseInt(bytes, 10) || 0;
+
+            if (bytes <= 0) {
+                return '0 B';
+            }
+
+            var units = ['B', 'KB', 'MB', 'GB'];
+            var i     = Math.floor(Math.log(bytes) / Math.log(1024));
+            i         = Math.min(i, units.length - 1);
+
+            return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + units[i];
+        }
+
+        function renderCache(cache) {
+            if (!cache) {
+                return;
+            }
+
+            if (cache.opcache && cache.opcache.available) {
+                _app.find('[data-an="opcache-unavailable"]').hide();
+                _app.find('[data-an="opcache-info"]').show();
+                _app.find('[data-an="opcache-status"]').text(cache.opcache.enabled ? 'Enabled' : 'Disabled');
+                _app.find('[data-an="opcache-scripts"]').text(cache.opcache.cached_scripts);
+                _app.find('[data-an="opcache-hits"]').text(cache.opcache.hits);
+                _app.find('[data-an="opcache-misses"]').text(cache.opcache.misses);
+                _app.find('[data-an="opcache-hitrate"]').text(cache.opcache.hit_rate);
+                _app.find('[data-an="opcache-memused"]').text(formatBytes(cache.opcache.memory_used));
+                _app.find('[data-an="opcache-memfree"]').text(formatBytes(cache.opcache.memory_free));
+            }
+            else {
+                _app.find('[data-an="opcache-info"]').hide();
+                _app.find('[data-an="opcache-unavailable"]').show();
+            }
+
+            if (cache.apcu && cache.apcu.available) {
+                _app.find('[data-an="apcu-unavailable"]').hide();
+                _app.find('[data-an="apcu-info"]').show();
+                _app.find('[data-an="apcu-entries"]').text(cache.apcu.entries);
+                _app.find('[data-an="apcu-memsize"]').text(formatBytes(cache.apcu.mem_size));
+            }
+            else {
+                _app.find('[data-an="apcu-info"]').hide();
+                _app.find('[data-an="apcu-unavailable"]').show();
+            }
+
+            if (cache.realpath_cache) {
+                _app.find('[data-an="realpath-entries"]').text(cache.realpath_cache.entries);
+                _app.find('[data-an="realpath-size"]').text(formatBytes(cache.realpath_cache.cache_size));
+                _app.find('[data-an="realpath-limit"]').text(cache.realpath_cache.cache_limit);
+            }
+
+            if (cache.sessions) {
+                _app.find('[data-an="sessions-total"]').text(cache.sessions.total_rows);
+                _app.find('[data-an="sessions-expired"]').text(cache.sessions.expired_rows);
+            }
+
+            if (cache.asset_version) {
+                _app.find('[data-an="asset-version"]').text(cache.asset_version);
+            }
+        }
+
+        function runAction(action, data, onSuccess) {
+            if (typeof data === 'function') {
+                onSuccess = data;
+                data      = {};
+            }
+
+            data      = data || {};
+            data.hash = _token;
+
+            SMC_CPanel.waitme('show');
+
+            return $.post('<?php echo cl_link("native_api/cpanel/"); ?>' + action, data, function(res) {
+                if (res.status == 200) {
+                    renderCache(res.cache);
+
+                    if (typeof onSuccess === 'function') {
+                        onSuccess(res);
+                    }
+                }
+                else {
+                    SMC_CPanel.errorMSG();
+                }
+            }, 'json').fail(function() {
+                SMC_CPanel.errorMSG();
+            }).always(function() {
+                SMC_CPanel.waitme();
+            });
+        }
+
+        runAction('cache_overview');
+
+        _app.find('[data-an="clear-opcache-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            runAction('cache_clear_opcache', function(res) {
+                cl_bs_notify(res.cleared ? 'OPcache has been reset successfully' : 'OPcache is not available on this server', 3000);
+            });
+        });
+
+        _app.find('[data-an="clear-apcu-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            runAction('cache_clear_apcu', function(res) {
+                cl_bs_notify(res.cleared ? 'APCu cache has been cleared successfully' : 'APCu is not available on this server', 3000);
+            });
+        });
+
+        _app.find('[data-an="clear-realpath-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            runAction('cache_clear_realpath', function() {
+                cl_bs_notify('Realpath cache has been cleared successfully', 3000);
+            });
+        });
+
+        _app.find('[data-an="bump-version-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            runAction('cache_bump_asset_version', function(res) {
+                cl_bs_notify('Static assets version has been bumped to ' + res.asset_version, 3000);
+            });
+        });
+
+        _app.find('[data-an="clear-expired-sessions-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            runAction('cache_clear_sessions', function(res) {
+                cl_bs_notify('Deleted ' + res.deleted + ' expired session row(s)', 3000);
+            });
+        });
+
+        _app.find('[data-an="clear-all-sessions-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            var promise = SMC_CPanel.confirm_action({
+                btn_1: "Cancel",
+                btn_2: "Clear all",
+                title: "Please confirm your actions!",
+                message: "This will sign out every logged-in user, including yourself. Are you sure you want to continue?"
+            });
+
+            promise.done(function() {
+                runAction('cache_clear_all_sessions', function(res) {
+                    cl_bs_notify('Deleted ' + res.deleted + ' session row(s). All users have been signed out.', 3000);
+                });
+            });
+        });
+
+        _app.find('[data-an="clear-all-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            var _results = _app.find('[data-an="clear-all-results"]');
+
+            runAction('cache_clear_all', function(res) {
+                var html = '<div class="alert alert-success mb-0"><strong>All caches cleared:</strong><ul class="list-unstyled mb-0 mt-2">';
+                html += '<li>OPcache reset: ' + (res.results.opcache ? 'Yes' : 'Not available') + '</li>';
+                html += '<li>APCu cleared: ' + (res.results.apcu ? 'Yes' : 'Not available') + '</li>';
+                html += '<li>Realpath cache cleared: Yes</li>';
+                html += '<li>Expired session rows deleted: ' + res.results.expired_sessions + '</li>';
+                html += '<li>Static assets version bumped to: ' + res.results.asset_version + '</li>';
+                html += '</ul></div>';
+
+                _results.html(html).show();
+                cl_bs_notify('All caches have been cleared successfully', 3000);
+            });
+        });
+    });
+</script>
