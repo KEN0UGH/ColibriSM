@@ -22,6 +22,7 @@ var pubbox_form_app_mixin = Object({
 			music_ctrl: true,
 			poll_ctrl: true,
 			drag_over: false,
+			drag_counter: 0,
 			donate_ctrl: true,
 			doc_ctrl: true,
 			gif_ctrl: true,
@@ -307,8 +308,14 @@ var pubbox_form_app_mixin = Object({
 			if (e) {
 				e.preventDefault();
 				e.stopPropagation();
+
+				if (!e.dataTransfer || !e.dataTransfer.types || e.dataTransfer.types.indexOf('Files') === -1) {
+					return;
+				}
 			}
+
 			var _app_ = this;
+			_app_.drag_counter++;
 			_app_.drag_over = true;
 		},
 		handle_drag_over: function(e = false) {
@@ -317,16 +324,20 @@ var pubbox_form_app_mixin = Object({
 				e.stopPropagation();
 				e.dataTransfer.dropEffect = 'copy';
 			}
-			var _app_ = this;
-			_app_.drag_over = true;
 		},
 		handle_drag_leave: function(e = false) {
 			if (e) {
 				e.preventDefault();
 				e.stopPropagation();
 			}
+
 			var _app_ = this;
-			_app_.drag_over = false;
+			_app_.drag_counter--;
+
+			if (_app_.drag_counter <= 0) {
+				_app_.drag_counter = 0;
+				_app_.drag_over = false;
+			}
 		},
 		handle_drop: function(e = false) {
 			if (e) {
@@ -335,6 +346,7 @@ var pubbox_form_app_mixin = Object({
 			}
 
 			var _app_ = this;
+			_app_.drag_counter = 0;
 			_app_.drag_over = false;
 
 			if (!e || !e.dataTransfer || !e.dataTransfer.files) {

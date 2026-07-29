@@ -1,6 +1,16 @@
 <div class="timeline-pubbox-container">
 	<form class="form" id="vue-pubbox-app-<?php echo($cl['pb_id']); ?>" v-on:submit="publish($event)" @dragenter="handle_drag_enter($event)" @dragover="handle_drag_over($event)" @dragleave="handle_drag_leave($event)" @drop="handle_drop($event)">
-		<div class="timeline-pubbox">
+		<div class="timeline-pubbox" v-bind:class="{'is-drag-over': drag_over}">
+			<div class="timeline-pubbox__dropzone" v-if="drag_over">
+				<div class="pubbox-dropzone">
+					<span class="pubbox-dropzone__icon">
+						<?php echo cl_ficon("image"); ?>
+					</span>
+					<span class="pubbox-dropzone__label">
+						<?php echo cl_translate("Drop your images here"); ?>
+					</span>
+				</div>
+			</div>
 			<div class="timeline-pubbox__header">
 				<div class="timeline-pubbox__textinput">
 					<div class="pubbox-avatar">
