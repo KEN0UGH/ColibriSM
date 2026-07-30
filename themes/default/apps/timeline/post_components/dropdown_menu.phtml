@@ -162,6 +162,47 @@
 					<?php echo cl_ficon('shield_error'); ?>
 				</span>
 			</a>
+			<?php if (not_empty($cl['is_logged'])): ?>
+				<div class="dropdown-divider"></div>
+				<?php if (not_empty($cl['li']['is_muted'])): ?>
+					<a class="dropdown-item" href="javascript:void(0);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon('eye_show'); ?>
+						</span>
+						<span class="flex-item" data-action="unmute" onclick="SMColibri.mute(this);" data-user-name="<?php echo($cl['li']['owner']['name']); ?>" data-id="<?php echo($cl['li']['owner']['id']); ?>">
+							<?php echo cl_translate('Unmute this user'); ?>
+						</span>
+					</a>
+				<?php else: ?>
+					<a class="dropdown-item" href="javascript:void(0);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon('eye_hide'); ?>
+						</span>
+						<span class="flex-item" data-action="mute" onclick="SMColibri.mute(this);" data-user-name="<?php echo($cl['li']['owner']['name']); ?>" data-id="<?php echo($cl['li']['owner']['id']); ?>">
+							<?php echo cl_translate('Mute this user'); ?>
+						</span>
+					</a>
+				<?php endif; ?>
+				<?php if (not_empty($cl['li']['is_blocked'])): ?>
+					<a class="dropdown-item" href="javascript:void(0);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon('checkmark'); ?>
+						</span>
+						<span class="flex-item" data-action="unblock" onclick="SMColibri.block(this);" data-id="<?php echo($cl['li']['owner']['id']); ?>">
+							<?php echo cl_translate('Unblock this user'); ?>
+						</span>
+					</a>
+				<?php else: ?>
+					<a class="dropdown-item" href="javascript:void(0);">
+						<span class="flex-item dropdown-item-icon">
+							<?php echo cl_ficon('block'); ?>
+						</span>
+						<span class="flex-item" data-action="block" onclick="SMColibri.block(this);" data-id="<?php echo($cl['li']['owner']['id']); ?>">
+							<?php echo cl_translate('Block this user'); ?>
+						</span>
+					</a>
+				<?php endif; ?>
+			<?php endif; ?>
 		<?php endif; ?>
 		<?php if (not_empty($cl['li']['is_owner'])): ?>
 			<div class="dropdown-divider"></div>

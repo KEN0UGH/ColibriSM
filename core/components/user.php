@@ -646,6 +646,14 @@ function cl_delete_user_data($user_id = false) {
                 $qr = $db->delete(T_BLOCKS);
             /*====================================*/
 
+            /*===== Delete user mutes =====*/
+                $db = $db->where('user_id', $user_id);
+                $qr = $db->delete(T_MUTES);
+                
+                $db = $db->where('profile_id', $user_id);
+                $qr = $db->delete(T_MUTES);
+            /*====================================*/
+
             /*===== Delete user aff payouts =====*/
                 $db = $db->where('user_id', $user_id);
                 $qr = $db->delete(T_AFF_PAYOUTS);
@@ -983,6 +991,24 @@ function cl_is_blocked($user_id = false, $profile_id = false) {
     $db  = $db->where('user_id', $user_id);
     $db  = $db->where('profile_id', $profile_id);
     $res = $db->getValue(T_BLOCKS, 'COUNT(id)');
+    
+    return is_posnum($res);
+}
+
+function cl_is_muted($user_id = false, $profile_id = false) {
+    global $db;
+
+    if (is_posnum($user_id) != true || is_posnum($profile_id) != true) {
+        return false;
+    }
+
+    else if($user_id == $profile_id) {
+        return false;
+    }
+
+    $db  = $db->where('user_id', $user_id);
+    $db  = $db->where('profile_id', $profile_id);
+    $res = $db->getValue(T_MUTES, 'COUNT(id)');
     
     return is_posnum($res);
 }
@@ -1720,6 +1746,57 @@ function cl_get_blocked_users() {
         't_users'  => T_USERS,
         't_blocks' => T_BLOCKS,
         'user_id'  => $cl['me']['id']
+    ));
+
+    $users = $db->rawQuery($sql);
+
+    if (cl_queryset($users)) {
+        foreach ($users as $row) {
+            $row['about']        = cl_rn_strip($row['about']);
+            $row['about']        = stripslashes($row['about']);
+            $row['name']         = cl_strf("%s %s",$row['fname'],$row['lname']);      
+            $row['avatar']       = cl_get_media($row['avatar']);
+            $row['url']          = cl_link($row['username']);
+            $row['country_a2c']  = fetch_or_get($cl['country_codes'][$row['country_id']], 'us');
+            $row['country_name'] = cl_translate($cl['countries'][$row['country_id']], 'Unknown');
+
+            $data[] = $row;
+        }
+    }
+
+    return $data;
+}
+
+function cl_get_muted_user_ids($user_id = false) {
+    global $db, $cl;
+
+    if (not_num($user_id)) {
+        return array();
+    }
+
+    else {
+        $db    = $db->where('user_id', $user_id);
+        $users = $db->get(T_MUTES, null, array('profile_id'));
+        $data  = array();
+
+        if (cl_queryset($users)) {
+            foreach ($users as $row) {
+                $data[] = $row['profile_id'];
+            }
+        }
+
+        return $data;
+    }
+}
+
+function cl_get_muted_users() {
+    global $db, $cl;
+
+    $data          = array();
+    $sql           = cl_sqltepmlate('components/sql/user/fetch_muted_users', array(
+        't_users' => T_USERS,
+        't_mutes' => T_MUTES,
+        'user_id' => $cl['me']['id']
     ));
 
     $users = $db->rawQuery($sql);

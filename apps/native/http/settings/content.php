@@ -29,9 +29,10 @@ else{
 	$cl["sbr"]           = true;
 	$cl["sbl"]           = true;
 	$cl["blocked_users"] = cl_get_blocked_users();
+	$cl["muted_users"]   = cl_get_muted_users();
 	$cl["settings_app"]  = fetch_or_get($_GET["sapp"], false);
 	$cl["settings_app"]  = (not_empty($cl["settings_app"])) ? cl_text_secure($cl["settings_app"]) : 0;
-	$cl["settings_apps"] = array("name", "email", "phone", "siteurl", "bio", "gender", "password", "language", "country", "city", "verification", "privacy", "notifications", "blocked", "delete", "information", "email_notifs", "cont_monetization", "social_links", "alt_accounts");
+	$cl["settings_apps"] = array("name", "email", "phone", "siteurl", "bio", "gender", "password", "language", "country", "city", "verification", "privacy", "notifications", "blocked", "muted", "delete", "information", "email_notifs", "cont_monetization", "social_links", "alt_accounts");
 	$cl["page_tab"] = fetch_or_get($_GET["stab"], false);
 
 	if (not_empty($cl["settings_app"]) && in_array($cl["settings_app"], $cl["settings_apps"])) {

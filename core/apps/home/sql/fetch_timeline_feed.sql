@@ -10,6 +10,8 @@ SELECT posts.`id` as offset_id, posts.`publication_id`, posts.`type`, posts.`use
 
 	AND (posts.`publication_id` NOT IN (SELECT `post_id` FROM `<?php echo($data['t_reports']); ?>` WHERE `user_id` = <?php echo($data['user_id']); ?>))
 
+	AND (posts.`user_id` NOT IN (SELECT `profile_id` FROM `<?php echo($data['t_mutes']); ?>` WHERE `user_id` = <?php echo($data['user_id']); ?>))
+
 
 
 	<?php if($data['onset']): ?>

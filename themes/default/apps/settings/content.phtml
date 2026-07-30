@@ -420,6 +420,26 @@
 				</div>
 			</a>
 		<?php endif; ?>
+		<?php if (not_empty($cl["muted_users"])): ?>
+			<a href="<?php echo cl_link("settings/muted"); ?>" class="profile-settings__link" data-spa="true">
+				<div class="nav-list-item">
+					<div class="lp">
+						<?php echo cl_ficon("eye_hide"); ?>
+					</div>
+					<div class="mp">
+						<span class="preview-label">
+							<?php echo cl_translate("Muted users"); ?>
+						</span>
+						<span class="preview-value">
+							<?php echo cl_translate("Click to manage muted users"); ?>
+						</span>
+					</div>
+					<div class="rp">
+						<?php echo cl_ficon("open"); ?>
+					</div>
+				</div>
+			</a>
+		<?php endif; ?>
 		<div class="profile-settings__title">
 			<h4><?php echo cl_translate("My account information"); ?></h4>
 		</div>

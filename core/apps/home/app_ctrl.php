@@ -30,6 +30,7 @@ function cl_get_timeline_feed($limit = false, $offset = false, $onset = false) {
 		"t_pubs"    => T_PUBS,
 		"t_conns"   => T_CONNECTIONS,
 		"t_reports" => T_PUB_REPORTS,
+		"t_mutes"   => T_MUTES,
 		"limit"     => $limit,
 		"offset"    => $offset,
 		"onset"     => $onset,

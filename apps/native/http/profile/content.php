@@ -53,10 +53,12 @@ else{
 		if (not_empty($cl["is_logged"])) {
 			$cl['prof_user']['is_blocked'] = false;
 			$cl['prof_user']['me_blocked'] = false;
+			$cl['prof_user']['is_muted']   = false;
 
 			if (($cl['prof_user']['id'] != $me['id'])) {
 				$cl['prof_user']['is_blocked'] = cl_is_blocked($me['id'], $cl['prof_user']['id']);
 				$cl['prof_user']['me_blocked'] = cl_is_blocked($cl['prof_user']['id'], $me['id']);
+				$cl['prof_user']['is_muted']   = cl_is_muted($me['id'], $cl['prof_user']['id']);
 			}
 
 			$cl['prof_user']['owner']            = ($cl['prof_user']['id'] == $me['id']);

@@ -519,6 +519,7 @@ function cl_post_data($post = array()) {
 	$post["is_blocked"]    = false;
 	$post["is_reported"]   = false;
 	$post["me_blocked"]    = false;
+	$post["is_muted"]      = false;
 	$post["can_see"]       = false;
 	$post["reply_to"]      = array();
 	$post["owner"]         = array(
@@ -638,6 +639,8 @@ function cl_post_data($post = array()) {
 		else if (cl_is_blocked($user_id, $post['user_id'])) {
 			$post['is_blocked'] = true;
 		}
+
+		$post['is_muted'] = cl_is_muted($user_id, $post['user_id']);
 
 		if (empty($post["can_see"]) && $post["priv_wcs"] == "followers") {
 			if (cl_is_following($user_id, $post["user_id"])) {

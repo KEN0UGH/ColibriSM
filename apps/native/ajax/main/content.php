@@ -1593,6 +1593,46 @@ else if($action == 'block') {
     }
 }
 
+else if($action == 'mute') {
+    if (empty($cl["is_logged"])) {
+        $data['status'] = 400;
+        $data['error']  = 'Invalid access token';
+    }
+    else {
+        $data['status']   = 404;
+        $data['err_code'] = 0;
+        $user_id          = fetch_or_get($_POST['id'], 0);
+
+
+        if (is_posnum($user_id) && $me['id'] != $user_id) {
+            
+            $udata = cl_raw_user_data($user_id);
+
+            if (not_empty($udata)) {
+            
+                if (cl_is_muted($me['id'], $user_id)) {
+                    $data['status'] = 200;
+
+                    cl_db_delete_item(T_MUTES, array(
+                        'user_id'    => $me['id'],
+                        'profile_id' => $user_id
+                    ));
+                }
+
+                else{
+                    
+                    $data['status']  = 200;
+                    $insert_id       = cl_db_insert(T_MUTES, array(
+                        'user_id'    => $me['id'],
+                        'profile_id' => $user_id,
+                        'time'       => time()
+                    ));
+                }
+            }
+        }
+    }
+}
+
 else if($action == 'post_privacy') {
     if (empty($cl["is_logged"])) {
         $data['status'] = 400;

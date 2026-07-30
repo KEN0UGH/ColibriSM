@@ -219,6 +219,28 @@
 									<?php endif; ?>
 								<?php endif; ?>
 
+								<?php if (not_empty($cl['is_logged']) && empty($cl['prof_user']['is_blocked']) && empty($cl['prof_user']['me_blocked'])): ?>
+									<?php if (not_empty($cl['prof_user']['is_muted'])): ?>
+										<a class="dropdown-item" href="javascript:void(0);">
+											<span class="flex-item dropdown-item-icon">
+												<?php echo cl_ficon("eye_show"); ?>
+											</span>
+											<span class="flex-item" data-action="unmute" onclick="SMColibri.mute(this);" data-user-name="<?php echo($cl['prof_user']['name']); ?>" data-id="<?php echo($cl['prof_user']['id']); ?>">
+												<?php echo cl_translate('Unmute user'); ?>
+											</span>
+										</a>
+									<?php else: ?>
+										<a class="dropdown-item" href="javascript:void(0);">
+											<span class="flex-item dropdown-item-icon">
+												<?php echo cl_ficon("eye_hide"); ?>
+											</span>
+											<span class="flex-item" data-action="mute" onclick="SMColibri.mute(this);" data-user-name="<?php echo($cl['prof_user']['name']); ?>" data-id="<?php echo($cl['prof_user']['id']); ?>">
+												<?php echo cl_translate('Mute this user'); ?>
+											</span>
+										</a>
+									<?php endif; ?>
+								<?php endif; ?>
+
 								<?php if (not_empty($cl['prof_user']['is_blocked'])): ?>
 									<a class="dropdown-item" href="javascript:void(0);">
 										<span class="flex-item dropdown-item-icon">

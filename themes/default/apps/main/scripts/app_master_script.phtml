@@ -1425,6 +1425,68 @@
 				}
 			}
 
+			_smc.mute = function(event = false) {
+				if (event) {
+					if (_smc.is_logged()) {
+						var target = $(event);
+
+				        if(target.data('action') == 'mute') {
+				        	target.data('action', 'unmute');
+
+							$.ajax({
+								url: '<?php echo cl_link("native_api/main/mute"); ?>',
+								type: 'POST',
+								dataType: 'json',
+								data: {id: target.data('id')},
+							}).done(function(data) {
+								if (data.status != 200) {
+									_smc.errorMSG();
+								}
+								else {
+									if (_smc.curr_pn == 'profile') {
+										_smc.spa_reload();
+									}
+									else if (_smc.curr_pn == 'home') {
+										var hp_tl_app = $('div[data-app="homepage"]');
+
+										hp_tl_app.find('div[data-an="entry-list"]').find('div[data-owner-id="{0}"]'.format(target.data('id'))).slideUp(200, function() {
+											$(this).remove();
+										});
+									}
+								}
+							});
+
+							cl_bs_notify("<?php echo cl_translate("You muted <b>@{0}</b>. Their posts will no longer appear in your main timeline."); ?>".format(target.data("user-name")), 3000, "success");
+				        }
+
+				        else if(target.data('action') == 'unmute') {
+				        	target.data('action', 'mute');
+
+							$.ajax({
+								url: '<?php echo cl_link("native_api/main/mute"); ?>',
+								type: 'POST',
+								dataType: 'json',
+								data: {id: target.data('id')},
+							}).done(function(data) {
+								if (data.status != 200) {
+									_smc.errorMSG();
+								}
+								else {
+									if (_smc.curr_pn == 'profile') {
+										_smc.spa_reload();
+									}
+								}
+							});
+
+							cl_bs_notify("<?php echo cl_translate("You unmuted <b>@{0}</b>"); ?>".format(target.data("user-name")), 3000, "success");
+				        }
+					}
+					else{
+						_smc.req_auth();
+					}
+				}
+			}
+
 			_smc.errorMSG = function() {
 				cl_bs_notify("<?php echo cl_translate("An error occurred while processing your request. Please try again later."); ?>", 5000, "error");
 			}
