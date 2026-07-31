@@ -597,6 +597,12 @@ function cl_post_data($post = array()) {
 		$post["is_owner"] = true;
 	}
 
+	/* Posts published "as" a linked alternate account still belong to the
+	   real, logged-in user for management purposes (edit/delete rights). */
+	else if (not_empty($user_id) && in_array($post['user_id'], cl_get_alt_account_ids($user_id))) {
+		$post["is_owner"] = true;
+	}
+
 	if (not_empty($cl["is_admin"]) || $post["priv_wcs"] == "everyone" || not_empty($post["is_owner"])) {
 		$post["can_see"] = true;
 	}
@@ -725,7 +731,6 @@ function cl_recursive_delete_post($post_id = false) {
 		foreach ($post_data['media'] as $row) {
 			if (in_array($row['type'], array('image', 'video', "document", "audio", "donation", "gif"))) {
 				cl_delete_media($row['src']);
-				cl_delete_media($og_data['image']);
 
 				if (not_empty($row['x']['image_thumb'])) {
 					cl_delete_media($row['x']['image_thumb']);
@@ -774,6 +779,22 @@ function cl_recursive_delete_post($post_id = false) {
 			}
 		}
 	}
+}
+
+function cl_owns_post($post_owner_id = 0) {
+	global $me;
+
+	if (empty($me) || not_num($post_owner_id)) {
+		return false;
+	}
+
+	if ((int) $post_owner_id === (int) $me['id']) {
+		return true;
+	}
+
+	/* The real, logged-in user also manages posts published "as" any of
+	   their linked alternate accounts (edit/delete/privacy rights). */
+	return in_array((int) $post_owner_id, cl_get_alt_account_ids($me['id']));
 }
 
 function cl_can_reply($thread_data = array()) {

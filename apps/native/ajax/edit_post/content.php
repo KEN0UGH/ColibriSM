@@ -29,7 +29,7 @@ else if ($action == 'get_data') {
 	$post_id          = cl_text_secure($post_id);
 	$cl['post_data']  = cl_raw_post_data($post_id);
 
-	if (not_empty($cl['post_data']) && $cl['post_data']["user_id"] == $me["id"] && empty($cl['post_data']["edited"])) {
+	if (not_empty($cl['post_data']) && cl_owns_post($cl['post_data']["user_id"]) && empty($cl['post_data']["edited"])) {
 		$cl['post_data']["htags"] = cl_listify_htags($cl['post_data']['text']);
 	    $cl['post_data']["text"]  = cl_tagify_htags($cl['post_data']['text'], $cl['post_data']["htags"]);
 	    
@@ -49,7 +49,7 @@ else if ($action == 'save_data') {
 	$max_post_length  = $cl["config"]["max_post_len"];
 
 
-	if (not_empty($post_data) && $post_data["user_id"] == $me["id"] && empty($post_data["edited"])) {
+	if (not_empty($post_data) && cl_owns_post($post_data["user_id"]) && empty($post_data["edited"])) {
 		$post_text = fetch_or_get($_POST['post_text'], "");
 		$post_text = cl_croptxt($post_text, $max_post_length);
 		$post_text = cl_upsert_htags($post_text);

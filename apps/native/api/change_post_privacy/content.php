@@ -33,7 +33,7 @@ else {
     if (is_posnum($post_id)) {
         $post_data = cl_raw_post_data($post_id);
 
-        if (not_empty($post_data) && $post_data["user_id"] == $me["id"] && in_array($priv_wcr, array("everyone", "mentioned", "followers"))) {
+        if (not_empty($post_data) && cl_owns_post($post_data["user_id"]) && in_array($priv_wcr, array("everyone", "mentioned", "followers"))) {
             cl_update_post_data($post_id, array(
                 "priv_wcr" => $priv_wcr
             ));

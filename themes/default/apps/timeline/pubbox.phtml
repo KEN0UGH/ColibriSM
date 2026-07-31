@@ -544,6 +544,49 @@
 							</div>
 						</button>
 					</div>
+					<div class="post-privacy" v-if="alt_accounts.length">
+						<button class="privacy-settings dropdown" type="button">
+							<div class="dropdown-toggle" data-toggle="dropdown">
+								<span class="d-inline-flex align-items-center flex-wn">
+									<span class="flex-item icon post-as-avatar">
+										<img v-if="post_as_account" v-bind:src="post_as_account.avatar" alt="Avatar">
+										<img v-else src="<?php echo($me['avatar']); ?>" alt="Avatar">
+									</span>
+									<span class="flex-item flex-grow-1 label">
+										<span v-if="post_as_account">@{{post_as_account.username}}</span>
+										<span v-else><?php echo cl_translate("Post as yourself"); ?></span>
+									</span>
+								</span>
+							</div>
+							<div class="dropdown-menu dropdown-icons">
+								<a class="dropdown-item" href="javascript:void(0);" v-on:click="post_as = 0">
+									<span class="flex-item dropdown-item-icon post-as-avatar">
+										<img src="<?php echo($me['avatar']); ?>" alt="Avatar">
+									</span>
+									<span class="flex-item">
+										<?php echo cl_translate("Post as yourself"); ?> (@<?php echo($me['raw_uname']); ?>)
+									</span>
+									<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_as == 0">
+										<?php echo cl_ficon('checkmark'); ?>
+									</span>
+								</a>
+								<template v-for="acc in alt_accounts">
+									<div class="dropdown-divider" v-bind:key="'divider-' + acc.id"></div>
+									<a class="dropdown-item" v-bind:key="acc.id" href="javascript:void(0);" v-on:click="post_as = acc.id">
+										<span class="flex-item dropdown-item-icon post-as-avatar">
+											<img v-bind:src="acc.avatar" alt="Avatar">
+										</span>
+										<span class="flex-item">
+											@{{acc.username}}
+										</span>
+										<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo" v-if="post_as == acc.id">
+											<?php echo cl_ficon('checkmark'); ?>
+										</span>
+									</a>
+								</template>
+							</div>
+						</button>
+					</div>
 					<div class="post-publication">
 						<button v-if="submitting" disabled="true" type="submit" class="btn-custom main-inline md">
 							<?php echo cl_translate("Publishing"); ?>...

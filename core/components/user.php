@@ -1376,9 +1376,19 @@ function cl_notify_user($data = array()) {
         return false;
     }
 
+    /* Allow the caller to attribute the notification to an explicit
+       notifier (e.g. an alternate account posting on behalf of the user)
+       instead of always defaulting to the current session user. */
+    $notifier_id = fetch_or_get($data['notifier_id'], $me['id']);
+    $notifier    = ((int) $notifier_id == (int) $me['id']) ? $me : cl_user_data($notifier_id);
+
+    if (empty($notifier)) {
+        $notifier = $me;
+    }
+
     if(cl_allow_user_notification($data['user_id'], $data['subject'])) {
         $total = cl_db_get_total(T_NOTIFS, array(
-            'notifier_id' => $me['id'],
+            'notifier_id' => $notifier['id'],
             'recipient_id' => $data['user_id'],
             'subject' => $data['subject'],
             'entry_id' => $data['entry_id']
@@ -1386,7 +1396,7 @@ function cl_notify_user($data = array()) {
 
         if (empty($total)) {
             cl_db_insert(T_NOTIFS, array(
-                'notifier_id' => $me['id'],
+                'notifier_id' => $notifier['id'],
                 'recipient_id' => $data['user_id'],
                 'status' => '0',
                 'entry_id' => $data['entry_id'],
@@ -1397,7 +1407,7 @@ function cl_notify_user($data = array()) {
         }
         else {
             cl_db_update(T_NOTIFS, array(
-                'notifier_id' => $me['id'],
+                'notifier_id' => $notifier['id'],
                 'recipient_id' => $data['user_id'],
                 'subject' => $data['subject'],
                 'entry_id' => $data['entry_id'],
@@ -1412,7 +1422,7 @@ function cl_notify_user($data = array()) {
 
         if (not_empty($recipient_push_data["web_device_id"])) {        
             cl_push_notify_user(array(
-                'notifier_id' => $me['id'],
+                'notifier_id' => $notifier['id'],
                 'recipient_id' => $data['user_id'],
                 'recipient_push_id' => $recipient_push_data["web_device_id"],
                 'entry_id' => $data['entry_id'],
@@ -1431,10 +1441,10 @@ function cl_notify_user($data = array()) {
             );
 
             $cl['enotif_data'] = array(
-                "url" => cl_link($me['username']),
+                "url" => cl_link($notifier['username']),
                 "subject" => $data['subject'],
-                "user_avatar" => $me['avatar'],
-                "user_name" => $me['name'],
+                "user_avatar" => $notifier['avatar'],
+                "user_name" => $notifier['name'],
                 "title" => array(
                     "verified" => cl_translate('Your verification request has been accepted'),
                     "reply" => cl_translate('Replied to your post'),
@@ -1449,14 +1459,14 @@ function cl_notify_user($data = array()) {
                 ),
                 "notif_text" => array(
                     "verified" => cl_translate('Congratulations! Your account has been successfully verified. Click on the link below to learn more'),
-                    "reply" => cl_translate('User <b>@{@user_name@}</b> replied to your post. Click on the link below to learn more', array("user_name" => $me["name"])),
-                    "subscribe" => cl_translate('User <b>@{@user_name@}</b> started following you. Click on the link below to learn more', array("user_name" => $me["name"])),
-                    "subscribe_request" => cl_translate('User <b>@{@user_name@}</b> wants to follow you. Click on the link below to learn more', array("user_name" => $me["name"])),
-                    "subscribe_accept" => cl_translate('User <b>@{@user_name@}</b> accepted your follow request. Click on the link below to learn more', array("user_name" => $me["name"])),
-                    "mention" => cl_translate('User <b>@{@user_name@}</b> mentioned you in a post.', array("user_name" => $me["name"])),
-                    "like" => cl_translate('User <b>@{@user_name@}</b> liked your post.', array("user_name" => $me["name"])),
-                    "repost" => cl_translate('User <b>@{@user_name@}</b> shared your publication.', array("user_name" => $me["name"])),
-                    "visit" => cl_translate('User <b>@{@user_name@}</b> visited your profile.', array("user_name" => $me["name"])),
+                    "reply" => cl_translate('User <b>@{@user_name@}</b> replied to your post. Click on the link below to learn more', array("user_name" => $notifier["name"])),
+                    "subscribe" => cl_translate('User <b>@{@user_name@}</b> started following you. Click on the link below to learn more', array("user_name" => $notifier["name"])),
+                    "subscribe_request" => cl_translate('User <b>@{@user_name@}</b> wants to follow you. Click on the link below to learn more', array("user_name" => $notifier["name"])),
+                    "subscribe_accept" => cl_translate('User <b>@{@user_name@}</b> accepted your follow request. Click on the link below to learn more', array("user_name" => $notifier["name"])),
+                    "mention" => cl_translate('User <b>@{@user_name@}</b> mentioned you in a post.', array("user_name" => $notifier["name"])),
+                    "like" => cl_translate('User <b>@{@user_name@}</b> liked your post.', array("user_name" => $notifier["name"])),
+                    "repost" => cl_translate('User <b>@{@user_name@}</b> shared your publication.', array("user_name" => $notifier["name"])),
+                    "visit" => cl_translate('User <b>@{@user_name@}</b> visited your profile.', array("user_name" => $notifier["name"])),
                     "ad_approval" => cl_translate('Congratulations! Your add has been approved. Click on the link below to learn more')
                 )
             );
@@ -1474,7 +1484,7 @@ function cl_notify_user($data = array()) {
                 'from_name'    => $cl['config']['name'],
                 'to_email'     => $cl['enotif_user']['email'],
                 'to_name'      => $cl['enotif_user']['name'],
-                'subject'      => cl_strf("%s - %s", $me['name'], $cl['enotif_data']['title'][$data['subject']]),
+                'subject'      => cl_strf("%s - %s", $notifier['name'], $cl['enotif_data']['title'][$data['subject']]),
                 'charSet'      => 'UTF-8',
                 'is_html'      => true,
                 'message_body' => cl_template('emails/notification')
@@ -1631,21 +1641,24 @@ function cl_get_user_mentions($text = "") {
     return $users;
 }
 
-function cl_notify_mentioned_users($users = array(), $post_id = false) {
+function cl_notify_mentioned_users($users = array(), $post_id = false, $notifier_id = null) {
     global $db, $cl, $me;
 
     if (empty($cl['is_logged']) || is_posnum($post_id) != true) {
         return false;
     }
 
+    $notifier_id = fetch_or_get($notifier_id, $me['id']);
+
     foreach ($users as $username) {
         $uid = cl_get_user_id_by_name($username);
 
-        if ($uid && ($uid != $me['id'])) {
+        if ($uid && ($uid != $notifier_id)) {
             cl_notify_user(array(
-                'subject'  => 'mention',
-                'user_id'  => $uid,
-                'entry_id' => $post_id
+                'subject'     => 'mention',
+                'user_id'     => $uid,
+                'entry_id'    => $post_id,
+                'notifier_id' => $notifier_id
             ));
         }
     }

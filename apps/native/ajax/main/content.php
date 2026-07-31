@@ -705,9 +705,26 @@ else if ($action == 'publish_new_post') {
         $post_privacy     = fetch_or_get($_POST['privacy'], "everyone");
 		$post_maturity    = fetch_or_get($_POST['maturity'], "general");
         $post_incognito    = fetch_or_get($_POST['incognito'], "cognito");
+        $post_as_id       = fetch_or_get($_POST['post_as'], 0);
         $post_text        = cl_censore_post_text($post_text);
         $post_text        = cl_croptxt($post_text, $max_post_length);
         $thread_data      = array();
+
+        /* If "post_as" targets a linked alternate account, publish the post
+           under that account's identity instead of the current session user. */
+        $author = $me;
+
+        if (is_numeric($post_as_id) && (int) $post_as_id > 0 && (int) $post_as_id != (int) $me['id']) {
+            $post_as_id = (int) $post_as_id;
+
+            if (in_array($post_as_id, cl_get_alt_account_ids($me['id']))) {
+                $post_as_user = cl_user_data($post_as_id);
+
+                if (not_empty($post_as_user)) {
+                    $author = $post_as_user;
+                }
+            }
+        }
 
         if (not_empty($thread_id)) {
             $thread_data  = cl_raw_post_data($thread_id);
@@ -738,15 +755,16 @@ else if ($action == 'publish_new_post') {
             $post_text      = cl_upsert_htags($post_text);
             $mentions       = cl_get_user_mentions($post_text);
             $post_data_update = array(
+                "user_id"   => $author['id'],
                 "text"      => cl_text_secure($post_text),
                 "status"    => "active",
                 "thread_id" => $thread_id,
                 "time"      => time(),
-                "priv_wcs"  => $me["profile_privacy"],
+                "priv_wcs"  => $author["profile_privacy"],
                 "priv_wcr"  => $post_privacy,
-				"mature_wcs"  => $me["mark_maturity"],
+				"mature_wcs"  => $author["mark_maturity"],
 				"mature_wcr"  => $post_maturity,
-				"incognito_wcs"  => $me["profile_incognito"],
+				"incognito_wcs"  => $author["profile_incognito"],
                 "incognito_wcr"  => $post_incognito
             );
 
@@ -773,14 +791,14 @@ else if ($action == 'publish_new_post') {
             
             if (empty($thread_id)) {
                 cl_db_insert(T_POSTS, array(
-                    "user_id"        => $me['id'],
+                    "user_id"        => $author['id'],
                     "publication_id" => $post_id,
                     "time"           => time()
                 ));
 
-                $data['posts_total'] = ($me['posts'] += 1);
+                $data['posts_total'] = ($author['posts'] += 1);
                 
-                cl_update_user_data($me['id'], array(
+                cl_update_user_data($author['id'], array(
                     'posts' => $data['posts_total']
                 ));
             }
@@ -792,11 +810,12 @@ else if ($action == 'publish_new_post') {
                     "target" => "pub_reply"
                 ));
 
-                if ($thread_data['user_id'] != $me['id']) {
+                if ($thread_data['user_id'] != $author['id']) {
                     cl_notify_user(array(
-                        'subject'  => 'reply',
-                        'user_id'  => $thread_data['user_id'],
-                        'entry_id' => $post_id
+                        'subject'     => 'reply',
+                        'user_id'     => $thread_data['user_id'],
+                        'entry_id'    => $post_id,
+                        'notifier_id' => $author['id']
                     ));
                 }
             }
@@ -808,7 +827,7 @@ else if ($action == 'publish_new_post') {
             }
 
             if (not_empty($mentions)) {
-                cl_notify_mentioned_users($mentions, $post_id);
+                cl_notify_mentioned_users($mentions, $post_id, $author['id']);
             }
 
             cl_delete_post_junk_files($post_data['id'], $post_data['type']);
@@ -820,17 +839,17 @@ else if ($action == 'publish_new_post') {
                 $post_text      = cl_upsert_htags($post_text);
                 $mentions       = cl_get_user_mentions($post_text);
                 $insert_data    = array(
-                    "user_id"   => $me['id'],
+                    "user_id"   => $author['id'],
                     "text"      => cl_text_secure($post_text),
                     "status"    => "active",
                     "type"      => "text",
                     "thread_id" => $thread_id,
                     "time"      => time(),
-                    "priv_wcs"  => $me["profile_privacy"],
+                    "priv_wcs"  => $author["profile_privacy"],
                     "priv_wcr"  => $post_privacy,
-					"mature_wcs"  => $me["mark_maturity"],
+					"mature_wcs"  => $author["mark_maturity"],
 					"mature_wcr"  => $post_maturity,
-					"incognito_wcs"  => $me["profile_incognito"],
+					"incognito_wcs"  => $author["profile_incognito"],
 					"incognito_wcr"  => $post_incognito
                 );
 
@@ -908,15 +927,15 @@ else if ($action == 'publish_new_post') {
 
                     if (empty($thread_id)) {
                         cl_db_insert(T_POSTS, array(
-                            "user_id" => $me['id'],
+                            "user_id" => $author['id'],
                             "publication_id" => $post_id,
                             "time" => time()
                         ));
 
 
-                        $data['posts_total'] = ($me['posts'] += 1);
+                        $data['posts_total'] = ($author['posts'] += 1);
 
-                        cl_update_user_data($me['id'], array(
+                        cl_update_user_data($author['id'], array(
                             'posts' => $data['posts_total']
                         ));
                     }
@@ -928,11 +947,12 @@ else if ($action == 'publish_new_post') {
                             "target" => "pub_reply"
                         ));
 
-                        if ($thread_data['user_id'] != $me['id']) {
+                        if ($thread_data['user_id'] != $author['id']) {
                             cl_notify_user(array(
-                                'subject'  => 'reply',
-                                'user_id'  => $thread_data['user_id'],
-                                'entry_id' => $post_id
+                                'subject'     => 'reply',
+                                'user_id'     => $thread_data['user_id'],
+                                'entry_id'    => $post_id,
+                                'notifier_id' => $author['id']
                             ));
                         }
                     }
@@ -953,7 +973,7 @@ else if ($action == 'publish_new_post') {
                     }
 
                     if (not_empty($mentions)) {
-                        cl_notify_mentioned_users($mentions, $post_id);
+                        cl_notify_mentioned_users($mentions, $post_id, $author['id']);
                     }
                 }
             }
@@ -1136,7 +1156,7 @@ else if($action == 'delete_post') {
         if (is_posnum($post_id)) {
             $post_data = cl_raw_post_data($post_id);
 
-            if (not_empty($post_data) && ($post_data['user_id'] == $me['id'] || not_empty($cl["is_admin"]))) {
+            if (not_empty($post_data) && (cl_owns_post($post_data['user_id']) || not_empty($cl["is_admin"]))) {
 
                 $post_owner = cl_raw_user_data($post_data['user_id']);
 

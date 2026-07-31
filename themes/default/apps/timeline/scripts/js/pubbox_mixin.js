@@ -32,6 +32,22 @@ var pubbox_form_app_mixin = Object({
 			post_privacy: "everyone",
 			post_maturity: "general",
 			post_incognito: "cognito",
+			post_as: 0,
+			alt_accounts: <?php
+				$_pubbox_alt_accounts = array();
+
+				foreach (cl_get_alt_accounts($me['id']) as $_pubbox_alt_account) {
+					$_pubbox_alt_accounts[] = array(
+						"id"       => (int) $_pubbox_alt_account['id'],
+						"name"     => $_pubbox_alt_account['name'],
+						"username" => $_pubbox_alt_account['raw_uname'],
+						"avatar"   => $_pubbox_alt_account['avatar'],
+						"verified" => ((int) fetch_or_get($_pubbox_alt_account['verified'], 0) === 1) ? 1 : 0
+					);
+				}
+
+				echo json($_pubbox_alt_accounts, true);
+			?>,
 			og_imported: false,
 			progress_bar_status: false,
 			progress_bar_value: 1,
@@ -225,6 +241,21 @@ var pubbox_form_app_mixin = Object({
 
 				return true;
 			}
+		},
+		post_as_account: function() {
+			var _app_ = this;
+
+			if (cl_empty(_app_.post_as) || _app_.post_as == 0) {
+				return null;
+			}
+
+			for (var i = 0; i < _app_.alt_accounts.length; i++) {
+				if (_app_.alt_accounts[i].id == _app_.post_as) {
+					return _app_.alt_accounts[i];
+				}
+			}
+
+			return null;
 		}
 	},
 	methods: {
@@ -469,7 +500,8 @@ var pubbox_form_app_mixin = Object({
 					poll_data: _app_.poll,
 					donation_amount: _app_.donation.donate_amount,
 					maturity: _app_.post_maturity,
-					incognito: _app_.post_incognito
+					incognito: _app_.post_incognito,
+					post_as: _app_.post_as
 				},
 				beforeSend: function() {
 					_app_.submitting = true;
