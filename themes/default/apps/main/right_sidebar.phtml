@@ -122,6 +122,41 @@
 						<?php endif; ?>
 					</div>
 				</div>
+
+				<?php if (not_empty($cl['is_logged'])): ?>
+					<div class="sidebar-content sidebar-content_user_lists">
+						<div class="sidebar-content__header">
+							<?php echo cl_translate("Your lists"); ?>
+						</div>
+						<div class="sidebar-content__body">
+							<?php if (not_empty($cl['user_sidebar_lists'])): ?>
+								<div class="sidebar-hashtags">
+									<?php foreach ($cl['user_sidebar_lists'] as $row): ?>
+										<div class="sidebar-hashtags__item" title="<?php echo cl_translate('Members'); ?> <?php echo cl_number($row['member_count']); ?>">
+											<a class="sidebar-hashtags__item-data" href="<?php echo cl_link(cl_strf('lists?list_id=%d', $row['id'])); ?>" data-spa="true">
+												<span class="icon">
+													<?php echo cl_icon("list"); ?>
+												</span>
+												<span class="text">
+													<?php echo cl_croptxt($row['name'], 30, '...'); ?>
+												</span>
+											</a>
+										</div>
+									<?php endforeach; ?>
+								</div>
+							<?php else: ?>
+								<div class="sidebar-content-empty">
+									<?php echo cl_translate("Create a list to organize accounts and view their posts in one feed"); ?>
+								</div>
+							<?php endif; ?>
+						</div>
+						<div class="sidebar-content__footer">
+							<a href="<?php echo cl_link('lists'); ?>" data-spa="true">
+								<?php echo cl_translate("Show more"); ?>
+							</a>
+						</div>
+					</div>
+				<?php endif; ?>
 			</div>
 			<div class="right-sidebar__footer">
 				<?php echo cl_template('main/footer'); ?>

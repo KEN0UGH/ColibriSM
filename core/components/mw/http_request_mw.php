@@ -19,6 +19,7 @@
 
 $cl['follow_suggestion'] = cl_get_follow_suggestions(5);
 $cl['hot_topics']        = cl_get_hot_topics(15);
+$cl['user_sidebar_lists'] = ((not_empty($cl['is_logged'])) ? cl_get_user_lists($me['id']) : false);
 $cl['visitor_uniqid']    = null;
 
 if (empty($_COOKIE['visid'])) {
