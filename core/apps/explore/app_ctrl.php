@@ -18,14 +18,15 @@
 # @*************************************************************************@
 
 function cl_search_hashtags($keyword = "", $offset = false, $limit = 30) {
-	global $db;
+	global $db, $cl, $me;
 
-    $data    = array();
-    $db      = $db->where('posts', '0', '>');
-    $db      = $db->orderBy('posts','DESC');
-    $db      = $db->orderBy('time','DESC');
-    $keyword = ltrim($keyword,'#');
-    $db      = (not_empty($keyword)) ? $db->where('tag', "%{$keyword}%", 'LIKE') : $db;
+    $data     = array();
+    $user_id  = ((not_empty($cl['is_logged'])) ? $me['id'] : false);
+    $db       = $db->where('posts', '0', '>');
+    $db       = $db->orderBy('posts','DESC');
+    $db       = $db->orderBy('time','DESC');
+    $keyword  = ltrim($keyword,'#');
+    $db       = (not_empty($keyword)) ? $db->where('tag', "%{$keyword}%", 'LIKE') : $db;
 
     if (is_posnum($offset)) {
         $tags = $db->get(T_HTAGS, array($offset, $limit));
@@ -37,6 +38,10 @@ function cl_search_hashtags($keyword = "", $offset = false, $limit = 30) {
 
     if (cl_queryset($tags)) {
     	foreach ($tags as $tag_data) {
+            if (not_empty($user_id) && cl_is_text_muted($user_id, cl_strf("#%s", $tag_data['tag']))) {
+                continue;
+            }
+
             $tag_data['tag']     = cl_rn_strip($tag_data['tag']);
     		$tag_data['hashtag'] = cl_strf("#%s", $tag_data['tag']);
     		$tag_data['url']     = cl_link(cl_strf("explore/posts?q=%s", cl_remove_emoji($tag_data['tag'])));
@@ -56,6 +61,7 @@ function cl_search_people($keyword = "", $offset = false, $limit = 30) {
     $sql           = cl_sqltepmlate('apps/explore/sql/fetch_people',array(
         't_users'  => T_USERS,
         't_blocks' => T_BLOCKS,
+        't_mutes'  => T_MUTES,
         'user_id'  => $user_id,
         'limit'    => $limit,
         'offset'   => $offset,
@@ -103,6 +109,7 @@ function cl_search_posts($keyword = "", $offset = false, $limit = 10) {
 	$sql            = cl_sqltepmlate("apps/explore/sql/fetch_posts",array(
 		"t_pubs"    => T_PUBS,
         "t_blocks"  => T_BLOCKS,
+        "t_mutes"   => T_MUTES,
         "t_conns"   => T_CONNECTIONS,
         't_reports' => T_PUB_REPORTS,
 		"keyword"   => $keyword,
@@ -117,6 +124,10 @@ function cl_search_posts($keyword = "", $offset = false, $limit = 10) {
 
 	if (cl_queryset($query_res)) {
 		foreach ($query_res as $row) {
+			if (not_empty($user_id) && $row['user_id'] != $user_id && cl_is_text_muted($user_id, $row['text'])) {
+				continue;
+			}
+
 			$data[] = cl_post_data($row);
 
             if ($cl['config']['advertising_system'] == 'on') {

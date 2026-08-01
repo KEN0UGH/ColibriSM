@@ -1,0 +1,91 @@
+<div class="timeline-container">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp">
+				<div class="nav-link-holder">
+					<a href="<?php echo cl_link("settings/muted_words"); ?>" data-spa="true">
+						<?php echo cl_translate("Muted words"); ?>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link("home"); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<span class="go-back" onclick="SMColibri.go_back();">
+						<?php echo cl_ficon('arrow_back'); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="profile-settings">
+		<div class="profile-settings__content">
+			<div class="form-group">
+				<label>
+					<?php echo cl_translate("Add a word or sentence to mute"); ?>
+				</label>
+				<div class="d-flex flex-wn">
+					<input type="text" class="form-control" data-an="muted-word-input" maxlength="150" placeholder="<?php echo cl_translate("E.g. a word, hashtag or sentence"); ?>">
+					<button type="button" class="btn-custom main-inline md ml-2" onclick="SMColibri.mute_word();">
+						<?php echo cl_translate("Mute"); ?>
+					</button>
+				</div>
+				<small>
+					<?php echo cl_translate("Posts on your main timeline containing this word or sentence will be hidden. This does not affect other users or their profiles."); ?>
+				</small>
+			</div>
+		</div>
+		<div class="profile-settings__content profile-settings__content_no-padding">
+			<div class="timeline-users-container" data-an="muted-words-list">
+				<?php if (not_empty($cl["muted_words"])): ?>
+					<div class="timeline-user-ls">
+						<?php foreach ($cl["muted_words"] as $cl['li']): ?>
+							<div class="user-list-item" data-muted-word-item="<?php echo($cl['li']['id']); ?>">
+								<div class="user-list-item__data">
+									<div class="user-data">
+										<div class="user-data__body">
+											<div class="user-data__body-topline">
+												<div class="flex-item-left">
+													<div class="user-data__name">
+														<?php echo htmlspecialchars($cl['li']['word'], ENT_QUOTES); ?>
+													</div>
+												</div>
+												<div class="flex-item-right">
+													<div class="user-data__ctrls">
+														<button onclick="SMColibri.unmute_word(this);" class="btn btn-custom md main-grey" data-id="<?php echo($cl['li']['id']); ?>">
+															<?php echo cl_translate("Unmute"); ?>
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				<?php else: ?>
+					<div class="timeline-placeholder" data-an="muted-words-empty">
+						<div class="icon">
+							<div class="icon__bg">
+								<?php echo cl_ficon('eye_hide'); ?>
+							</div>
+						</div>
+						<div class="pl-message">
+							<h4>
+								<?php echo cl_translate("No muted words yet!"); ?>
+							</h4>
+							<p>
+								<?php echo cl_translate("Words or sentences you mute will be hidden from your main timeline and listed here."); ?>
+							</p>
+						</div>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+	</div>
+</div>

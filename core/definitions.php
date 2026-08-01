@@ -36,6 +36,7 @@ define("T_VERIFICATIONS", "cl_verifications");
 define("T_PROF_REPORTS", "cl_profile_reports");
 define("T_BLOCKS", "cl_blocks");
 define("T_MUTES", "cl_mutes");
+define("T_MUTED_WORDS", "cl_muted_words");
 define("T_AFF_PAYOUTS", "cl_affiliate_payouts");
 define("T_ADS", "cl_ads");
 define("T_WALLET_HISTORY", "cl_wallet_history");

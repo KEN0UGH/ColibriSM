@@ -654,6 +654,11 @@ function cl_delete_user_data($user_id = false) {
                 $qr = $db->delete(T_MUTES);
             /*====================================*/
 
+            /*===== Delete user muted words =====*/
+                $db = $db->where('user_id', $user_id);
+                $qr = $db->delete(T_MUTED_WORDS);
+            /*====================================*/
+
             /*===== Delete user aff payouts =====*/
                 $db = $db->where('user_id', $user_id);
                 $qr = $db->delete(T_AFF_PAYOUTS);
@@ -1800,6 +1805,47 @@ function cl_get_muted_user_ids($user_id = false) {
 
         return $data;
     }
+}
+
+function cl_get_muted_words($user_id = false) {
+    global $db;
+
+    if (not_num($user_id)) {
+        return array();
+    }
+
+    $db = $db->where('user_id', $user_id);
+    $db = $db->orderBy('id', 'DESC');
+    $qr = $db->get(T_MUTED_WORDS);
+
+    return (cl_queryset($qr)) ? $qr : array();
+}
+
+function cl_is_text_muted($user_id = false, $text = '') {
+    if (not_num($user_id) || empty($text)) {
+        return false;
+    }
+
+    $muted_words = cl_get_muted_words($user_id);
+
+    if (empty($muted_words)) {
+        return false;
+    }
+
+    /* Raw post text stores hashtags as {#id:N#} placeholders, resolve them to #tag first */
+    $htags = cl_listify_htags($text);
+
+    if (not_empty($htags)) {
+        $text = cl_tagify_htags($text, $htags);
+    }
+
+    foreach ($muted_words as $muted_word) {
+        if (not_empty($muted_word['word']) && mb_stripos($text, $muted_word['word']) !== false) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function cl_get_muted_users() {

@@ -28,6 +28,8 @@ SELECT * FROM `<?php echo($data['t_pubs']); ?>`
 
 		AND `user_id` NOT IN (SELECT b2.`user_id` FROM `<?php echo($data['t_blocks']); ?>` b2 WHERE b2.`profile_id` = <?php echo($data['user_id']); ?>)
 
+		AND `user_id` NOT IN (SELECT `profile_id` FROM `<?php echo($data['t_mutes']); ?>` WHERE `user_id` = <?php echo($data['user_id']); ?>)
+
 		AND (`id` NOT IN (SELECT `post_id` FROM `<?php echo($data['t_reports']); ?>` WHERE `user_id` = <?php echo($data['user_id']); ?>))
 	<?php endif; ?>
 

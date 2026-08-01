@@ -1653,6 +1653,68 @@ else if($action == 'mute') {
     }
 }
 
+else if($action == 'mute_word') {
+    if (empty($cl["is_logged"])) {
+        $data['status'] = 400;
+        $data['error']  = 'Invalid access token';
+    }
+    else {
+        $data['status'] = 404;
+        $word           = cl_text_secure(fetch_or_get($_POST['word'], ''));
+
+        if (not_empty($word) && len_between($word, 1, 150)) {
+
+            $existing = cl_db_get_item(T_MUTED_WORDS, array(
+                'user_id' => $me['id'],
+                'word'    => $word
+            ));
+
+            if (empty($existing)) {
+                $insert_id = cl_db_insert(T_MUTED_WORDS, array(
+                    'user_id' => $me['id'],
+                    'word'    => $word,
+                    'time'    => time()
+                ));
+
+                if (is_posnum($insert_id)) {
+                    $data['status'] = 200;
+                    $data['item']   = array(
+                        'id'   => $insert_id,
+                        'word' => $word
+                    );
+                }
+            }
+            else {
+                $data['status']  = 400;
+                $data['error']   = 'This word or sentence is already muted';
+            }
+        }
+        else {
+            $data['error'] = 'Invalid word or sentence';
+        }
+    }
+}
+
+else if($action == 'unmute_word') {
+    if (empty($cl["is_logged"])) {
+        $data['status'] = 400;
+        $data['error']  = 'Invalid access token';
+    }
+    else {
+        $data['status'] = 404;
+        $id             = fetch_or_get($_POST['id'], 0);
+
+        if (is_posnum($id)) {
+            cl_db_delete_item(T_MUTED_WORDS, array(
+                'id'      => $id,
+                'user_id' => $me['id']
+            ));
+
+            $data['status'] = 200;
+        }
+    }
+}
+
 else if($action == 'post_privacy') {
     if (empty($cl["is_logged"])) {
         $data['status'] = 400;
@@ -1667,7 +1729,7 @@ else if($action == 'post_privacy') {
         if (is_posnum($post_id)) {
             $post_data = cl_raw_post_data($post_id);
 
-            if (not_empty($post_data) && $post_data["user_id"] == $me["id"] && in_array($priv_wcr, array("everyone", "mentioned", "followers"))) {
+            if (not_empty($post_data) && (cl_owns_post($post_data['user_id']) || not_empty($cl["is_admin"])) && in_array($priv_wcr, array("everyone", "mentioned", "followers"))) {
                 cl_update_post_data($post_id, array(
                     "priv_wcr" => $priv_wcr
                 ));
@@ -1692,7 +1754,7 @@ else if($action == 'post_maturity') {
         if (is_posnum($post_id)) {
             $post_data = cl_raw_post_data($post_id);
 
-            if (not_empty($post_data) && $post_data["user_id"] == $me["id"] && in_array($mature_wcr, array("general", "adult", "offensive"))) {
+            if (not_empty($post_data) && (cl_owns_post($post_data['user_id']) || not_empty($cl["is_admin"])) && in_array($mature_wcr, array("general", "adult", "offensive"))) {
                 cl_update_post_data($post_id, array(
                     "mature_wcr" => $mature_wcr
                 ));
@@ -1717,7 +1779,7 @@ else if($action == 'post_incognito') {
         if (is_posnum($post_id)) {
             $post_data = cl_raw_post_data($post_id);
 
-            if (not_empty($post_data) && $post_data["user_id"] == $me["id"] && in_array($incognito_wcr, array("cognito", "incognito"))) {
+            if (not_empty($post_data) && (cl_owns_post($post_data['user_id']) || not_empty($cl["is_admin"])) && in_array($incognito_wcr, array("cognito", "incognito"))) {
                 cl_update_post_data($post_id, array(
                     "incognito_wcr" => $incognito_wcr
                 ));

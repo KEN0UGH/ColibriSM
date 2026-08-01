@@ -1487,6 +1487,84 @@
 				}
 			}
 
+			_smc.mute_word = function() {
+				if (_smc.is_logged()) {
+					var input = $('input[data-an="muted-word-input"]');
+					var word  = $.trim(input.val());
+
+					if (word.length < 1) {
+						return;
+					}
+
+					$.ajax({
+						url: '<?php echo cl_link("native_api/main/mute_word"); ?>',
+						type: 'POST',
+						dataType: 'json',
+						data: {word: word},
+					}).done(function(data) {
+						if (data.status != 200) {
+							cl_bs_notify((data.error ? data.error : "<?php echo cl_translate("An error occurred while processing your request. Please try again later."); ?>"), 3000, "error");
+						}
+						else {
+							input.val('');
+
+							$('div[data-an="muted-words-empty"]').remove();
+
+							var list_container = $('div[data-an="muted-words-list"]');
+
+							if (list_container.find('.timeline-user-ls').length < 1) {
+								list_container.append('<div class="timeline-user-ls"></div>');
+							}
+
+							var item = $('<div class="user-list-item" data-muted-word-item="{0}"><div class="user-list-item__data"><div class="user-data"><div class="user-data__body"><div class="user-data__body-topline"><div class="flex-item-left"><div class="user-data__name"></div></div><div class="flex-item-right"><div class="user-data__ctrls"><button onclick="SMColibri.unmute_word(this);" class="btn btn-custom md main-grey" data-id="{0}"><?php echo cl_translate("Unmute"); ?></button></div></div></div></div></div></div></div>'.format(data.item.id));
+
+							item.find('.user-data__name').text(data.item.word);
+
+							list_container.find('.timeline-user-ls').prepend(item);
+
+							cl_bs_notify("<?php echo cl_translate("The word or sentence has been muted"); ?>", 3000, "success");
+						}
+					});
+				}
+				else{
+					_smc.req_auth();
+				}
+			}
+
+			_smc.unmute_word = function(event = false) {
+				if (event) {
+					if (_smc.is_logged()) {
+						var target = $(event);
+						var id     = target.data('id');
+
+						$.ajax({
+							url: '<?php echo cl_link("native_api/main/unmute_word"); ?>',
+							type: 'POST',
+							dataType: 'json',
+							data: {id: id},
+						}).done(function(data) {
+							if (data.status != 200) {
+								_smc.errorMSG();
+							}
+							else {
+								var list_container = $('div[data-an="muted-words-list"]');
+
+								list_container.find('div[data-muted-word-item="{0}"]'.format(id)).slideUp(200, function() {
+									$(this).remove();
+
+									if (list_container.find('div[data-muted-word-item]').length < 1) {
+										$(window).reloadPage();
+									}
+								});
+							}
+						});
+					}
+					else{
+						_smc.req_auth();
+					}
+				}
+			}
+
 			_smc.errorMSG = function() {
 				cl_bs_notify("<?php echo cl_translate("An error occurred while processing your request. Please try again later."); ?>", 5000, "error");
 			}

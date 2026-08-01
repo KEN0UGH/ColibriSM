@@ -440,6 +440,24 @@
 				</div>
 			</a>
 		<?php endif; ?>
+		<a href="<?php echo cl_link("settings/muted_words"); ?>" class="profile-settings__link" data-spa="true">
+			<div class="nav-list-item">
+				<div class="lp">
+					<?php echo cl_ficon("dismiss"); ?>
+				</div>
+				<div class="mp">
+					<span class="preview-label">
+						<?php echo cl_translate("Muted words"); ?>
+					</span>
+					<span class="preview-value">
+						<?php echo cl_translate("Click to manage muted words and sentences"); ?>
+					</span>
+				</div>
+				<div class="rp">
+					<?php echo cl_ficon("open"); ?>
+				</div>
+			</div>
+		</a>
 		<div class="profile-settings__title">
 			<h4><?php echo cl_translate("My account information"); ?></h4>
 		</div>

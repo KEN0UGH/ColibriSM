@@ -445,6 +445,18 @@
 {%end%}
 
 {%begin%}
+  CREATE TABLE `cl_muted_words` ( `id` int(11) NOT NULL, `user_id` int(11) NOT NULL DEFAULT '0', `word` varchar(150) NOT NULL DEFAULT '', `time` varchar(25) NOT NULL DEFAULT '0' ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_muted_words` ADD PRIMARY KEY(`id`);
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_muted_words` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+{%end%}
+
+{%begin%}
   CREATE TABLE `cl_affiliate_payouts` ( `id` INT(11) NOT NULL AUTO_INCREMENT ,  `user_id` INT(11) NOT NULL DEFAULT '0' ,  `amount` VARCHAR(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.00' ,  `bonuses` INT(11) NOT NULL DEFAULT '0' ,  `status` ENUM('pending','paid','declined') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'pending' ,  `time` VARCHAR(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,    PRIMARY KEY  (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci;
 {%end%}
 

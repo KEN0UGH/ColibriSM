@@ -8,6 +8,8 @@ SELECT `id`, `about`, `followers`, `following`, `posts`, `is_online`, `website`,
 		AND `id` NOT IN (SELECT b1.`profile_id` FROM `<?php echo($data['t_blocks']); ?>` b1 WHERE b1.`user_id` = <?php echo($data['user_id']); ?>)
 
 		AND `id` NOT IN (SELECT b2.`user_id` FROM `<?php echo($data['t_blocks']); ?>` b2 WHERE b2.`profile_id` = <?php echo($data['user_id']); ?>)
+
+		AND `id` NOT IN (SELECT `profile_id` FROM `<?php echo($data['t_mutes']); ?>` WHERE `user_id` = <?php echo($data['user_id']); ?>)
 	<?php endif; ?>
 
 	<?php if($data['keyword']): ?>

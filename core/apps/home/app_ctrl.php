@@ -47,9 +47,9 @@ function cl_get_timeline_feed($limit = false, $offset = false, $onset = false) {
 		foreach ($query_res as $row) {
 			$post_data = cl_raw_post_data($row['publication_id']);
 
-			
+			$is_word_muted = (not_empty($post_data) && $row['user_id'] != $me['id']) ? cl_is_text_muted($me['id'], $post_data['text']) : false;
 
-			if (not_empty($post_data) && in_array($post_data['status'], array('active'))) {
+			if (not_empty($post_data) && in_array($post_data['status'], array('active')) && empty($is_word_muted)) {
 				$post_data['offset_id']   = $row['offset_id'];
 				$post_data['is_repost']   = (($row['type'] == 'repost') ? true : false);
 				$post_data['is_reposter'] = false;
