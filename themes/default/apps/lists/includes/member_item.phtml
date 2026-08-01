@@ -1,0 +1,44 @@
+<div class="user-list-item" data-list-member="<?php echo $cl['li']['id']; ?>" data-member-offset="<?php echo $cl['li']['offset_id']; ?>">
+	<div class="user-list-item__avatar">
+		<a href="<?php echo $cl['li']['url']; ?>" class="block-link" data-spa="true">
+			<div class="user-avatar <?php if(cl_is_online($cl['li']['is_online'])) {echo "user-avatar-online";} ?>">
+				<img src="<?php echo $cl['li']['avatar']; ?>" alt="Avatar">
+			</div>
+		</a>
+	</div>
+	<div class="user-list-item__data">
+		<div class="user-data">
+			<div class="user-data__body">
+				<div class="user-data__body-topline">
+					<div class="flex-item-left">
+						<div class="user-data__name">
+							<a href="<?php echo $cl['li']['url']; ?>" data-spa="true">
+								<span class="user-name-holder">
+									<span class="user-name-holder__name">
+										<?php echo $cl['li']['name']; ?>
+									</span>
+									<?php if ($cl['li']['verified'] == '1'): ?>
+										<span class="user-name-holder__badge">
+											<?php echo cl_icon('verified_user_badge'); ?>
+										</span>
+									<?php endif; ?>
+								</span>
+							</a>
+						</div>
+						<div class="user-data__about">
+							@<?php echo $cl['li']['username']; ?>
+							<?php if (not_empty($cl['li']['about'])): ?>
+								| <?php echo $cl['li']['about']; ?>
+							<?php endif; ?>
+						</div>
+					</div>
+					<div class="flex-item-right">
+						<button type="button" class="btn btn-custom main-gray md" data-an="remove-member" data-member-id="<?php echo $cl['li']['id']; ?>">
+							<?php echo cl_translate('Remove'); ?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

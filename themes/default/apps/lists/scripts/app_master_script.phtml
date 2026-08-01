@@ -1,0 +1,183 @@
+<script>
+	"use strict";
+
+	jQuery(document).ready(function($) {
+		var _app = $('[data-app="lists"]');
+
+		_app.find('[data-an="lists-tab-btn"]').on('click', function(event) {
+			event.preventDefault();
+			var _self = $(this);
+			var tab   = _self.data('tab');
+
+			_app.find('[data-an="lists-tab-btn"]').removeClass('active');
+			_self.addClass('active');
+			_app.find('[data-an="lists-tab-panel"]').removeClass('active');
+			_app.find('[data-an="lists-tab-panel"][data-tab="' + tab + '"]').addClass('active');
+			SMColibri.fix_sidebars();
+		});
+
+		_app.find('form[data-an="create-list-form"]').on('submit', function(event) {
+			event.preventDefault();
+			var _self = $(this);
+			var _btn  = _self.find('[data-an="create-list-btn"]');
+
+			$.ajax({
+				url: '<?php echo cl_link("native_api/lists/create"); ?>',
+				type: 'POST',
+				dataType: 'json',
+				data: _self.serialize(),
+				beforeSend: function() {
+					_btn.attr('disabled', 'true').text("<?php echo cl_translate('Please wait'); ?>");
+				}
+			}).done(function(data) {
+				if (data.status == 200 && data.redirect_url) {
+					SMColibri.spa_load(data.redirect_url);
+				}
+				else {
+					cl_bs_notify((data.error || '<?php echo cl_translate('Something went wrong'); ?>'), 3000, 'danger');
+				}
+			}).always(function() {
+				_btn.removeAttr('disabled').text("<?php echo cl_translate('Create list'); ?>");
+			});
+		});
+
+		_app.find('form[data-an="add-member-form"]').on('submit', function(event) {
+			event.preventDefault();
+			var _self = $(this);
+			var _btn  = _self.find('[data-an="add-member-btn"]');
+
+			$.ajax({
+				url: '<?php echo cl_link("native_api/lists/add_member"); ?>',
+				type: 'POST',
+				dataType: 'json',
+				data: _self.serialize(),
+				beforeSend: function() {
+					_btn.attr('disabled', 'true').text("<?php echo cl_translate('Please wait'); ?>");
+				}
+			}).done(function(data) {
+				if (data.status == 200) {
+					SMColibri.spa_reload();
+				}
+				else {
+					cl_bs_notify((data.error || '<?php echo cl_translate('Something went wrong'); ?>'), 3000, 'danger');
+				}
+			}).always(function() {
+				_btn.removeAttr('disabled').text("<?php echo cl_translate('Add to list'); ?>");
+			});
+		});
+
+		_app.find('[data-an="remove-member"]').on('click', function(event) {
+			event.preventDefault();
+			var _self    = $(this);
+			var memberId = _self.data('member-id');
+			var listId   = _app.find('form[data-an="add-member-form"] input[name="list_id"]').val();
+
+			SMColibri.confirm_action({
+				title: "<?php echo cl_translate('Remove member'); ?>",
+				message: "<?php echo cl_translate('This user will stop appearing in this list timeline.'); ?>",
+				btn_1: "<?php echo cl_translate('Cancel'); ?>",
+				btn_2: "<?php echo cl_translate('Remove'); ?>"
+			}).done(function() {
+				$.ajax({
+					url: '<?php echo cl_link("native_api/lists/remove_member"); ?>',
+					type: 'POST',
+					dataType: 'json',
+					data: {list_id: listId, member_id: memberId}
+				}).done(function(data) {
+					if (data.status == 200) {
+						SMColibri.spa_reload();
+					}
+					else {
+						cl_bs_notify((data.error || '<?php echo cl_translate('Something went wrong'); ?>'), 3000, 'danger');
+					}
+				});
+			});
+		});
+
+		_app.find('[data-an="delete-list"]').on('click', function(event) {
+			event.preventDefault();
+			var listId = $(this).data('list-id');
+
+			SMColibri.confirm_action({
+				title: "<?php echo cl_translate('Delete this list'); ?>",
+				message: "<?php echo cl_translate('The list and all of its members will be removed.'); ?>",
+				btn_1: "<?php echo cl_translate('Cancel'); ?>",
+				btn_2: "<?php echo cl_translate('Delete'); ?>"
+			}).done(function() {
+				$.ajax({
+					url: '<?php echo cl_link("native_api/lists/delete"); ?>',
+					type: 'POST',
+					dataType: 'json',
+					data: {list_id: listId}
+				}).done(function(data) {
+					if (data.status == 200 && data.redirect_url) {
+						SMColibri.spa_load(data.redirect_url);
+					}
+					else {
+						cl_bs_notify((data.error || '<?php echo cl_translate('Something went wrong'); ?>'), 3000, 'danger');
+					}
+				});
+			});
+		});
+
+		_app.find('button[data-an="load-more"]').on('click', function(event) {
+			event.preventDefault();
+			var entryList = _app.find('[data-an="entry-list"]');
+			var lastLi    = entryList.find('div[data-post-offset]').last();
+			var _self     = $(this);
+
+			if (lastLi.length) {
+				$.ajax({
+					url: '<?php echo cl_link("native_api/lists/load_more"); ?>',
+					type: 'GET',
+					dataType: 'json',
+					data: {
+						list_id: _self.data('list-id'),
+						offset: lastLi.data('post-offset')
+					},
+					beforeSend: function() {
+						_self.attr('disabled', 'true').text("<?php echo cl_translate('Please wait'); ?>");
+					}
+				}).done(function(data) {
+					if (data.status == 200) {
+						entryList.append(data.html);
+						_self.removeAttr('disabled').text("<?php echo cl_translate('Show more'); ?>");
+					}
+					else {
+						_self.text("<?php echo cl_translate('That is all for now!'); ?>");
+					}
+				});
+			}
+		});
+
+		_app.find('button[data-an="load-more-members"]').on('click', function(event) {
+			event.preventDefault();
+			var memberList = _app.find('[data-an="list-members"]');
+			var lastLi     = memberList.find('div[data-member-offset]').last();
+			var _self      = $(this);
+
+			if (lastLi.length) {
+				$.ajax({
+					url: '<?php echo cl_link("native_api/lists/load_more_members"); ?>',
+					type: 'GET',
+					dataType: 'json',
+					data: {
+						list_id: _self.data('list-id'),
+						offset: lastLi.data('member-offset')
+					},
+					beforeSend: function() {
+						_self.attr('disabled', 'true').text("<?php echo cl_translate('Please wait'); ?>");
+					}
+				}).done(function(data) {
+					if (data.status == 200) {
+						memberList.append(data.html);
+						_self.removeAttr('disabled').text("<?php echo cl_translate('Show more'); ?>");
+					}
+					else {
+						_self.text("<?php echo cl_translate('That is all for now!'); ?>");
+					}
+				});
+			}
+		});
+	});
+</script>

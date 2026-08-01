@@ -415,6 +415,59 @@
 				$('div[data-app="black-hole"]').append($(modal)).find('div.info-popup-modal').modal('show');
 			}
 
+			_smc.list_picker_ctx = {
+				user_id: false,
+				username: false
+			};
+
+			_smc.close_add_to_list_modal = function() {
+				$('div[data-app="black-hole"]').find('div[data-an="add-to-list-modal"]').modal('hide');
+			}
+
+			_smc.render_add_to_list_modal = function(username = "", lists = []) {
+				var options = "";
+
+				if (lists.length) {
+					for (var i = 0; i < lists.length; i++) {
+						options += "<option value='" + lists[i].id + "'>" + lists[i].name + "</option>";
+					}
+				}
+
+				var listBlock = (lists.length)
+					? "<form data-an='add-to-list-form'><div class='form-group'><label><?php echo cl_translate('Choose a list'); ?></label><select name='list_id' class='form-control'>" + options + "</select></div><div class='form-group mb-0'><button type='submit' class='btn btn-custom main-inline md btn-block' data-an='submit-add-to-list'><?php echo cl_translate('Add to list'); ?></button></div></form>"
+					: "<div class='alert alert-light mb-4'><?php echo cl_translate('You have no lists yet. Create one below and this user will be added immediately.'); ?></div>";
+
+				return "<div class='modal fadeIn' data-an='add-to-list-modal' tabindex='-1' data-onclose='remove' role='dialog' aria-hidden='true' data-keyboard='false' data-backdrop='static'><div class='modal-dialog modal-md' role='document'><div class='modal-content'><div class='modal-header'><div class='modal-header__inner'><h5 class='modal-title'><?php echo cl_translate('Add to list'); ?></h5><span class='dismiss-modal' data-dismiss='modal'><?php echo str_replace('"', '\'', cl_ficon('dismiss')); ?></span></div></div><div class='modal-body'><p class='mb-4'><?php echo cl_translate('Choose where to save this account'); ?> <strong>@" + username + "</strong></p>" + listBlock + "<hr><form data-an='create-inline-list-form'><div class='form-group'><label><?php echo cl_translate('Create a new list'); ?></label><input type='text' class='form-control' name='name' maxlength='60' placeholder='<?php echo cl_translate('List name'); ?>'></div><div class='form-group'><textarea class='form-control' name='about' maxlength='190' rows='3' placeholder='<?php echo cl_translate('Optional short description'); ?>'></textarea></div><div class='form-group mb-0'><button type='submit' class='btn btn-custom main-outline md btn-block' data-an='submit-create-inline-list'><?php echo cl_translate('Create and add'); ?></button></div></form></div></div></div></div>";
+			}
+
+			_smc.open_add_to_list = function(user_id = false, username = "") {
+				if (_smc.is_logged()) {
+					if ($.isNumeric(user_id) && user_id && username) {
+						$.ajax({
+							url: '<?php echo cl_link("native_api/lists/fetch"); ?>',
+							type: 'GET',
+							dataType: 'json',
+							beforeSend: function() {
+								_smc.user_lbox_rm();
+							}
+						}).done(function(data) {
+							if (data.status == 200) {
+								_smc.list_picker_ctx.user_id  = Number(user_id);
+								_smc.list_picker_ctx.username = username;
+								$('div[data-app="black-hole"]').find('div[data-an="add-to-list-modal"]').remove();
+								$('div[data-app="black-hole"]').append($(_smc.render_add_to_list_modal(username, (data.items || [])))).find('div[data-an="add-to-list-modal"]').modal('show');
+							}
+							else {
+								_smc.errorMSG();
+							}
+						});
+					}
+				}
+				else {
+					_smc.req_auth();
+				}
+			}
+
 			_smc.vote_poll = function(id = false, index = false) {
 				if (_smc.is_logged()) {
 					if ($.isNumeric(id) && $.isNumeric(index)) {
@@ -1886,6 +1939,89 @@ timeline.find('[data-el="timeline-content"]').html($(data.html)).promise().done(
     		event.preventDefault();
     		SMColibri.toggleSB();
     	});
+
+		$(document).on('submit', 'form[data-an="add-to-list-form"]', function(event) {
+			event.preventDefault();
+
+			var _self   = $(this);
+			var _submit = _self.find('[data-an="submit-add-to-list"]');
+			var list_id = _self.find('select[name="list_id"]').val();
+
+			if ($.isNumeric(list_id) && list_id) {
+				$.ajax({
+					url: '<?php echo cl_link("native_api/lists/add_member"); ?>',
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						list_id: list_id,
+						username: SMColibri.list_picker_ctx.username
+					},
+					beforeSend: function() {
+						_submit.attr('disabled', 'true').text("<?php echo cl_translate('Please wait'); ?>");
+					}
+				}).done(function(data) {
+					if (data.status == 200) {
+						cl_bs_notify("<?php echo cl_translate('User added to your list'); ?>", 3000, 'success');
+						SMColibri.close_add_to_list_modal();
+
+						if (SMColibri.curr_pn == 'lists') {
+							SMColibri.spa_reload();
+						}
+					}
+					else {
+						cl_bs_notify((data.error || '<?php echo cl_translate('Something went wrong'); ?>'), 3000, 'danger');
+					}
+				}).always(function() {
+					_submit.removeAttr('disabled').text("<?php echo cl_translate('Add to list'); ?>");
+				});
+			}
+		});
+
+		$(document).on('submit', 'form[data-an="create-inline-list-form"]', function(event) {
+			event.preventDefault();
+
+			var _self   = $(this);
+			var _submit = _self.find('[data-an="submit-create-inline-list"]');
+
+			$.ajax({
+				url: '<?php echo cl_link("native_api/lists/create"); ?>',
+				type: 'POST',
+				dataType: 'json',
+				data: _self.serialize(),
+				beforeSend: function() {
+					_submit.attr('disabled', 'true').text("<?php echo cl_translate('Please wait'); ?>");
+				}
+			}).done(function(data) {
+				if (data.status == 200 && $.isNumeric(data.list_id)) {
+					$.ajax({
+						url: '<?php echo cl_link("native_api/lists/add_member"); ?>',
+						type: 'POST',
+						dataType: 'json',
+						data: {
+							list_id: data.list_id,
+							username: SMColibri.list_picker_ctx.username
+						}
+					}).done(function(addData) {
+						if (addData.status == 200) {
+							cl_bs_notify("<?php echo cl_translate('List created and user added'); ?>", 3000, 'success');
+							SMColibri.close_add_to_list_modal();
+
+							if (SMColibri.curr_pn == 'lists') {
+								SMColibri.spa_reload();
+							}
+						}
+						else {
+							cl_bs_notify((addData.error || '<?php echo cl_translate('List created, but the user could not be added'); ?>'), 4000, 'danger');
+						}
+					});
+				}
+				else {
+					cl_bs_notify((data.error || '<?php echo cl_translate('Something went wrong'); ?>'), 3000, 'danger');
+				}
+			}).always(function() {
+				_submit.removeAttr('disabled').text("<?php echo cl_translate('Create and add'); ?>");
+			});
+		});
 
     	SMColibri.update_plyr();
 

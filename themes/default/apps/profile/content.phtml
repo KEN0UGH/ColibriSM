@@ -120,6 +120,17 @@
 												<?php echo cl_ficon("open"); ?>
 											</span>
 										</a>
+										<a class="dropdown-item" href="javascript:void(0);" onclick="SMColibri.open_add_to_list('<?php echo($cl['prof_user']['id']); ?>','<?php echo($cl['prof_user']['username']); ?>');">
+											<span class="flex-item dropdown-item-icon">
+												<?php echo cl_ficon("people"); ?>
+											</span>
+											<span class="flex-item">
+												<?php echo cl_translate('Add to list'); ?>
+											</span>
+											<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+												<?php echo cl_ficon("open"); ?>
+											</span>
+										</a>
 									<?php endif; ?>
 									<div class="dropdown-divider"></div>
 								<?php endif; ?>

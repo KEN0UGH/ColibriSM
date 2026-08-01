@@ -659,6 +659,27 @@ function cl_delete_user_data($user_id = false) {
                 $qr = $db->delete(T_MUTED_WORDS);
             /*====================================*/
 
+            /*===== Delete user lists =====*/
+                $lists = cl_db_get_items(T_LISTS, array(
+                    'owner_id' => $user_id
+                ));
+
+                if (not_empty($lists)) {
+                    foreach ($lists as $list) {
+                        cl_db_delete_item(T_LIST_MEMBERS, array(
+                            'list_id' => $list['id']
+                        ));
+                    }
+
+                    cl_db_delete_item(T_LISTS, array(
+                        'owner_id' => $user_id
+                    ));
+                }
+
+                $db = $db->where('member_id', $user_id);
+                $qr = $db->delete(T_LIST_MEMBERS);
+            /*====================================*/
+
             /*===== Delete user aff payouts =====*/
                 $db = $db->where('user_id', $user_id);
                 $qr = $db->delete(T_AFF_PAYOUTS);
@@ -1015,6 +1036,31 @@ function cl_is_muted($user_id = false, $profile_id = false) {
     $db  = $db->where('profile_id', $profile_id);
     $res = $db->getValue(T_MUTES, 'COUNT(id)');
     
+    return is_posnum($res);
+}
+
+function cl_is_list_member($list_id = false, $member_id = false, $owner_id = false) {
+    global $db;
+
+    if (is_posnum($list_id) != true || is_posnum($member_id) != true) {
+        return false;
+    }
+
+    if (is_posnum($owner_id)) {
+        $list_data = cl_db_get_item(T_LISTS, array(
+            'id'       => $list_id,
+            'owner_id' => $owner_id
+        ));
+
+        if (empty($list_data)) {
+            return false;
+        }
+    }
+
+    $db  = $db->where('list_id', $list_id);
+    $db  = $db->where('member_id', $member_id);
+    $res = $db->getValue(T_LIST_MEMBERS, 'COUNT(id)');
+
     return is_posnum($res);
 }
 
@@ -1843,6 +1889,107 @@ function cl_is_text_muted($user_id = false, $text = '') {
         if (not_empty($muted_word['word']) && mb_stripos($text, $muted_word['word']) !== false) {
             return true;
         }
+    }
+
+    return false;
+}
+
+function cl_get_user_lists($owner_id = false) {
+    global $db;
+
+    if (is_posnum($owner_id) != true) {
+        return false;
+    }
+
+    $data = array();
+    $db   = $db->where('owner_id', $owner_id);
+    $db   = $db->orderBy('id', 'DESC');
+    $qr   = $db->get(T_LISTS);
+
+    if (cl_queryset($qr)) {
+        foreach ($qr as $row) {
+            $row['member_count'] = cl_db_get_total(T_LIST_MEMBERS, array(
+                'list_id' => $row['id']
+            ), 'COUNT(id)');
+
+            $data[] = $row;
+        }
+
+        return $data;
+    }
+
+    return false;
+}
+
+function cl_get_user_list($list_id = false, $owner_id = false) {
+    if (is_posnum($list_id) != true || is_posnum($owner_id) != true) {
+        return false;
+    }
+
+    $list = cl_db_get_item(T_LISTS, array(
+        'id'       => $list_id,
+        'owner_id' => $owner_id
+    ));
+
+    if (not_empty($list)) {
+        $list['member_count'] = cl_db_get_total(T_LIST_MEMBERS, array(
+            'list_id' => $list_id
+        ), 'COUNT(id)');
+
+        return $list;
+    }
+
+    return false;
+}
+
+function cl_get_list_members($list_id = false, $owner_id = false, $limit = false, $offset = false) {
+    global $db, $cl;
+
+    if (is_posnum($list_id) != true || is_posnum($owner_id) != true) {
+        return false;
+    }
+
+    if (empty(cl_get_user_list($list_id, $owner_id))) {
+        return false;
+    }
+
+    $data = array();
+    $sql  = cl_sqltepmlate('components/sql/user/fetch_list_members', array(
+        't_users'        => T_USERS,
+        't_list_members' => T_LIST_MEMBERS,
+        'list_id'        => $list_id,
+        'limit'          => $limit,
+        'offset'         => $offset
+    ));
+
+    $query_result = $db->rawQuery($sql);
+
+    if (cl_queryset($query_result)) {
+        foreach ($query_result as $row) {
+            $row['about']            = cl_rn_strip($row['about']);
+            $row['about']            = stripslashes($row['about']);
+            $row['name']             = cl_strf("%s %s", $row['fname'], $row['lname']);
+            $row['avatar']           = cl_get_media($row['avatar']);
+            $row['url']              = cl_link($row['username']);
+            $row['is_following']     = false;
+            $row['follow_requested'] = false;
+            $row['is_user']          = false;
+            $row['country_a2c']      = fetch_or_get($cl['country_codes'][$row['country_id']], 'us');
+            $row['country_name']     = cl_translate($cl['countries'][$row['country_id']], 'Unknown');
+
+            if (not_empty($cl['is_logged'])) {
+                $row['is_following'] = cl_is_following($cl['me']['id'], $row['id']);
+                $row['is_user']      = ($cl['me']['id'] == $row['id']);
+
+                if (empty($row['is_following']) && empty($row['is_user'])) {
+                    $row['follow_requested'] = cl_follow_requested($cl['me']['id'], $row['id']);
+                }
+            }
+
+            $data[] = $row;
+        }
+
+        return $data;
     }
 
     return false;

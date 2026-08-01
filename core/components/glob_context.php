@@ -38,6 +38,7 @@ $applications       = array(
     "thread"        => true,
     "feed"          => true,
     "bookmarks"     => true,
+    "lists"         => true,
     "stat_pages"    => true,
     "notifications" => true,
     "affiliates"    => true,

@@ -167,6 +167,16 @@
 						</a>
 					</span>
 				</div>
+				<div data-navitem="lists" class="sidebar__nav-item <?php if($cl['pn'] == 'lists') {echo('active');} ?>">
+					<span class="icon">
+						<?php echo cl_ficon('people'); ?>
+					</span>
+					<span class="text">
+						<a href="<?php echo cl_link("lists"); ?>" data-spa="true">
+							<?php echo cl_translate('Lists'); ?>
+						</a>
+					</span>
+				</div>
 				<div class="sidebar__nav-item">
 					<span class="icon">
 						<?php echo cl_ficon('content_settings'); ?>

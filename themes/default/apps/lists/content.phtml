@@ -1,0 +1,218 @@
+<div class="timeline-container" data-app="lists">
+	<div class="timeline-header" data-el="tl-header">
+		<div class="timeline-header__botline">
+			<div class="lp">
+				<div class="nav-link-holder">
+					<a href="<?php echo cl_link('lists'); ?>" data-spa="true">
+						<?php echo cl_translate('Lists'); ?>
+					</a>
+				</div>
+			</div>
+			<div class="cp">
+				<a href="<?php echo cl_link('/'); ?>">
+					<img src="{%config site_logo%}" alt="Logo">
+				</a>
+			</div>
+			<div class="rp">
+				<div class="nav-link-holder">
+					<span class="go-back" onclick="SMColibri.go_back();">
+						<?php echo cl_ficon('arrow_back'); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="profile-settings lists-page-section lists-page-section_create">
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate('Create a list'); ?></h4>
+		</div>
+		<form class="form" data-an="create-list-form" autocomplete="off">
+			<div class="form-group">
+				<label><?php echo cl_translate('List name'); ?></label>
+				<input type="text" class="form-control" name="name" maxlength="60" placeholder="<?php echo cl_translate('E.g. Designers, Friends, News'); ?>">
+			</div>
+			<div class="form-group">
+				<label><?php echo cl_translate('Description'); ?></label>
+				<textarea class="form-control" name="about" maxlength="190" rows="3" placeholder="<?php echo cl_translate('Optional short description'); ?>"></textarea>
+			</div>
+			<div class="form-group mb-0">
+				<button type="submit" class="btn btn-custom main-inline lg" data-an="create-list-btn">
+					<?php echo cl_translate('Create list'); ?>
+				</button>
+			</div>
+		</form>
+
+		<?php if (not_empty($cl['prefill_username']) && empty($cl['current_list'])): ?>
+			<div class="timeline-placeholder mt-3">
+				<div class="pl-message">
+					<h4><?php echo cl_strf('%s @%s', cl_translate('Add to a list'), $cl['prefill_username']); ?></h4>
+					<p><?php echo cl_translate('Create a list or open one below to add this user.'); ?></p>
+				</div>
+			</div>
+		<?php endif; ?>
+	</div>
+
+	<div class="profile-settings lists-page-section lists-page-section_overview">
+		<div class="profile-settings__title">
+			<h4><?php echo cl_translate('Your lists'); ?></h4>
+		</div>
+
+		<?php if (not_empty($cl['user_lists'])): ?>
+			<div class="lists-directory" data-an="lists-directory">
+				<?php foreach ($cl['user_lists'] as $list): ?>
+					<a href="<?php echo cl_link(cl_strf('lists/%s', $list['id'])); ?><?php echo ((not_empty($cl['prefill_username'])) ? cl_strf('?add=%s', $cl['prefill_username']) : ''); ?>" class="profile-settings__link lists-directory__link" data-spa="true">
+						<div class="nav-list-item lists-directory__item <?php if (not_empty($cl['current_list']) && $cl['current_list']['id'] == $list['id']) { echo('active'); } ?>">
+							<div class="lp">
+								<?php echo cl_ficon('people'); ?>
+							</div>
+							<div class="mp">
+								<span class="preview-label"><?php echo $list['name']; ?></span>
+								<span class="preview-value">
+									<?php if (not_empty($list['about'])): ?>
+										<?php echo $list['about']; ?>
+									<?php else: ?>
+										<?php echo cl_strf('%s %s', cl_number($list['member_count']), cl_translate('members')); ?>
+									<?php endif; ?>
+								</span>
+								<span class="lists-directory__meta"><?php echo cl_strf('%s %s', cl_number($list['member_count']), cl_translate('members')); ?></span>
+							</div>
+							<div class="rp">
+								<?php echo cl_ficon('open'); ?>
+							</div>
+						</div>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		<?php else: ?>
+			<div class="timeline-placeholder">
+				<div class="icon">
+					<div class="icon__bg">
+						<?php echo cl_ficon('people'); ?>
+					</div>
+				</div>
+				<div class="pl-message">
+					<h4><?php echo cl_translate('No lists yet!'); ?></h4>
+					<p><?php echo cl_translate('Create your first list to group accounts into a custom timeline.'); ?></p>
+				</div>
+			</div>
+		<?php endif; ?>
+	</div>
+
+	<?php if (not_empty($cl['current_list'])): ?>
+		<div class="profile-settings lists-page-section lists-page-section_current">
+			<div class="profile-settings__title d-flex align-items-center justify-content-between">
+				<h4><?php echo $cl['current_list']['name']; ?></h4>
+				<button type="button" class="btn btn-custom main-red md" data-an="delete-list" data-list-id="<?php echo $cl['current_list']['id']; ?>">
+					<?php echo cl_translate('Delete list'); ?>
+				</button>
+			</div>
+
+			<?php if (not_empty($cl['current_list']['about'])): ?>
+				<p><?php echo $cl['current_list']['about']; ?></p>
+			<?php endif; ?>
+
+			<p class="mb-4"><?php echo cl_strf('%s %s', cl_number($cl['current_list']['member_count']), cl_translate('members')); ?></p>
+
+			<form class="form" data-an="add-member-form" autocomplete="off">
+				<input type="hidden" name="list_id" value="<?php echo $cl['current_list']['id']; ?>">
+				<div class="form-group">
+					<label><?php echo cl_translate('Add a user'); ?></label>
+					<input type="text" class="form-control" name="username" maxlength="25" placeholder="<?php echo cl_translate('Enter a username'); ?>" value="<?php echo $cl['prefill_username']; ?>">
+				</div>
+				<div class="form-group mb-0">
+					<button type="submit" class="btn btn-custom main-inline lg" data-an="add-member-btn">
+						<?php echo cl_translate('Add to list'); ?>
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="timeline-navbar timeline-navbar_border-top lists-tabs-nav" data-an="lists-tabs">
+			<div class="timeline-navbar__item">
+				<button type="button" class="timeline-navbar__item-btn active" data-an="lists-tab-btn" data-tab="feed">
+					<span class="btn-flex-inner"><?php echo cl_translate('Feed'); ?></span>
+				</button>
+			</div>
+			<div class="timeline-navbar__item">
+				<button type="button" class="timeline-navbar__item-btn" data-an="lists-tab-btn" data-tab="members">
+					<span class="btn-flex-inner"><?php echo cl_translate('Members'); ?></span>
+				</button>
+			</div>
+		</div>
+
+		<div class="lists-tab-panel active" data-an="lists-tab-panel" data-tab="feed">
+			<?php if (not_empty($cl['list_feed'])): ?>
+				<div class="timeline-posts-container">
+					<div class="timeline-posts-ls" data-an="entry-list">
+						<?php foreach ($cl['list_feed'] as $cl['li']): ?>
+							<?php echo cl_template('timeline/post'); ?>
+						<?php endforeach; ?>
+					</div>
+
+					<?php if (count($cl['list_feed']) == 30): ?>
+						<div class="timeline-data-loader">
+							<button class="timeline-data-loader__btn" data-an="load-more" data-list-id="<?php echo $cl['current_list']['id']; ?>">
+								<?php echo cl_translate('Show more'); ?>
+							</button>
+						</div>
+					<?php endif; ?>
+				</div>
+			<?php else: ?>
+				<?php echo cl_template('home/includes/no_posts'); ?>
+			<?php endif; ?>
+		</div>
+
+		<div class="lists-tab-panel" data-an="lists-tab-panel" data-tab="members">
+			<div class="profile-settings profile-settings_compact">
+				<div class="profile-settings__title">
+					<h4><?php echo cl_translate('Members'); ?></h4>
+				</div>
+
+				<?php if (not_empty($cl['list_members'])): ?>
+					<div class="timeline-users-container timeline-users-container_compact">
+						<div class="timeline-user-ls" data-an="list-members">
+							<?php foreach ($cl['list_members'] as $cl['li']): ?>
+								<?php echo cl_template('lists/includes/member_item'); ?>
+							<?php endforeach; ?>
+						</div>
+
+						<?php if (count($cl['list_members']) == 50): ?>
+							<div class="timeline-data-loader">
+								<button class="timeline-data-loader__btn" data-an="load-more-members" data-list-id="<?php echo $cl['current_list']['id']; ?>">
+									<?php echo cl_translate('Show more'); ?>
+								</button>
+							</div>
+						<?php endif; ?>
+					</div>
+				<?php else: ?>
+					<div class="timeline-placeholder">
+						<div class="icon">
+							<div class="icon__bg">
+								<?php echo cl_ficon('people'); ?>
+							</div>
+						</div>
+						<div class="pl-message">
+							<h4><?php echo cl_translate('No members yet!'); ?></h4>
+							<p><?php echo cl_translate('Add usernames to start building this custom timeline.'); ?></p>
+						</div>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+	<?php elseif (not_empty($cl['user_lists'])): ?>
+		<div class="timeline-placeholder">
+			<div class="icon">
+				<div class="icon__bg">
+					<?php echo cl_ficon('people'); ?>
+				</div>
+			</div>
+			<div class="pl-message">
+				<h4><?php echo cl_translate('Select a list'); ?></h4>
+				<p><?php echo cl_translate('Open one of your lists to see the posts from its members.'); ?></p>
+			</div>
+		</div>
+	<?php endif; ?>
+
+	<?php echo cl_template('lists/scripts/app_master_script'); ?>
+</div>

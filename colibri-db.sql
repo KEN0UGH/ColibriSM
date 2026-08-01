@@ -457,6 +457,38 @@
 {%end%}
 
 {%begin%}
+  CREATE TABLE `cl_lists` ( `id` int(11) NOT NULL, `owner_id` int(11) NOT NULL DEFAULT '0', `name` varchar(60) NOT NULL DEFAULT '', `about` varchar(190) NOT NULL DEFAULT '', `time` varchar(25) NOT NULL DEFAULT '0' ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_lists` ADD PRIMARY KEY(`id`);
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_lists` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_lists` ADD KEY `owner_id` (`owner_id`);
+{%end%}
+
+{%begin%}
+  CREATE TABLE `cl_list_members` ( `id` int(11) NOT NULL, `list_id` int(11) NOT NULL DEFAULT '0', `member_id` int(11) NOT NULL DEFAULT '0', `time` varchar(25) NOT NULL DEFAULT '0' ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_list_members` ADD PRIMARY KEY(`id`);
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_list_members` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+{%end%}
+
+{%begin%}
+  ALTER TABLE `cl_list_members` ADD UNIQUE KEY `list_member_unique` (`list_id`,`member_id`), ADD KEY `list_id` (`list_id`), ADD KEY `member_id` (`member_id`);
+{%end%}
+
+{%begin%}
   CREATE TABLE `cl_affiliate_payouts` ( `id` INT(11) NOT NULL AUTO_INCREMENT ,  `user_id` INT(11) NOT NULL DEFAULT '0' ,  `amount` VARCHAR(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.00' ,  `bonuses` INT(11) NOT NULL DEFAULT '0' ,  `status` ENUM('pending','paid','declined') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'pending' ,  `time` VARCHAR(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,    PRIMARY KEY  (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci;
 {%end%}
 

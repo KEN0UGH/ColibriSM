@@ -86,6 +86,11 @@
 					</button>
 				<?php endif; ?>
 			<?php endif; ?>
+			<?php if (not_empty($cl['is_logged'])): ?>
+				<button onclick="SMColibri.open_add_to_list('<?php echo($cl['lbox_usr']['id']); ?>','<?php echo($cl['lbox_usr']['username']); ?>');" class="btn btn-custom btn-block main-outline md mt-2">
+					<?php echo cl_translate("Add to list"); ?>
+				</button>
+			<?php endif; ?>
 		<?php else: ?>
 			<a href="<?php echo($cl["lbox_usr"]["url"]); ?>">
 				<div class="btn btn-custom btn-block main-outline md">

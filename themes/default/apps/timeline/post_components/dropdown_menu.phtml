@@ -151,6 +151,20 @@
 		</a>
 		<?php if (empty($cl['li']['is_owner'])): ?>
 			<div class="dropdown-divider"></div>
+			<?php if (not_empty($cl['is_logged'])): ?>
+				<a onclick="SMColibri.open_add_to_list('<?php echo($cl['li']['owner']['id']); ?>','<?php echo($cl['li']['owner']['username']); ?>');" class="dropdown-item" href="javascript:void(0);">
+					<span class="flex-item dropdown-item-icon">
+						<?php echo cl_ficon('people'); ?>
+					</span>
+					<span class="flex-item">
+						<?php echo cl_translate('Add author to list'); ?>
+					</span>
+					<span class="flex-item dropdown-item-icon dropdown-item-icon_adinfo">
+						<?php echo cl_ficon('open'); ?>
+					</span>
+				</a>
+				<div class="dropdown-divider"></div>
+			<?php endif; ?>
 			<a onclick="SMColibri.report_post(<?php echo($cl['li']['id']); ?>);" class="dropdown-item" href="javascript:void(0);">
 				<span class="flex-item dropdown-item-icon">
 					<?php echo cl_ficon('flag'); ?>
