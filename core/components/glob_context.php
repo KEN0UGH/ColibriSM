@@ -318,12 +318,31 @@ $cl["media_mime_types"] = array(
     'text/html',
     'application/xhtml+xml',
     'application/vnd.oasis.opendocument.text',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.oasis.opendocument.spreadsheet',
     'application/vnd.ms-powerpoint',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    'text/plain'
+    'text/plain',
+    'application/json',
+    'application/xml',
+    'text/xml',
+    'text/csv',
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/x-rar-compressed',
+    'application/x-rar',
+    'text/markdown',
+    'text/x-markdown',
+    'text/css',
+    'application/javascript',
+    'text/javascript',
+    'application/x-javascript',
+    'application/x-yaml',
+    'text/yaml',
+    'text/x-yaml'
 );
 
 $cl['countries'] = array(

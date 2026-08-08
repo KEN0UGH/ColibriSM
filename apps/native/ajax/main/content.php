@@ -412,7 +412,7 @@ else if ($action == 'upload_post_document' && $cl["config"]["post_documents_syst
                         'file_type' => 'docs',
                         'folder'    => 'documents',
                         'slug'      => 'doc',
-                        'allowed'   => 'doc,docx,html,htm,odt,pdf,xls,xlsx,ods,ppt,pptx,txt'
+                        'allowed'   => 'doc,docx,html,htm,odt,pdf,xls,xlsx,ods,ppt,pptx,txt,json,csv,xml,zip,rar,md,markdown,yml,yaml,css,js,sql'
                     );
 
                     $file_upload = cl_upload($file_info);

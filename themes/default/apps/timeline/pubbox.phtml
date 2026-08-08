@@ -605,7 +605,7 @@
 		<input multiple="multiple" type="file" class="d-none" data-an="images-input" accept="image/*" v-on:change="upload_images($event)">
 		<input type="file" class="d-none" data-an="video-input" accept="video/*" v-on:change="upload_video($event)">
 		<input type="file" class="d-none" data-an="music-input" accept="audio/*" v-on:change="upload_music($event)">
-		<input type="file" class="d-none" data-an="doc-input" v-on:change="upload_document($event)">
+		<input type="file" class="d-none" data-an="doc-input" accept=".doc,.docx,.html,.htm,.odt,.pdf,.xls,.xlsx,.ods,.ppt,.pptx,.txt,.json,.csv,.xml,.zip,.rar,.md,.markdown,.yml,.yaml,.css,.js,.sql,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain,application/json,application/xml,text/xml,text/csv,application/zip,application/x-zip-compressed,application/x-rar-compressed,text/markdown,text/css,application/javascript,text/javascript,application/x-yaml,text/yaml" v-on:change="upload_document($event)">
 		<input type="hidden" class="d-none" value="<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>" name="hash">
 	</form>
 </div>
