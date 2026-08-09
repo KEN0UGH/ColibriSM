@@ -130,7 +130,7 @@
 						</button>
 					</div>
 				</div>
-				<div class="timeline-pubbox__images" v-if="active_media == 'image'">
+				<div class="timeline-pubbox__images" v-if="images.length">
 					<div class="pubbox-images">
 						<div class="pubbox-images__list" data-an="post-images">
 							<div v-for="img in images" class="pubbox-images__list-item">
@@ -143,7 +143,7 @@
 					</div>
 				</div>
 				<?php if ($cl["config"]["html5player"] == "on"): ?>
-				<div class="timeline-pubbox__video" v-if="active_media == 'video'">	
+				<div class="timeline-pubbox__video" v-if="preview_video">	
 					<div class="pubbox-video">
 						<div class="pubbox-video__player">
 							<div class="cl-html5-video">
@@ -162,7 +162,7 @@
 					</div>
 				</div>
 				<?php else: ?>
-				<div class="timeline-pubbox__video" v-if="active_media == 'video'">	
+				<div class="timeline-pubbox__video" v-if="preview_video">	
 					<div class="pubbox-video">
 						<div class="pubbox-video__player">
 							<div class="cl-plyr-video">
@@ -376,7 +376,7 @@
 					</button>
 
 					<?php if ($cl["config"]["donation_system_status"] == "on"): ?>
-						<button v-on:click="create_donation" type="button" class="ctrl-item">
+						<button v-on:click="create_donation" type="button" class="ctrl-item" v-bind:disabled="donate_ctrl != true">
 							<?php echo cl_ficon("donation"); ?>
 						</button>
 					<?php endif; ?>

@@ -53,9 +53,9 @@
 				<?php echo cl_translate('Show thread'); ?>
 			</span>
 		</a>
-		<?php if ($cl['li']['type'] == "document"): ?>
+		<?php if (not_empty($cl['li']['has_document_media']) && not_empty($cl['li']['first_document_media'])): ?>
 			<div class="dropdown-divider"></div>
-			<a download="<?php echo $cl['li']['media'][0]['x']["filename"]; ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>">
+			<a download="<?php echo fetch_or_get($cl['li']['first_document_media']['x']["filename"], cl_strf('%s-document', $cl['config']['name'])); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['first_document_media']['src'],'')); ?>">
 				<span class="flex-item dropdown-item-icon">
 					<?php echo cl_ficon('arrow_download'); ?>
 				</span>
@@ -67,9 +67,9 @@
 				</span>
 			</a>
 		<?php endif; ?>
-		<?php if ($cl["config"]["post_video_download_system"] == "on" && $cl['li']['type'] == "video"): ?>
+		<?php if ($cl["config"]["post_video_download_system"] == "on" && not_empty($cl['li']['has_video_media']) && not_empty($cl['li']['first_video_media'])): ?>
 			<div class="dropdown-divider"></div>
-			<a download="<?php echo cl_strf("%s-Video-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>">
+			<a download="<?php echo cl_strf("%s-Video-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['first_video_media']['src'],'')); ?>">
 				<span class="flex-item dropdown-item-icon">
 					<?php echo cl_ficon('arrow_download'); ?>
 				</span>
@@ -81,9 +81,9 @@
 				</span>
 			</a>
 		<?php endif; ?>
-		<?php if ($cl["config"]["post_audio_download_system"] == "on" && $cl['li']['type'] == "audio"): ?>
+		<?php if ($cl["config"]["post_audio_download_system"] == "on" && not_empty($cl['li']['has_audio_media']) && not_empty($cl['li']['first_audio_media'])): ?>
 			<div class="dropdown-divider"></div>
-			<a download="<?php echo cl_strf("%s-Audio-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['media'][0]['src'],'')); ?>">
+			<a download="<?php echo cl_strf("%s-Audio-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['li']['first_audio_media']['src'],'')); ?>">
 				<span class="flex-item dropdown-item-icon">
 					<?php echo cl_ficon('arrow_download'); ?>
 				</span>

@@ -167,7 +167,36 @@
 									</div>
 								<?php endif; ?>
 								<?php if ($cl['thread_data']['post']["content_view"] == true): ?>
-									<?php if ($cl['thread_data']['post']['type'] == 'image' && not_empty($cl['thread_data']['post']['media'])): ?>
+									<?php
+										$post_images = array();
+										$post_videos = array();
+										$post_audios = array();
+										$post_docs = array();
+										$post_gifs = array();
+
+										if (not_empty($cl['thread_data']['post']['media'])) {
+											foreach ($cl['thread_data']['post']['media'] as $media_row) {
+												if ($media_row['type'] == 'image') {
+													$post_images[] = $media_row;
+												}
+												else if ($media_row['type'] == 'video') {
+													$post_videos[] = $media_row;
+												}
+												else if ($media_row['type'] == 'audio') {
+													$post_audios[] = $media_row;
+												}
+												else if ($media_row['type'] == 'document') {
+													$post_docs[] = $media_row;
+												}
+												else if ($media_row['type'] == 'gif') {
+													$post_gifs[] = $media_row;
+												}
+											}
+										}
+									?>
+
+									<?php if (not_empty($post_images)): ?>
+										<?php $media_backup = $cl['thread_data']['post']['media']; $cl['thread_data']['post']['media'] = $post_images; ?>
 										<?php if (count($cl['thread_data']['post']['media']) == 1): ?>
 											<div class="lozad-media">
 												<div class="publication-image issafe-<?php echo strtolower(fetch_or_get($cl['thread_data']['post']['media'][0]['is_safe'], 'Y')); ?>">
@@ -199,17 +228,21 @@
 												<?php endif; ?>
 											</div>
 										<?php endif; ?>
-									<?php elseif($cl['thread_data']['post']['type'] == 'video' && not_empty($cl['thread_data']['post']['media'])): ?>
+										<?php $cl['thread_data']['post']['media'] = $media_backup; ?>
+									<?php endif; ?>
+
+									<?php if (not_empty($post_videos)): ?>
+										<?php $video_media = $post_videos[0]; ?>
 										<?php if ($cl["config"]["html5player"] == "on"): ?>
 											<div class="lozad-media">
 												<div class="publication-video">
 													<div class="cl-html5-video">
-														<video data-video-ratio="<?php echo(fetch_or_get($cl['thread_data']['post']['media'][0]['x']["ratio"],'16:9')); ?>" preload="metadata" style="width: 100%;" playsinline controls>
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/mp4">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/webm">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/mov">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/3gp">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/ogg">
+														<video data-video-ratio="<?php echo(fetch_or_get($video_media['x']["ratio"],'16:9')); ?>" preload="metadata" style="width: 100%;" playsinline controls>
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/mp4">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/webm">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/mov">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/3gp">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/ogg">
 														</video>
 													</div>
 												</div>
@@ -218,46 +251,54 @@
 											<div class="lozad-media">
 												<div class="publication-video">
 													<div class="cl-plyr-video">
-														<video class="plyr" preload="metadata" playsinline controls data-poster="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['x']['poster_thumb'],'')); ?>">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/mp4">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/webm">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/mov">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/3gp">
-															<source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="video/ogg">
+														<video class="plyr" preload="metadata" playsinline controls data-poster="<?php echo cl_get_media(fetch_or_get($video_media['x']['poster_thumb'],'')); ?>">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/mp4">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/webm">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/mov">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/3gp">
+															<source src="<?php echo cl_get_media(fetch_or_get($video_media['src'],'')); ?>" type="video/ogg">
 														</video>
 													</div>
 												</div>
 											</div>
 										<?php endif; ?>
-									<?php elseif($cl['thread_data']['post']['type'] == 'audio' && not_empty($cl['thread_data']['post']['media'])): ?>
+									<?php endif; ?>
+
+									<?php if (not_empty($post_audios)): ?>
+										<?php $audio_media = $post_audios[0]; ?>
 										<div class="publication-audio">
 											<div class="cl-plyr-audio">
 												<audio controls preload="metadata" class="plyr">
-											        <source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="audio/mpeg">
-											        <source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="audio/wav">
-											        <source src="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>" type="audio/mp3">
+											        <source src="<?php echo cl_get_media(fetch_or_get($audio_media['src'],'')); ?>" type="audio/mpeg">
+											        <source src="<?php echo cl_get_media(fetch_or_get($audio_media['src'],'')); ?>" type="audio/wav">
+											        <source src="<?php echo cl_get_media(fetch_or_get($audio_media['src'],'')); ?>" type="audio/mp3">
 											    </audio>
 											</div>
 										</div>
-									<?php elseif($cl['thread_data']['post']['type'] == 'document' && not_empty($cl['thread_data']['post']['media'])): ?>
+									<?php endif; ?>
+
+									<?php if (not_empty($post_docs)): ?>
+										<?php $doc_media = $post_docs[0]; ?>
 										<div class="publication-document">
-											<a href="<?php echo cl_get_media($cl['thread_data']['post']['media'][0]['src']); ?>" target="_blank" class="document-file">
+											<a href="<?php echo cl_get_media($doc_media['src']); ?>" target="_blank" class="document-file">
 												<div class="document-file__icon">
 													<?php echo cl_ficon("document"); ?>
 												</div>
 												<div class="document-file__body">
-													<?php echo($cl['thread_data']['post']['media'][0]['x']["filename"]); ?>
+													<?php echo(fetch_or_get($doc_media['x']["filename"], "")); ?>
 												</div>
 												<div class="document-file__type">
-													<?php echo($cl['thread_data']['post']['media'][0]['x']["file_type"]); ?>-<?php echo cl_translate("FILE"); ?>
+													<?php echo(fetch_or_get($doc_media['x']["file_type"], "")); ?>-<?php echo cl_translate("FILE"); ?>
 												</div>
 											</a>
 										</div>
-									<?php elseif($cl['thread_data']['post']['type'] == 'gif' && not_empty($cl['thread_data']['post']['media'])): ?>
+									<?php endif; ?>
+
+									<?php if($cl['thread_data']['post']['type'] == 'gif' && not_empty($post_gifs)): ?>
 										<div class="lozad-media">
 											<div class="publication-image">
-												<a href="<?php echo fetch_or_get($cl['thread_data']['post']['media'][0]['src'],''); ?>" class="fbox-media">
-													<img class="lozad" data-src="<?php echo fetch_or_get($cl['thread_data']['post']['media'][0]['src'],''); ?>" alt="GIF-Image">
+												<a href="<?php echo fetch_or_get($post_gifs[0]['src'],''); ?>" class="fbox-media">
+													<img class="lozad" data-src="<?php echo fetch_or_get($post_gifs[0]['src'],''); ?>" alt="GIF-Image">
 												</a>
 											</div>
 										</div>
@@ -827,9 +868,9 @@
 											</span>
 										</a>
 
-										<?php if ($cl["config"]["post_video_download_system"] == "on" && $cl['thread_data']['post']['type'] == "video"): ?>
+										<?php if ($cl["config"]["post_video_download_system"] == "on" && not_empty($cl['thread_data']['post']['has_video_media']) && not_empty($cl['thread_data']['post']['first_video_media'])): ?>
 											<div class="dropdown-divider"></div>
-											<a download="<?php echo cl_strf("%s-Video-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>">
+											<a download="<?php echo cl_strf("%s-Video-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['first_video_media']['src'],'')); ?>">
 												<span class="flex-item dropdown-item-icon">
 													<?php echo cl_ficon('arrow_download'); ?>
 												</span>
@@ -842,9 +883,9 @@
 											</a>
 										<?php endif; ?>
 
-										<?php if ($cl["config"]["post_audio_download_system"] == "on" && $cl['thread_data']['post']['type'] == "audio"): ?>
+										<?php if ($cl["config"]["post_audio_download_system"] == "on" && not_empty($cl['thread_data']['post']['has_audio_media']) && not_empty($cl['thread_data']['post']['first_audio_media'])): ?>
 											<div class="dropdown-divider"></div>
-											<a download="<?php echo cl_strf("%s-Audio-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>">
+											<a download="<?php echo cl_strf("%s-Audio-Publication", $cl["config"]["name"]); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['first_audio_media']['src'],'')); ?>">
 												<span class="flex-item dropdown-item-icon">
 													<?php echo cl_ficon('arrow_download'); ?>
 												</span>
@@ -857,9 +898,9 @@
 											</a>
 										<?php endif; ?>
 										
-										<?php if ($cl['thread_data']['post']['type'] == "document"): ?>
+										<?php if (not_empty($cl['thread_data']['post']['has_document_media']) && not_empty($cl['thread_data']['post']['first_document_media'])): ?>
 											<div class="dropdown-divider"></div>
-											<a download="<?php echo $cl['thread_data']['post']['media'][0]['x']["filename"]; ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['media'][0]['src'],'')); ?>">
+											<a download="<?php echo fetch_or_get($cl['thread_data']['post']['first_document_media']['x']["filename"], cl_strf('%s-document', $cl['config']['name'])); ?>" class="dropdown-item" href="<?php echo cl_get_media(fetch_or_get($cl['thread_data']['post']['first_document_media']['src'],'')); ?>">
 												<span class="flex-item dropdown-item-icon">
 													<?php echo cl_ficon('arrow_download'); ?>
 												</span>

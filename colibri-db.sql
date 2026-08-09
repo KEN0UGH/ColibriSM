@@ -1048,7 +1048,7 @@
 {%end%}
 
 {%begin%}
-  ALTER TABLE `cl_publications` CHANGE `type` `type` ENUM('text','video','image','gif','poll','audio','document','donation') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'text';
+  ALTER TABLE `cl_publications` CHANGE `type` `type` ENUM('text','video','image','gif','poll','audio','document','donation','mixed') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'text';
 {%end%}
 
 {%begin%}

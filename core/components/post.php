@@ -89,7 +89,7 @@ function cl_get_orphan_post($id = null) {
 	$data         = array();
 
 	if (cl_queryset($query_result)) {
-		if (in_array($query_result['type'], array("image", "video", "audio", "document"))) {
+		if (in_array($query_result['type'], array("image", "video", "audio", "document", "mixed"))) {
 			$media = cl_get_post_media($id);
 
 			if (cl_queryset($media)) {
@@ -127,8 +127,12 @@ function cl_get_post_media($post_id = false) {
 function cl_delete_post_junk_files($post_id = false, $post_type = null) {
 	global $db;
 
-	if (not_num($post_id) || in_array($post_type, array("image", "video", "gif")) != true) {
+	if (not_num($post_id) || in_array($post_type, array("image", "video", "gif", "mixed")) != true) {
 		return false;
+	}
+
+	if ($post_type == 'mixed') {
+		return true;
 	}
 
 	else {
@@ -176,12 +180,12 @@ function cl_delete_orphan_posts($user_id = null) {
 	if (cl_queryset($query_result)) {
 
 		foreach ($query_result as $row) {
-			if (in_array($row['type'], array("image", "video", "audio"))) {
+			if (in_array($row['type'], array("image", "video", "audio", "document", "mixed"))) {
 				$media = cl_get_post_media($row['id']);
 
 				if (cl_queryset($media)) {
 					foreach ($media as $media_data) {
-						if (in_array($media_data['type'], array('image','video', 'audio'))) {
+							if (in_array($media_data['type'], array('image','video', 'audio', 'document'))) {
            
 		                    $json_data = json($media_data['json_data']);
 
@@ -521,6 +525,16 @@ function cl_post_data($post = array()) {
 	$post["me_blocked"]    = false;
 	$post["is_muted"]      = false;
 	$post["can_see"]       = false;
+	$post["has_image_media"] = false;
+	$post["has_video_media"] = false;
+	$post["has_audio_media"] = false;
+	$post["has_document_media"] = false;
+	$post["has_gif_media"] = false;
+	$post["first_image_media"] = array();
+	$post["first_video_media"] = array();
+	$post["first_audio_media"] = array();
+	$post["first_document_media"] = array();
+	$post["first_gif_media"] = array();
 	$post["reply_to"]      = array();
 	$post["owner"]         = array(
 		'id'               => $post_owner_data['id'],
@@ -537,8 +551,48 @@ function cl_post_data($post = array()) {
 	if ($post["type"] != "text") {
 		$post["media"] = cl_get_post_media($post["id"]);
 
+		if (not_empty($post["media"])) {
+			foreach ($post["media"] as $media_row) {
+				if ($media_row['type'] == 'image') {
+					$post["has_image_media"] = true;
+
+					if (empty($post["first_image_media"])) {
+						$post["first_image_media"] = $media_row;
+					}
+				}
+				else if ($media_row['type'] == 'video') {
+					$post["has_video_media"] = true;
+
+					if (empty($post["first_video_media"])) {
+						$post["first_video_media"] = $media_row;
+					}
+				}
+				else if ($media_row['type'] == 'audio') {
+					$post["has_audio_media"] = true;
+
+					if (empty($post["first_audio_media"])) {
+						$post["first_audio_media"] = $media_row;
+					}
+				}
+				else if ($media_row['type'] == 'document') {
+					$post["has_document_media"] = true;
+
+					if (empty($post["first_document_media"])) {
+						$post["first_document_media"] = $media_row;
+					}
+				}
+				else if ($media_row['type'] == 'gif') {
+					$post["has_gif_media"] = true;
+
+					if (empty($post["first_gif_media"])) {
+						$post["first_gif_media"] = $media_row;
+					}
+				}
+			}
+		}
+
 		if ($post["type"] == "image") {
-			$post['og_image'] = fetch_or_get($post["media"][0]['src'], false);
+			$post['og_image'] = fetch_or_get($post["first_image_media"]['src'], false);
 
 			if (empty($post['og_image'])) {
 				$post['og_image'] = $cl['config']['site_logo'];
@@ -550,11 +604,11 @@ function cl_post_data($post = array()) {
 		}
 
 		else if ($post["type"] == "gif") {
-			$post['og_image'] = fetch_or_get($post["gif"], $cl['config']['site_logo']);
+			$post['og_image'] = fetch_or_get($post["first_gif_media"]['src'], $cl['config']['site_logo']);
 		}
 
 		else if ($post["type"] == "video") {
-			$post['og_image'] = fetch_or_get($post["media"][0]["x"]["poster_thumb"], false);
+			$post['og_image'] = fetch_or_get($post["first_video_media"]["x"]["poster_thumb"], false);
 
 			if (empty($post['og_image'])) {
 				$post['og_image'] = $cl['config']['site_logo'];
@@ -562,6 +616,23 @@ function cl_post_data($post = array()) {
 
 			else {
 				$post['og_image'] = cl_get_media($post['og_image']);
+			}
+		}
+
+		else if ($post["type"] == "mixed") {
+			if (not_empty($post["first_image_media"])) {
+				$post['og_image'] = fetch_or_get($post["first_image_media"]['src'], $cl['config']['site_logo']);
+				$post['og_image'] = cl_get_media($post['og_image']);
+			}
+			else if (not_empty($post["first_video_media"])) {
+				$post['og_image'] = fetch_or_get($post["first_video_media"]["x"]["poster_thumb"], $cl['config']['site_logo']);
+
+				if ($post['og_image'] != $cl['config']['site_logo']) {
+					$post['og_image'] = cl_get_media($post['og_image']);
+				}
+			}
+			else if (not_empty($post["first_gif_media"])) {
+				$post['og_image'] = fetch_or_get($post["first_gif_media"]['src'], $cl['config']['site_logo']);
 			}
 		}
 

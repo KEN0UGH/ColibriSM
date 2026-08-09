@@ -37,8 +37,18 @@ if ($action == 'upload_post_image' && $cl["config"]["post_images_system"] == "on
                 ));
             }
             
-            if (not_empty($post_data) && $post_data["type"] == "image") {
-                if (empty($post_data['media']) || count($post_data['media']) < 10) {
+            if (not_empty($post_data) && in_array($post_data["type"], array("image", "video", "audio", "document", "mixed"))) {
+                $images_total = 0;
+
+                if (not_empty($post_data['media'])) {
+                    foreach ($post_data['media'] as $media_row) {
+                        if ($media_row['type'] == 'image') {
+                            $images_total++;
+                        }
+                    }
+                }
+
+                if ($images_total < 10) {
                     $file_info      =  array(
                         'file'      => $_FILES['image']['tmp_name'],
                         'size'      => $_FILES['image']['size'],
@@ -119,8 +129,18 @@ else if ($action == 'upload_post_video' && $cl["config"]["post_videos_system"] =
                 ));
             }
 
-            if (not_empty($post_data) && $post_data["type"] == "video") {
-                if (empty($post_data['media'])) {
+            if (not_empty($post_data) && in_array($post_data["type"], array("image", "video", "audio", "document", "mixed"))) {
+                $videos_total = 0;
+
+                if (not_empty($post_data['media'])) {
+                    foreach ($post_data['media'] as $media_row) {
+                        if ($media_row['type'] == 'video') {
+                            $videos_total++;
+                        }
+                    }
+                }
+
+                if ($videos_total < 1) {
                     $file_info           = array(
                         'file'           => $_FILES['video']['tmp_name'],
                         'size'           => $_FILES['video']['size'],
@@ -256,8 +276,18 @@ else if ($action == 'upload_post_arecord' && $cl["config"]["post_record_system"]
                 ));
             }
 
-            if (not_empty($post_data) && $post_data["type"] == "audio") {
-                if (empty($post_data['media'])) {
+            if (not_empty($post_data) && in_array($post_data["type"], array("image", "video", "audio", "document", "mixed"))) {
+                $audios_total = 0;
+
+                if (not_empty($post_data['media'])) {
+                    foreach ($post_data['media'] as $media_row) {
+                        if ($media_row['type'] == 'audio') {
+                            $audios_total++;
+                        }
+                    }
+                }
+
+                if ($audios_total < 1) {
                     $file_info      =  array(
                         'file'      => $_FILES['audio_file']['tmp_name'],
                         'size'      => $_FILES['audio_file']['size'],
@@ -329,8 +359,18 @@ else if ($action == 'upload_post_music' && $cl["config"]["post_audio_system"] ==
                 ));
             }
 
-            if (not_empty($post_data) && $post_data["type"] == "audio") {
-                if (empty($post_data['media'])) {
+            if (not_empty($post_data) && in_array($post_data["type"], array("image", "video", "audio", "document", "mixed"))) {
+                $audios_total = 0;
+
+                if (not_empty($post_data['media'])) {
+                    foreach ($post_data['media'] as $media_row) {
+                        if ($media_row['type'] == 'audio') {
+                            $audios_total++;
+                        }
+                    }
+                }
+
+                if ($audios_total < 1) {
                     $file_info      =  array(
                         'file'      => $_FILES['music_file']['tmp_name'],
                         'size'      => $_FILES['music_file']['size'],
@@ -402,8 +442,18 @@ else if ($action == 'upload_post_document' && $cl["config"]["post_documents_syst
                 ));
             }
 
-            if (not_empty($post_data) && $post_data["type"] == "document") {
-                if (empty($post_data['media'])) {
+            if (not_empty($post_data) && in_array($post_data["type"], array("image", "video", "audio", "document", "mixed"))) {
+                $documents_total = 0;
+
+                if (not_empty($post_data['media'])) {
+                    foreach ($post_data['media'] as $media_row) {
+                        if ($media_row['type'] == 'document') {
+                            $documents_total++;
+                        }
+                    }
+                }
+
+                if ($documents_total < 1) {
                     $file_info      =  array(
                         'file'      => $_FILES['doc_file']['tmp_name'],
                         'size'      => $_FILES['doc_file']['size'],
@@ -519,11 +569,32 @@ else if ($action == 'delete_post_video' || $action == 'delete_post_document') {
 
             $data['err_code'] = "0";
             $data['status']   = 200;
-            
-            cl_delete_orphan_posts($me['id']);
-            cl_update_user_data($me['id'],array(
-                'last_post' => 0
-            ));
+
+            $delete_type = (($action == 'delete_post_video') ? 'video' : 'document');
+            $post_id     = $post_data['id'];
+
+            if (not_empty($post_data['media'])) {
+                foreach ($post_data['media'] as $media_row) {
+                    if ($media_row['type'] == $delete_type) {
+                        $json_data = json($media_row['json_data']);
+                        $db->where('id', $media_row['id'])->where('pub_id', $post_id)->delete(T_PUBMEDIA);
+                        cl_delete_media($media_row['src']);
+
+                        if (not_empty($json_data['poster_thumb'])) {
+                            cl_delete_media($json_data['poster_thumb']);
+                        }
+                    }
+                }
+            }
+
+            $post_data = cl_get_orphan_post($post_id);
+
+            if (empty($post_data['media'])) {
+                cl_delete_orphan_posts($me['id']);
+                cl_update_user_data($me['id'],array(
+                    'last_post' => 0
+                ));
+            }
         }   
     }
 }
@@ -542,11 +613,26 @@ else if ($action == 'delete_post_audiofile') {
 
             $data['err_code'] = "0";
             $data['status']   = 200;
-            
-            cl_delete_orphan_posts($me['id']);
-            cl_update_user_data($me['id'],array(
-                'last_post' => 0
-            ));
+
+            $post_id = $post_data['id'];
+
+            if (not_empty($post_data['media'])) {
+                foreach ($post_data['media'] as $media_row) {
+                    if ($media_row['type'] == 'audio') {
+                        $db->where('id', $media_row['id'])->where('pub_id', $post_id)->delete(T_PUBMEDIA);
+                        cl_delete_media($media_row['src']);
+                    }
+                }
+            }
+
+            $post_data = cl_get_orphan_post($post_id);
+
+            if (empty($post_data['media'])) {
+                cl_delete_orphan_posts($me['id']);
+                cl_update_user_data($me['id'],array(
+                    'last_post' => 0
+                ));
+            }
         }   
     }
 }
@@ -754,10 +840,31 @@ else if ($action == 'publish_new_post') {
             $post_id        = $post_data['id'];
             $post_text      = cl_upsert_htags($post_text);
             $mentions       = cl_get_user_mentions($post_text);
+            $primary_type   = $post_data['type'];
+            $media_types    = array();
+
+            if (not_empty($post_data['media'])) {
+                foreach ($post_data['media'] as $media_row) {
+                    if (in_array($media_row['type'], array('image', 'video', 'audio', 'document', 'gif'))) {
+                        $media_types[] = $media_row['type'];
+                    }
+                }
+            }
+
+            $media_types = array_values(array_unique($media_types));
+
+            if (count($media_types) > 1) {
+                $primary_type = 'mixed';
+            }
+            else if (count($media_types) == 1) {
+                $primary_type = $media_types[0];
+            }
+
             $post_data_update = array(
                 "user_id"   => $author['id'],
                 "text"      => cl_text_secure($post_text),
                 "status"    => "active",
+                "type"      => $primary_type,
                 "thread_id" => $thread_id,
                 "time"      => time(),
                 "priv_wcs"  => $author["profile_privacy"],
@@ -830,7 +937,20 @@ else if ($action == 'publish_new_post') {
                 cl_notify_mentioned_users($mentions, $post_id, $author['id']);
             }
 
-            cl_delete_post_junk_files($post_data['id'], $post_data['type']);
+            $post_media_rows  = cl_get_post_media($post_data['id']);
+            $post_media_types = array();
+
+            if (not_empty($post_media_rows)) {
+                foreach ($post_media_rows as $media_row) {
+                    $post_media_types[] = $media_row['type'];
+                }
+            }
+
+            $post_media_types = array_unique($post_media_types);
+
+            if (count($post_media_types) <= 1) {
+                cl_delete_post_junk_files($post_data['id'], $post_data['type']);
+            }
         }
 
         else {
@@ -1046,6 +1166,39 @@ else if($action == 'get_draft_post') {
                     $data['document'] = array(
                         "filename" => cl_get_media($doc_src['x']['filename'])
                     );
+                }
+            }
+            else if($me['draft_post']['type'] == "mixed") {
+                $data['status']   = 200;
+                $data['type']     = "mixed";
+                $data['images']   = array();
+                $data['video']    = array();
+                $data['audio']    = array();
+                $data['document'] = array();
+
+                foreach ($me['draft_post']['media'] as $media_row) {
+                    if ($media_row['type'] == 'image') {
+                        $data['images'][] = array(
+                            "id"  => $media_row["id"],
+                            "url" => cl_get_media(fetch_or_get($media_row['x']['image_thumb'], $media_row['src']))
+                        );
+                    }
+                    else if ($media_row['type'] == 'video' && empty($data['video'])) {
+                        $data['video'] = array(
+                            "poster" => cl_get_media(fetch_or_get($media_row['x']['poster_thumb'], 'upload/default/video.png')),
+                            "source" => cl_get_media($media_row['src'])
+                        );
+                    }
+                    else if ($media_row['type'] == 'audio' && empty($data['audio'])) {
+                        $data['audio'] = array(
+                            "source" => cl_get_media($media_row['src'])
+                        );
+                    }
+                    else if ($media_row['type'] == 'document' && empty($data['document'])) {
+                        $data['document'] = array(
+                            "filename" => fetch_or_get($media_row['x']['filename'], '')
+                        );
+                    }
                 }
             }
         }
