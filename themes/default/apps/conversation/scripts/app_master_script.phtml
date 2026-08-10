@@ -217,6 +217,7 @@
 									_app_.sending = true;
 									var form_data = new FormData();
 									form_data.append('image', event.target.files[0]);
+									form_data.append('message', _app_.message);
 									form_data.append('hash', "<?php echo fetch_or_get($cl['csrf_token'],'none'); ?>");
 									
 									$.ajax({

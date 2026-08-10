@@ -35,6 +35,11 @@
 					    </div>
 					</div>
 				<?php endif; ?>
+				<?php if (not_empty($cl['li']['message']) && $cl['li']['media_type'] != 'none'): ?>
+					<div class="message-text">
+						<?php echo($cl['li']['message']); ?>
+					</div>
+				<?php endif; ?>
 			<?php endif; ?>
 		</div>
 		<div class="message-data__ctrls">

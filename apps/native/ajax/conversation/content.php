@@ -90,42 +90,44 @@ else {
 
 					$image_mime = mime_content_type($_FILES['image']['tmp_name']);
 					$image_mime = explode("/", $image_mime);
+					$message_text = trim(fetch_or_get($_POST['message'], ''));
+					$message_text = cl_text_secure($message_text);
 
 					if ($image_mime[0] == "image") {
 						$file_info = array(
-			                'file'      => $_FILES['image']['tmp_name'],
-			                'size'      => $_FILES['image']['size'],
-			                'name'      => $_FILES['image']['name'],
-			                'type'      => $_FILES['image']['type'],
-			                'file_type' => 'image',
-			                'folder'    => 'images',
-			                'slug'      => 'original',
-			                'allowed'   => 'jpg,png,jpeg,gif,webp'
-			            );
+							'file'      => $_FILES['image']['tmp_name'],
+							'size'      => $_FILES['image']['size'],
+							'name'      => $_FILES['image']['name'],
+							'type'      => $_FILES['image']['type'],
+							'file_type' => 'image',
+							'folder'    => 'images',
+							'slug'      => 'original',
+							'allowed'   => 'jpg,png,jpeg,gif,webp'
+						);
 					}
 
 					else{
 						$file_info = array(
-			                'file'      => $_FILES['image']['tmp_name'],
-	                        'size'      => $_FILES['image']['size'],
-	                        'name'      => $_FILES['image']['name'],
-	                        'type'      => $_FILES['image']['type'],
-	                        'file_type' => 'video',
-	                        'folder'    => 'videos',
-	                        'slug'      => 'original',
-	                        'allowed'   => 'mp4,mov,3gp,webm'
-			            );
+							'file'      => $_FILES['image']['tmp_name'],
+							'size'      => $_FILES['image']['size'],
+							'name'      => $_FILES['image']['name'],
+							'type'      => $_FILES['image']['type'],
+							'file_type' => 'video',
+							'folder'    => 'videos',
+							'slug'      => 'original',
+							'allowed'   => 'mp4,mov,3gp,webm'
+						);
 					}
 
-		            $file_upload = cl_upload($file_info);
+			            $file_upload = cl_upload($file_info);
 
-		            if (not_empty($file_upload['filename'])) {
-		                $filename        = $file_upload['filename'];               
-		                $insert_data     = array(
+			            if (not_empty($file_upload['filename'])) {
+			                $filename        = $file_upload['filename'];
+			                $insert_data     = array(
 							'sent_by'    => $me['id'],
 							'sent_to'    => $send_to,
 							'owner'      => $me['id'],
-							'message'    => (($image_mime[0] == "image") ? 'Image' : "Video"),
+							'message'    => $message_text,
 							'media_file' => $filename,
 							'media_type' => (($image_mime[0] == "image") ? 'image' : "video"),
 							'seen'       => 0,

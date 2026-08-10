@@ -108,6 +108,8 @@ else {
 
 		else if($type == "media") {
 			if (not_empty($_FILES['image']) && not_empty($_FILES['image']['tmp_name'])) {	
+	            $media_message = trim(fetch_or_get($_POST['message'], ''));
+	            $media_message = cl_text_secure($media_message);
 	            $file_info      = array(
 	                'file'      => $_FILES['image']['tmp_name'],
 	                'size'      => $_FILES['image']['size'],
@@ -122,12 +124,12 @@ else {
 	            $file_upload = cl_upload($file_info);
 
 	            if (not_empty($file_upload['filename'])) {
-	                $filename        = $file_upload['filename'];               
+	                $filename        = $file_upload['filename'];
 	                $insert_data     = array(
 						'sent_by'    => $me['id'],
 						'sent_to'    => $send_to,
 						'owner'      => $me['id'],
-						'message'    => 'Image',
+						'message'    => $media_message,
 						'media_file' => $filename,
 						'media_type' => 'image',
 						'seen'       => 0,
