@@ -1230,16 +1230,118 @@ function cl_db_session_id() {
     return $session_id;
 }
 
-// Initialize session from DB
+function cl_get_session_backend() {
+    $backend = 'db';
+
+    if (isset($GLOBALS['cl']['config']['session_backend']) && !empty($GLOBALS['cl']['config']['session_backend'])) {
+        $backend = strtolower($GLOBALS['cl']['config']['session_backend']);
+    }
+    else if (($env_backend = getenv('SESSION_BACKEND')) || ($env_backend = getenv('REDIS_SESSION_BACKEND'))) {
+        $backend = strtolower($env_backend);
+    }
+
+    return in_array($backend, array('db', 'redis'), true) ? $backend : 'db';
+}
+
+function cl_redis_session_connect() {
+    if (!class_exists('Redis')) {
+        return false;
+    }
+
+    try {
+        $host = getenv('REDIS_HOST') ?: getenv('REDIS_URL') ?: getenv('REDIS_SESSION_HOST') ?: '127.0.0.1';
+        $port = getenv('REDIS_PORT') ?: getenv('REDIS_SESSION_PORT') ?: 6379;
+
+        if (strpos($host, 'tcp://') === 0 || strpos($host, 'redis://') === 0) {
+            $parsed = parse_url($host);
+            if (is_array($parsed)) {
+                $host = fetch_or_get($parsed['host'], '127.0.0.1');
+                $port = fetch_or_get($parsed['port'], $port);
+            }
+        }
+
+        $redis = new Redis();
+        $redis->connect($host, (int) $port, 2);
+
+        if ($redis->ping()) {
+            return $redis;
+        }
+    }
+    catch (Exception $e) {
+        return false;
+    }
+
+    return false;
+}
+
+function cl_redis_session_load($session_id) {
+    $redis = cl_redis_session_connect();
+    if (empty($redis)) {
+        return array();
+    }
+
+    $key = 'sess:' . $session_id;
+    $payload = $redis->hGetAll($key);
+
+    if (!is_array($payload)) {
+        return array();
+    }
+
+    $data = array();
+    foreach ($payload as $name => $value) {
+        $decoded = @unserialize($value);
+        if ($decoded === false && $value !== 'b:0;') {
+            $decoded = $value;
+        }
+        $data[$name] = $decoded;
+    }
+
+    $redis->expire($key, 86400 * 30);
+    return $data;
+}
+
+function cl_redis_session_write($session_id, $key, $value) {
+    $redis = cl_redis_session_connect();
+    if (empty($redis)) {
+        return false;
+    }
+
+    $hash_key = 'sess:' . $session_id;
+    $redis->hSet($hash_key, $key, serialize($value));
+    $redis->expire($hash_key, 86400 * 30);
+    return true;
+}
+
+function cl_redis_session_delete($session_id, $key) {
+    $redis = cl_redis_session_connect();
+    if (empty($redis)) {
+        return false;
+    }
+
+    $redis->hDel('sess:' . $session_id, $key);
+    return true;
+}
+
+// Initialize session from DB or Redis
 function cl_db_session_init() {
     global $db;
-    if (empty($db)) return false;
 
     if (!isset($_SESSION) || !is_array($_SESSION)) {
         $_SESSION = [];
     }
 
     $session_id = cl_db_session_id();
+
+    if (cl_get_session_backend() == 'redis') {
+        $redis_data = cl_redis_session_load($session_id);
+        if (!empty($redis_data)) {
+            $_SESSION = array_merge($_SESSION, $redis_data);
+        }
+        return $session_id;
+    }
+
+    if (empty($db)) return false;
+
     $rows = $db->where('session_id', $session_id)
                ->get(T_SESSION_DATA, null, ['name', 'value', 'updated_at']);
 
@@ -1266,12 +1368,17 @@ function cl_session($key = null, $val = null) {
         return false;
     }
 
-    global $db;
     $session_id = cl_db_session_id();
 
     if ($val !== null) { // Set value
         $_SESSION[$key] = $val;
 
+        if (cl_get_session_backend() == 'redis') {
+            cl_redis_session_write($session_id, $key, $val);
+            return true;
+        }
+
+        global $db;
         if (!empty($db)) {
             $db->where('session_id', $session_id)
                ->where('name', $key)
@@ -1297,9 +1404,15 @@ function cl_session_unset($key = null) {
 
     unset($_SESSION[$key]);
 
+    $session_id = cl_db_session_id();
+
+    if (cl_get_session_backend() == 'redis') {
+        cl_redis_session_delete($session_id, $key);
+        return true;
+    }
+
     global $db;
     if (!empty($db)) {
-        $session_id = cl_db_session_id();
         $db->where('session_id', $session_id)
            ->where('name', $key)
            ->delete(T_SESSION_DATA);
@@ -1310,6 +1423,11 @@ function cl_session_unset($key = null) {
 // Garbage Collection - call periodically (e.g. in cron or randomly)
 function cl_session_gc($max_lifetime = 86400 * 30) { // 30 days
     global $db;
+
+    if (cl_get_session_backend() == 'redis') {
+        return true;
+    }
+
     if (empty($db)) return false;
 
     $db->where('updated_at', time() - $max_lifetime, '<')

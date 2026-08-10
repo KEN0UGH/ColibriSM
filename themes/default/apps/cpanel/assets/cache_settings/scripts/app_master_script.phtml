@@ -57,6 +57,22 @@
                 _app.find('[data-an="realpath-limit"]').text(cache.realpath_cache.cache_limit);
             }
 
+            if (cache.redis && cache.redis.available) {
+                _app.find('[data-an="redis-unavailable"]').hide();
+                _app.find('[data-an="redis-info"]').show();
+                _app.find('[data-an="redis-status"]').text(cache.redis.enabled ? 'Online' : 'Offline');
+                _app.find('[data-an="redis-host"]').text(cache.redis.host || '127.0.0.1');
+                _app.find('[data-an="redis-version"]').text(cache.redis.version || '-');
+                _app.find('[data-an="redis-keys"]').text(cache.redis.keys || 0);
+                _app.find('[data-an="redis-memory"]').text(formatBytes(cache.redis.used_memory || 0));
+                _app.find('[data-an="redis-hits"]').text(cache.redis.hits || 0);
+                _app.find('[data-an="redis-misses"]').text(cache.redis.misses || 0);
+            }
+            else {
+                _app.find('[data-an="redis-info"]').hide();
+                _app.find('[data-an="redis-unavailable"]').show();
+            }
+
             if (cache.sessions) {
                 _app.find('[data-an="sessions-total"]').text(cache.sessions.total_rows);
                 _app.find('[data-an="sessions-expired"]').text(cache.sessions.expired_rows);
@@ -122,6 +138,14 @@
             });
         });
 
+        _app.find('[data-an="clear-redis-ctrl"]').on('click', function(e) {
+            e.preventDefault();
+
+            runAction('cache_clear_redis', function(res) {
+                cl_bs_notify(res.cleared ? 'Redis cache has been flushed successfully' : 'Redis is not available on this server', 3000);
+            });
+        });
+
         _app.find('[data-an="bump-version-ctrl"]').on('click', function(e) {
             e.preventDefault();
 
@@ -165,6 +189,7 @@
                 html += '<li>OPcache reset: ' + (res.results.opcache ? 'Yes' : 'Not available') + '</li>';
                 html += '<li>APCu cleared: ' + (res.results.apcu ? 'Yes' : 'Not available') + '</li>';
                 html += '<li>Realpath cache cleared: Yes</li>';
+                html += '<li>Redis flushed: ' + (res.results.redis ? 'Yes' : 'Not available') + '</li>';
                 html += '<li>Expired session rows deleted: ' + res.results.expired_sessions + '</li>';
                 html += '<li>Static assets version bumped to: ' + res.results.asset_version + '</li>';
                 html += '</ul></div>';

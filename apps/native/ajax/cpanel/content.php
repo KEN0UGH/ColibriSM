@@ -207,9 +207,92 @@ function cl_admin_cache_get_realpath_status() {
     );
 }
 
+function cl_admin_cache_get_redis_status() {
+    $status = array(
+        'available' => false,
+        'enabled'   => false,
+        'host'      => '',
+        'port'      => 6379,
+        'version'   => '-',
+        'keys'      => 0,
+        'used_memory' => 0,
+        'hits'      => 0,
+        'misses'    => 0
+    );
+
+    if (!class_exists('Redis')) {
+        return $status;
+    }
+
+    try {
+        $host = getenv('REDIS_HOST') ?: getenv('REDIS_URL') ?: ini_get('redis.default_host') ?: '127.0.0.1';
+        $port = getenv('REDIS_PORT') ?: ini_get('redis.default_port') ?: 6379;
+
+        if (strpos($host, 'tcp://') === 0 || strpos($host, 'redis://') === 0) {
+            $parsed = parse_url($host);
+            if (is_array($parsed)) {
+                $host = fetch_or_get($parsed['host'], '127.0.0.1');
+                $port = fetch_or_get($parsed['port'], $port);
+            }
+        }
+
+        $redis = new Redis();
+        $redis->connect($host, (int) $port, 2);
+
+        if ($redis->ping()) {
+            $status['available'] = true;
+            $status['enabled']   = true;
+            $status['host']      = $host;
+            $status['port']      = (int) $port;
+
+            $info = $redis->info();
+            if (is_array($info)) {
+                $db_stats = fetch_or_get($info['db0'], array());
+                $status['version'] = fetch_or_get($info['redis_version'], '-');
+                $status['keys']    = fetch_or_get($db_stats['keys'], 0);
+                $status['used_memory'] = fetch_or_get($info['used_memory'], 0);
+                $status['hits']    = fetch_or_get($info['keyspace_hits'], 0);
+                $status['misses']  = fetch_or_get($info['keyspace_misses'], 0);
+            }
+        }
+    }
+    catch (Exception $e) {
+        $status['available'] = false;
+        $status['enabled']   = false;
+    }
+
+    return $status;
+}
+
 function cl_admin_cache_clear_realpath() {
     clearstatcache(true);
     return true;
+}
+
+function cl_admin_cache_clear_redis() {
+    if (!class_exists('Redis')) {
+        return false;
+    }
+
+    try {
+        $host = getenv('REDIS_HOST') ?: getenv('REDIS_URL') ?: ini_get('redis.default_host') ?: '127.0.0.1';
+        $port = getenv('REDIS_PORT') ?: ini_get('redis.default_port') ?: 6379;
+
+        if (strpos($host, 'tcp://') === 0 || strpos($host, 'redis://') === 0) {
+            $parsed = parse_url($host);
+            if (is_array($parsed)) {
+                $host = fetch_or_get($parsed['host'], '127.0.0.1');
+                $port = fetch_or_get($parsed['port'], $port);
+            }
+        }
+
+        $redis = new Redis();
+        $redis->connect($host, (int) $port, 2);
+        return (bool) $redis->flushDB();
+    }
+    catch (Exception $e) {
+        return false;
+    }
 }
 
 function cl_admin_cache_get_sessions_status() {
@@ -256,6 +339,7 @@ function cl_admin_cache_get_overview() {
         'opcache'        => cl_admin_cache_get_opcache_status(),
         'apcu'           => cl_admin_cache_get_apcu_status(),
         'realpath_cache' => cl_admin_cache_get_realpath_status(),
+        'redis'          => cl_admin_cache_get_redis_status(),
         'sessions'       => cl_admin_cache_get_sessions_status(),
         'asset_version'  => cl_get_asset_cache_version()
     );
@@ -1411,6 +1495,12 @@ else if($action == "cache_clear_realpath") {
     $data['cache']   = cl_admin_cache_get_overview();
 }
 
+else if($action == "cache_clear_redis") {
+    $data['status']  = 200;
+    $data['cleared'] = cl_admin_cache_clear_redis();
+    $data['cache']   = cl_admin_cache_get_overview();
+}
+
 else if($action == "cache_clear_sessions") {
     $data['status']  = 200;
     $data['deleted'] = cl_admin_cache_clear_expired_sessions();
@@ -1435,6 +1525,7 @@ else if($action == "cache_clear_all") {
         'opcache'          => cl_admin_cache_clear_opcache(),
         'apcu'             => cl_admin_cache_clear_apcu(),
         'realpath_cache'   => cl_admin_cache_clear_realpath(),
+        'redis'            => cl_admin_cache_clear_redis(),
         'expired_sessions' => cl_admin_cache_clear_expired_sessions(),
         'asset_version'    => cl_admin_cache_bump_asset_version()
     );

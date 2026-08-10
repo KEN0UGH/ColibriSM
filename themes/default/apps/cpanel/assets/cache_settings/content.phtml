@@ -13,7 +13,7 @@
             </div>
             <div class="alert-message">
                 <p>
-                    This page lets you inspect and clear the caching layers used by the server (PHP OPcache, APCu, filesystem realpath cache), the database-backed session storage, and the static assets (CSS/JS) cache-busting version.
+                    This page lets you inspect and clear the caching layers used by the server (PHP OPcache, APCu, Redis, filesystem realpath cache), the database-backed session storage, and the static assets (CSS/JS) cache-busting version.
                 </p>
             </div>
         </div>
@@ -31,6 +31,24 @@
                         Clear all caches
                     </button>
                     <div data-an="clear-all-results" class="mt-3" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Server load improvements
+                    </h2>
+                </div>
+                <div class="body">
+                    <ul class="list-unstyled mb-0">
+                        <li>• Keep OPcache and APCu enabled for hot-path PHP execution.</li>
+                        <li>• Use Redis for session and object caching when available to reduce database load.</li>
+                        <li>• Clear expired sessions regularly and bump asset versions after front-end changes.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -103,6 +121,33 @@
                     <button data-an="clear-realpath-ctrl" type="button" class="btn btn-primary btn-sm">
                         Clear realpath cache
                     </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Redis cache
+                    </h2>
+                </div>
+                <div class="body">
+                    <div data-an="redis-unavailable" class="alert alert-secondary" style="display:none;">
+                        Redis is not available on this server.
+                    </div>
+                    <div data-an="redis-info">
+                        <ul class="list-unstyled mb-3">
+                            <li>Status: <strong data-an="redis-status">-</strong></li>
+                            <li>Host: <strong data-an="redis-host">-</strong></li>
+                            <li>Version: <strong data-an="redis-version">-</strong></li>
+                            <li>Keys: <strong data-an="redis-keys">0</strong></li>
+                            <li>Used memory: <strong data-an="redis-memory">0</strong></li>
+                            <li>Hits / Misses: <strong data-an="redis-hits">0</strong> / <strong data-an="redis-misses">0</strong></li>
+                        </ul>
+                        <button data-an="clear-redis-ctrl" type="button" class="btn btn-primary btn-sm">
+                            Flush Redis
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
