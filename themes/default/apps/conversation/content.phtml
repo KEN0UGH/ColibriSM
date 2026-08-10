@@ -113,6 +113,9 @@
 				</div>
 			</div>
 			<div class="conversation__footer">
+				<div v-if="manual_refresh_notice" class="conversation__sync-note">
+					<?php echo cl_translate("Auto-refresh is disabled. Please refresh the conversation manually."); ?>
+				</div>
 				<?php if (not_empty($cl["can_contact"])): ?>
 					<form class="form" v-on:submit="send_message($event)" data-an="message-form" ref="form">
 						<div class="message-input">

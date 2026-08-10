@@ -15,7 +15,7 @@
 				is_logged_user: '<?php echo (($cl["is_logged"] == true) ? 1 : 0); ?>',
 				back_url: data.url,
 				timeout: false,
-				msb_upinterval: "<?php echo fetch_or_get($cl["config"]["page_update_interval"], "30"); ?>",
+				msb_upinterval: "<?php echo (isset($cl["config"]["page_update_interval"]) && $cl["config"]["page_update_interval"] !== '') ? $cl["config"]["page_update_interval"] : "30"; ?>",
 				userlbox: {
 					interv: 0,
 					status: false,

@@ -12,7 +12,8 @@
 					loading_old: false,
 					sending: false,
 					message: "",
-					update_interval: "<?php echo fetch_or_get($cl['config']['chat_update_interval'], 5); ?>",
+					update_interval: "<?php echo (isset($cl['config']['chat_update_interval']) && $cl['config']['chat_update_interval'] !== '') ? $cl['config']['chat_update_interval'] : 5; ?>",
+					manual_refresh_notice: false,
 					pause_interval: false,
 					loadmore_old: true,
 					scroll_sr_up: true,
@@ -475,6 +476,7 @@
 				mounted: function() {
 					var _app_ = this;
 					_app_.scroll_down();
+					_app_.manual_refresh_notice = (Number(_app_.update_interval) <= 0);
 
 					var interval_ms = Number(_app_.update_interval) * 1000;
 					if (interval_ms > 0) {
