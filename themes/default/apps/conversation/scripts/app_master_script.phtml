@@ -476,16 +476,19 @@
 					var _app_ = this;
 					_app_.scroll_down();
 
-					_app_.interval_id = setInterval(function() {
-						if (SMColibri.curr_pn == 'conversation') {
-							if (_app_.pause_interval != true) {
-								_app_.get_new_messages();
+					var interval_ms = Number(_app_.update_interval) * 1000;
+					if (interval_ms > 0) {
+						_app_.interval_id = setInterval(function() {
+							if (SMColibri.curr_pn == 'conversation') {
+								if (_app_.pause_interval != true) {
+									_app_.get_new_messages();
+								}
 							}
-						}
-						else {
-							_app_.stop_interval();
-						}
-					}, (Number(_app_.update_interval) * 1000));
+							else {
+								_app_.stop_interval();
+							}
+						}, interval_ms);
+					}
 				}
 			})
 		});

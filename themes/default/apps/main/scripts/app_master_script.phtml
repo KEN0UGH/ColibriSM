@@ -1711,7 +1711,13 @@
 				if (_smc.is_logged()) {
 					var main_left_sb   = $('div[data-app="left-sidebar"]');
 					var main_bottom_nb = $('div[data-app="mobile-navbar"]');
-					var timer_id       = setInterval(function() {
+					var interval_ms    = Number(_smc.msb_upinterval) * 1000;
+
+					if (interval_ms <= 0) {
+						return false;
+					}
+
+					var timer_id = setInterval(function() {
 						$.ajax({
 							url: '<?php echo cl_link("native_api/main/update_msb_indicators"); ?>',
 							type: 'GET',
@@ -1757,7 +1763,7 @@
 								clearInterval(timer_id);
 							}
 						});
-					}, (Number(_smc.msb_upinterval) * 100));
+					}, interval_ms);
 				}
 			}
 
