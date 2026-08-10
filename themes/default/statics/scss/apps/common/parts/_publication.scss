@@ -134,7 +134,7 @@ div.timeline-posts-container{
 					div.post-data__content{
 						flex: 1;
 						padding-left: var(--cl-primary-offset-size);
-						overflow: hidden;
+						overflow: visible;
 
 						div.post-data__content-inner{
 							div.post-data-layout{
@@ -864,6 +864,12 @@ div.timeline-posts-container{
 														opacity: 1;
 													}
 												}
+											}
+										}
+
+										&.repost-dropdown{
+											div.dropdown-menu{
+												z-index: 1100;
 											}
 										}
 									}

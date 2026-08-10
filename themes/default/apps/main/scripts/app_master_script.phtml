@@ -924,7 +924,17 @@
 			_smc.repost = function(id = false, event = false) {
 				if (_smc.is_logged()) {
 					if ($.isNumeric(id) && id) {
-						$(event).attr('disabled', 'true');
+						var repost_ctrl = $(event);
+
+						if (repost_ctrl.length && repost_ctrl.attr('data-an') != 'repost-ctrl') {
+							repost_ctrl = repost_ctrl.closest('.repost-dropdown').find('[data-an="repost-ctrl"]').first();
+						}
+
+						if (repost_ctrl.length < 1) {
+							repost_ctrl = $(event);
+						}
+
+						repost_ctrl.attr('disabled', 'true');
 
 						$.ajax({
 							url: '<?php echo cl_link("native_api/main/repost"); ?>',
@@ -933,16 +943,16 @@
 							data: {id: id},
 						}).done(function(data) {
 							if (data.status == 200) {
-								if ($(event).hasClass('reposted')) {
-									$(event).removeClass('reposted');
+								if (repost_ctrl.hasClass('reposted')) {
+									repost_ctrl.removeClass('reposted');
 
-									$(event).removeClass('reposted').addClass('animated bounceIn').promise().done(function(){
+									repost_ctrl.removeClass('reposted').addClass('animated bounceIn').promise().done(function(){
 										delay(function() {
-											$(event).removeClass('animated bounceIn');
+											repost_ctrl.removeClass('animated bounceIn');
 										}, 1000);
 									});
 
-									$(event).find('span[data-an="reposts-count"]').text(data.reposts_count);
+									repost_ctrl.find('span[data-an="reposts-count"]').text(data.reposts_count);
 
 									if (_smc.curr_pn == 'home' || _smc.curr_pn == 'profile') {
 
@@ -957,31 +967,31 @@
 										}
 
 										if (orig_post.length) {
-											orig_post.find('button[data-an="repost-ctrl"]').removeClass('reposted');
+											orig_post.find('[data-an="repost-ctrl"]').closest('.repost-dropdown').removeClass('reposted');
 											orig_post.find('span[data-an="reposts-count"]').text(data.reposts_count);
 											orig_post.find('span[data-an="reposts-count"]').addClass('animated bounceIn').promise().done(function(){
 												delay(function() {
-													$(event).removeClass('animated bounceIn');
+													repost_ctrl.removeClass('animated bounceIn');
 												}, 1000);
 											});
 										}
 									}
 								}
 								else {
-									$(event).addClass('reposted').addClass('animated bounceIn').promise().done(function(){
+									repost_ctrl.addClass('reposted').addClass('animated bounceIn').promise().done(function(){
 										delay(function() {
-											$(event).removeClass('animated bounceIn');
+											repost_ctrl.removeClass('animated bounceIn');
 										}, 1000);
 									});
 
-									$(event).find('span[data-an="reposts-count"]').text(data.reposts_count);
+									repost_ctrl.find('span[data-an="reposts-count"]').text(data.reposts_count);
 								}
 							}
 							else {
 								_smc.errorMSG();
 							}
 						}).always(function() {
-							$(event).removeAttr('disabled');
+							repost_ctrl.removeAttr('disabled');
 						});
 					}
 				}
@@ -990,18 +1000,44 @@
 				}
 			}
 
-			_smc.quote_repost = function(id = false, url = false, event = false) {
+			_smc.quote_repost = function(id = false, quote_data = false, event = false) {
 				if (_smc.is_logged()) {
-					if ($.isNumeric(id) && id && url) {
+					if ($.isNumeric(id) && id) {
+						if (quote_data && (quote_data.nodeType || quote_data.jquery)) {
+							event = quote_data;
+							quote_data = {};
+						}
+
+						if ($.isPlainObject(quote_data) != true) {
+							quote_data = {
+								url: quote_data
+							};
+						}
+
+						if (cl_empty(quote_data.url)) {
+							_smc.errorMSG();
+							return;
+						}
+
 						var pubbox = _smc.vue.pubbox2;
 
 						if (pubbox) {
+							if (typeof pubbox.reset_data == 'function') {
+								pubbox.reset_data();
+							}
+
 							pubbox.thread_id   = 0;
-							pubbox.active_media = null;
-							pubbox.og_imported  = false;
-							pubbox.og_data      = {};
-							pubbox.text         = url + " ";
+							pubbox.quote_post_id = parseInt(id, 10) || 0;
+							pubbox.text         = "";
 							pubbox.post_privacy = "everyone";
+							pubbox.og_imported  = true;
+							pubbox.og_data      = {
+								title: ((quote_data.title) ? quote_data.title : '<?php echo cl_translate("Quoted post"); ?>'),
+								description: ((quote_data.description) ? quote_data.description : quote_data.url),
+								image: ((quote_data.image) ? quote_data.image : ''),
+								type: 'article',
+								url: quote_data.url
+							};
 
 							$('div#add_new_post').modal('show');
 

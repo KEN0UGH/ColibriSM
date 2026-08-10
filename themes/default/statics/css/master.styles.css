@@ -774,6 +774,53 @@ body main.main-content-container div.main-content-container-inner div.timeline-c
 body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder a.go-forward {
   text-decoration: none;
 }
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  margin-right: 8px;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh::before {
+  background: var(--cl-secondary-bg-color);
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: -1;
+  border-radius: 100%;
+  opacity: 0.7;
+}
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh svg {
+  width: 20px;
+  height: 20px;
+}
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh svg path {
+  fill: var(--cl-secondary-text-color);
+}
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh:hover::before, body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh:active::before {
+  opacity: 1;
+}
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh:hover > svg, body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-refresh:active > svg {
+  fill: var(--cl-primary-color);
+}
 body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder span.go-back, body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder a.go-forward, body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder button.go-options, body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-header div.timeline-header__botline div.rp div.nav-link-holder div.dropdown-toggle.go-options__icon {
   padding: 0;
   margin: 0;
@@ -1063,7 +1110,7 @@ body main.main-content-container div.main-content-container-inner div.timeline-c
 body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-posts-container div.timeline-posts-ls div.post-list-item div.post-list-item__content div.post-data div.post-data__content {
   flex: 1;
   padding-left: var(--cl-primary-offset-size);
-  overflow: hidden;
+  overflow: visible;
 }
 body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-posts-container div.timeline-posts-ls div.post-list-item div.post-list-item__content div.post-data div.post-data__content div.post-data__content-inner div.post-data-layout div.post-data-layout__publisher {
   display: flex;
@@ -1711,6 +1758,9 @@ body main.main-content-container div.main-content-container-inner div.timeline-c
 }
 body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-posts-container div.timeline-posts-ls div.post-list-item div.post-list-item__content div.post-data div.post-data__content div.post-data__content-inner div.post-data-layout div.post-data-layout__controls button.ctrls-item.dropleft div.dropdown-toggle.ctrls-item__icon:hover svg, body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-posts-container div.timeline-posts-ls div.post-list-item div.post-list-item__content div.post-data div.post-data__content div.post-data__content-inner div.post-data-layout div.post-data-layout__controls button.ctrls-item.dropleft div.dropdown-toggle.ctrls-item__icon:active svg, body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-posts-container div.timeline-posts-ls div.post-list-item div.post-list-item__content div.post-data div.post-data__content div.post-data__content-inner div.post-data-layout div.post-data-layout__controls button.ctrls-item.dropleft div.dropdown-toggle.ctrls-item__icon:focus svg {
   opacity: 1;
+}
+body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-posts-container div.timeline-posts-ls div.post-list-item div.post-list-item__content div.post-data div.post-data__content div.post-data__content-inner div.post-data-layout div.post-data-layout__controls button.ctrls-item.repost-dropdown div.dropdown-menu {
+  z-index: 1100;
 }
 body main.main-content-container div.main-content-container-inner div.timeline-container-wrapper div.timeline-container-inner div.timeline-container div.timeline-posts-container div.timeline-posts-ls div.post-list-item div.post-list-item__content div.post-data div.post-data__content div.post-data__content-hidden div.soft-hidden-post {
   border: 1px solid var(--cl-primary-border-color);

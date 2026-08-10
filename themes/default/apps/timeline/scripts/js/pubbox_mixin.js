@@ -32,6 +32,7 @@ var pubbox_form_app_mixin = Object({
 			post_privacy: "everyone",
 			post_maturity: "general",
 			post_incognito: "cognito",
+			quote_post_id: 0,
 			post_as: 0,
 			alt_accounts: <?php
 				$_pubbox_alt_accounts = array();
@@ -473,6 +474,7 @@ var pubbox_form_app_mixin = Object({
 				data: {
 					gif_src: _app_.gif_source,
 					thread_id: ((_app_.thread_id) ? _app_.thread_id : 0),
+					quote_post_id: ((_app_.quote_post_id) ? _app_.quote_post_id : 0),
 					curr_pn: SMColibri.curr_pn,
 					og_data: _app_.og_data,
 					privacy: _app_.post_privacy,
@@ -487,6 +489,14 @@ var pubbox_form_app_mixin = Object({
 				},
 				success: function(data) {
 					if (data.status == 200) {
+						if ($.isNumeric(data.quoted_post_id) && $.isNumeric(data.quoted_reposts_count)) {
+							var quoted_post_id = parseInt(data.quoted_post_id, 10);
+							var quoted_reposts_count = data.quoted_reposts_count;
+
+							$('[data-post-id="' + quoted_post_id + '"]').find('span[data-an="reposts-count"]').text(quoted_reposts_count);
+							$('[data-list-item="' + quoted_post_id + '"]').find('span[data-an="reposts-count"]').text(quoted_reposts_count);
+						}
+
 						if (SMColibri.curr_pn == "home") {
 							var home_timeline = $('div[data-app="homepage"]');
 							var new_post      = $(data.html).addClass('animated fadeIn');
@@ -1355,6 +1365,7 @@ var pubbox_form_app_mixin = Object({
 			_app_.donate_ctrl  = true;
 			_app_.og_imported  = false;
 			_app_.text         = "";
+			_app_.quote_post_id = 0;
 			_app_.images       = [];
 			_app_.video        = Object({});
 			_app_.document     = Object({});

@@ -788,6 +788,7 @@ else if ($action == 'publish_new_post') {
         $og_data          = fetch_or_get($_POST['og_data'], array());
         $poll_data        = fetch_or_get($_POST['poll_data'], array());
         $thread_id        = fetch_or_get($_POST['thread_id'], 0);
+        $quote_post_id    = fetch_or_get($_POST['quote_post_id'], 0);
         $post_privacy     = fetch_or_get($_POST['privacy'], "everyone");
 		$post_maturity    = fetch_or_get($_POST['maturity'], "general");
         $post_incognito    = fetch_or_get($_POST['incognito'], "cognito");
@@ -795,6 +796,7 @@ else if ($action == 'publish_new_post') {
         $post_text        = cl_censore_post_text($post_text);
         $post_text        = cl_croptxt($post_text, $max_post_length);
         $thread_data      = array();
+        $quoted_reposts_count = false;
 
         /* If "post_as" targets a linked alternate account, publish the post
            under that account's identity instead of the current session user. */
@@ -931,6 +933,30 @@ else if ($action == 'publish_new_post') {
                 $post_data    = cl_raw_post_data($post_id);
                 $cl['li']     = cl_post_data($post_data);
                 $data['html'] = cl_template('timeline/post');
+            }
+
+            if (is_posnum($quote_post_id) && empty($thread_id) && $quote_post_id != $post_id) {
+                $quoted_post_data = cl_raw_post_data($quote_post_id);
+
+                if (not_empty($quoted_post_data) && $quoted_post_data['status'] == 'active') {
+                    $quoted_reposts_count = ($quoted_post_data['reposts_count'] += 1);
+
+                    cl_update_post_data($quote_post_id, array(
+                        'reposts_count' => $quoted_reposts_count
+                    ));
+
+                    if ($quoted_post_data['user_id'] != $author['id']) {
+                        cl_notify_user(array(
+                            'subject'     => 'repost',
+                            'user_id'     => $quoted_post_data['user_id'],
+                            'entry_id'    => $quote_post_id,
+                            'notifier_id' => $author['id']
+                        ));
+                    }
+
+					$data['quoted_post_id'] = $quote_post_id;
+					$data['quoted_reposts_count'] = $quoted_reposts_count;
+                }
             }
 
             if (not_empty($mentions)) {
@@ -1090,6 +1116,30 @@ else if ($action == 'publish_new_post') {
                         $post_data    = cl_raw_post_data($post_id);
                         $cl['li']     = cl_post_data($post_data);
                         $data['html'] = cl_template('timeline/post');
+                    }
+
+                    if (is_posnum($quote_post_id) && empty($thread_id) && $quote_post_id != $post_id) {
+                        $quoted_post_data = cl_raw_post_data($quote_post_id);
+
+                        if (not_empty($quoted_post_data) && $quoted_post_data['status'] == 'active') {
+                            $quoted_reposts_count = ($quoted_post_data['reposts_count'] += 1);
+
+                            cl_update_post_data($quote_post_id, array(
+                                'reposts_count' => $quoted_reposts_count
+                            ));
+
+                            if ($quoted_post_data['user_id'] != $author['id']) {
+                                cl_notify_user(array(
+                                    'subject'     => 'repost',
+                                    'user_id'     => $quoted_post_data['user_id'],
+                                    'entry_id'    => $quote_post_id,
+                                    'notifier_id' => $author['id']
+                                ));
+                            }
+
+							$data['quoted_post_id'] = $quote_post_id;
+							$data['quoted_reposts_count'] = $quoted_reposts_count;
+                        }
                     }
 
                     if (not_empty($mentions)) {

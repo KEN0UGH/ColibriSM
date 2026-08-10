@@ -97,8 +97,20 @@ div.timeline-header{
 
 		div.rp{
 			div.nav-link-holder{
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+
 				a.go-forward{
 					text-decoration: none;
+				}
+
+				button.go-refresh{
+					background: transparent;
+					border: none;
+					box-shadow: none;
+					outline: none;
+					margin-right: 8px;
 				}
 
 				span.go-back, a.go-forward, button.go-options, div.dropdown-toggle.go-options__icon{
