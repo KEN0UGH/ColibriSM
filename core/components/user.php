@@ -698,6 +698,34 @@ function cl_delete_user_data($user_id = false) {
                 $qr = $db->delete(T_WALLET_HISTORY);
             /*====================================*/
 
+            /*===== Delete user wallet payouts =====*/
+                $db = $db->where('user_id', $user_id);
+                $qr = $db->delete(T_WALLET_POUT);
+            /*====================================*/
+
+            /*===== Delete pending payment requests =====*/
+                $db = $db->where('user_id', $user_id);
+                $qr = $db->delete(T_PEND_PAYMS);
+            /*====================================*/
+
+            /*===== Delete user subscription records =====*/
+                $db = $db->where('subscriber_id', $user_id);
+                $qr = $db->delete(T_SUBSCRIPTIONS);
+
+                $db = $db->where('creator_id', $user_id);
+                $qr = $db->delete(T_SUBSCRIPTIONS);
+            /*====================================*/
+
+            /*===== Delete user verification requests =====*/
+                $db = $db->where('user_id', $user_id);
+                $qr = $db->delete(T_VERIFICATIONS);
+            /*====================================*/
+
+            /*===== Delete user admin permissions =====*/
+                $db = $db->where('user_id', $user_id);
+                $qr = $db->delete(T_ADMIN_PERMS);
+            /*====================================*/
+
             /*===== Delete user post reposts =====*/
                 $db = $db->where('user_id', $user_id);
                 $qr = $db->delete(T_PUB_REPORTS);
@@ -811,6 +839,10 @@ function cl_delete_user_data($user_id = false) {
                         if (not_empty($row['media_file'])) {
                             cl_delete_media($row['media_file']);
                         }
+
+                        if (not_empty($row['audio_record'])) {
+                            cl_delete_media($row['audio_record']);
+                        }
                     }
 
                     $db = $db->where('sent_by', $user_id);
@@ -918,6 +950,21 @@ function cl_delete_user_data($user_id = false) {
                             cl_update_user_data($alt_id, array(
                                 'settings' => json($alt_settings, true)
                             ));
+                        }
+                    }
+                }
+            /*====================================*/
+
+            /*===== Delete session metadata rows for this user =====*/
+                $session_rows = $db->where('user_id', $user_id)->get(T_SESSIONS, null, array('session_id'));
+
+                if (cl_queryset($session_rows)) {
+                    foreach ($session_rows as $session_row) {
+                        $session_id = fetch_or_get($session_row['session_id'], false);
+
+                        if (!empty($session_id)) {
+                            $db = $db->where('session_id', $session_id);
+                            $db->delete(T_SESSION_DATA);
                         }
                     }
                 }
